@@ -13,11 +13,11 @@ public class ResponseWrappingAspect {
 
     @Pointcut("within(@org.springframework.stereotype.Controller *)")
     public void anyControllerPointcut() {
-        System.out.println("I work1");
+        logger.info("I work1");
     }
 
     @Pointcut("execution(* *(..))")
-    public void anyMethodPointcut() {System.out.println("I work2");}
+    public void anyMethodPointcut() {logger.info("I work2");}
 
     @AfterReturning(
             value = "anyControllerPointcut() && anyMethodPointcut()",
@@ -32,7 +32,7 @@ public class ResponseWrappingAspect {
             value = "anyControllerPointcut() && anyMethodPointcut()",
             throwing = "cause")
     public Object wrapException(Exception cause) {
-
+        logger.info("Exception thrown");
         // Do whatever logic needs to be done to wrap it correctly.
         return cause;
     }
