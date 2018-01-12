@@ -39,7 +39,7 @@ public class UserControllerTests {
     @Test
     public void noParamGreetingShouldReturnDefaultMessage() throws Exception {
 
-        this.mockMvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk())
+        this.mockMvc.perform(get("/users")).andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("Hello, World!"));
     }
 
