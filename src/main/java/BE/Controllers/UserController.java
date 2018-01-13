@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BE.Models.UserModel;
+import BE.exceptions.UserNotFoundException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,8 +28,7 @@ public class UserController {
      */
     @RequestMapping("/users")
     public List<UserModel> getAllUsers() {
-        List<UserModel> list = Arrays.asList(users);
-        return list;
+        return Arrays.asList(users);
     }
 
     /**
@@ -37,19 +37,19 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping("/users/{username}")
-    public UserModel getUser(@PathVariable(value="username") String username) {
-        for (int i = 0; i < users.length; i++) {
-            if (users[i].getUsername().equals(username)) return users[i];
+    public UserModel getUser(@PathVariable(value="username") String username) throws UserNotFoundException {
+        for (UserModel user : users) {
+            if (user.getUsername().equals(username)) return user;
         }
-        return new UserModel(String.format(template, username), "content");
+        throw new UserNotFoundException();
     }
 
     @RequestMapping("/user_privileges")
-    public UserModel getListOfUserPrivileges(@PathVariable(value="username") String username) {
+    public UserModel getListOfUserPrivileges(@PathVariable(value="username") String username) throws UserNotFoundException {
         for (int i = 0; i < users.length; i++) {
             if (users[i].getUsername().equals(username)) return users[i];
         }
-        return new UserModel(String.format(template, username), "content");
+        throw new UserNotFoundException();
     }
 
 }

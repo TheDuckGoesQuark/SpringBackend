@@ -1,5 +1,6 @@
 package BE.aspect;
 
+import BE.exceptions.BaseException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
@@ -21,19 +22,17 @@ public class ResponseWrappingAspect {
     @AfterReturning(
             pointcut = "anyControllerPointcut()",
             returning = "response")
-    public Object wrapResponse(Object response) {
-        logger.info("Hello World");
-        // Do whatever logic needs to be done to wrap it correctly.
-        return response;
+    public ResponseWrapper wrapResponse(Object response) {
+        logger.info("Wrapping response.");
+        return new ResponseWrapper(response);
     }
 
     @AfterThrowing(
             pointcut = "anyControllerPointcut()",
             throwing = "cause")
-    public Object wrapException(Exception cause) {
-        logger.info("Exception thrown");
-        // Do whatever logic needs to be done to wrap it correctly.
-        return cause;
+    public ErrorResponseWrapper wrapException(BaseException cause) {
+        logger.info("Exception thrown: " + cause.toString());
+        return new ErrorResponseWrapper(cause);
     }
 
     /**
