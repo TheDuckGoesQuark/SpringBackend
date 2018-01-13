@@ -1,5 +1,6 @@
 package BE.aspect;
 
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
@@ -11,16 +12,14 @@ public class ResponseWrappingAspect {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    @Pointcut("within(@org.springframework.stereotype.Controller *)")
-    public void anyControllerPointcut() {
-        logger.info("I work1");
-    }
+    @Pointcut("within(BE.Controllers.*)")
+    public void anyControllerPointcut() {}
 
     @Pointcut("execution(* *(..))")
-    public void anyMethodPointcut() {logger.info("I work2");}
+    public void anyMethodPointcut() {}
 
     @AfterReturning(
-            value = "anyControllerPointcut() && anyMethodPointcut()",
+            pointcut = "anyControllerPointcut()",
             returning = "response")
     public Object wrapResponse(Object response) {
         logger.info("Hello World");
@@ -29,12 +28,27 @@ public class ResponseWrappingAspect {
     }
 
     @AfterThrowing(
-            value = "anyControllerPointcut() && anyMethodPointcut()",
+            pointcut = "anyControllerPointcut()",
             throwing = "cause")
     public Object wrapException(Exception cause) {
         logger.info("Exception thrown");
         // Do whatever logic needs to be done to wrap it correctly.
         return cause;
+    }
+
+    /**
+     * Performance tracking for controllers.
+     * @param pjp
+     * @return
+     * @throws Throwable
+     */
+    @Around("within(BE.Controllers.*)")
+    public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable {
+        long start = System.currentTimeMillis();
+        Object retVal = pjp.proceed();
+        long end = System.currentTimeMillis();
+        logger.info(pjp.getSignature().toShortString() + " Finish: " + (end - start) + "ms");
+        return retVal;
     }
 }
 
