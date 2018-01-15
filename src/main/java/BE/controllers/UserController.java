@@ -58,8 +58,26 @@ public class UserController {
         throw new NotImplementedException();
     }
 
+    @RequestMapping(value = "/current_user", method = RequestMethod.PATCH)
+    public UserModel updateCurrentUser(@RequestBody UserModel user) {
+        //TODO this
+        throw new NotImplementedException();
+    }
+
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
     public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+        // TODO this
+        throw new NotImplementedException();
+    }
+
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.PATCH)
+    public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+        // TODO this
+        throw new NotImplementedException();
+    }
+
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
+    public UserModel deleteUser(@PathVariable(value="username") String username) {
         // TODO this
         throw new NotImplementedException();
     }
