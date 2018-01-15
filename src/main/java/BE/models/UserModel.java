@@ -1,4 +1,4 @@
-package BE.Models;
+package BE.models;
 
 public class UserModel {
 
