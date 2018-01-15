@@ -3,23 +3,24 @@ package BE.controllers;
 import java.util.Arrays;
 import java.util.List;
 
+// Exceptions
 import BE.exceptions.NotImplementedException;
-import BE.models.UserModel;
 import BE.exceptions.UserNotFoundException;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+// Models
+import BE.models.user.UserModel;
+// Spring
+import BE.models.UserPrivilegesModel;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController {
 
     /**
-     * Templates for testing sake TODO remove and replace with DB connection
+     * Templates for testing sake TODO remove and replace with DB connection and user service
      */
-    private static final String template = "Hello, %s!";
     private static final UserModel[] users = {
-            new UserModel("JohnSmith", "Says hi"),
-            new UserModel("SomeGuy", "Doesn't say hi")
+            new UserModel("JohnSmith", null, null, null, null, null, null, null),
+            new UserModel("SomeGuy", null, null, null, null, null, null, null),
     };
 
 
@@ -38,7 +39,7 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping("/users/{username}")
-    public UserModel getUser(@PathVariable(value="username") String username) throws UserNotFoundException {
+    public UserModel getUser(@PathVariable(value="username") String username)  {
         for (UserModel user : users) {
             if (user.getUsername().equals(username)) return user;
         }
@@ -46,7 +47,19 @@ public class UserController {
     }
 
     @RequestMapping("/user_privileges")
-    public UserModel getListOfUserPrivileges() throws NotImplementedException {
+    public List<UserPrivilegesModel> getListOfUserPrivileges() {
+        // TODO this
+        throw new NotImplementedException();
+    }
+
+    @RequestMapping("/current_user")
+    public UserModel getCurrentUser() {
+        //TODO this
+        throw new NotImplementedException();
+    }
+
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
+    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         // TODO this
         throw new NotImplementedException();
     }
