@@ -28,7 +28,7 @@ public class UserController {
      * Gets all users
      * @return a list of all users
      */
-    @RequestMapping("/users")
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<UserModel> getAllUsers() {
         return Arrays.asList(users);
     }
@@ -38,7 +38,7 @@ public class UserController {
      * @param username username of user to retrieve
      * @return user with requested username
      */
-    @RequestMapping("/users/{username}")
+    @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
     public UserModel getUser(@PathVariable(value="username") String username)  {
         for (UserModel user : users) {
             if (user.getUsername().equals(username)) return user;
@@ -46,13 +46,13 @@ public class UserController {
         throw new UserNotFoundException();
     }
 
-    @RequestMapping("/user_privileges")
+    @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
     public List<UserPrivilegesModel> getListOfUserPrivileges() {
         // TODO this
         throw new NotImplementedException();
     }
 
-    @RequestMapping("/current_user")
+    @RequestMapping(value = "/current_user", method = RequestMethod.GET)
     public UserModel getCurrentUser() {
         //TODO this
         throw new NotImplementedException();
