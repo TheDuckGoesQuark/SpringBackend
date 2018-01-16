@@ -9,7 +9,7 @@ import BE.exceptions.UserNotFoundException;
 // Models
 import BE.models.user.UserModel;
 // Spring
-import BE.models.UserPrivilegesModel;
+import BE.models.user.UserPrivilegesModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

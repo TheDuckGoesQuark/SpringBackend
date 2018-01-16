@@ -1,4 +1,4 @@
-package BE.models;
+package BE.models.user;
 
 public class UserPrivilegesModel {
     private String privilege;

@@ -1,8 +1,6 @@
 package BE.models.user;
 
 import BE.models.MetaDataModel;
-import BE.models.UserPrivilegesModel;
-import BE.models.user.ProjectAccessLevelModel;
 
 public class UserModel {
     private String username;
