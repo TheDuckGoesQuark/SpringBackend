@@ -1,6 +1,6 @@
 ---
 applications:
-- name: gs-rest-service
+- username: gs-rest-service
   memory: 256M
   instances: 1
   host: rest-service

@@ -1,15 +1,18 @@
 package BE.controllers;
 
-import java.util.Arrays;
 import java.util.List;
 
 // Exceptions
 import BE.exceptions.NotImplementedException;
 import BE.exceptions.UserNotFoundException;
 // Models
+import BE.exceptions.UsernameAlreadyExistsException;
+import BE.models.user.User;
 import BE.models.user.UserModel;
 // Spring
 import BE.models.user.UserPrivilegesModel;
+import BE.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,14 +26,17 @@ public class UserController {
             new UserModel("SomeGuy", null, null, null, null, null, null, null),
     };
 
+    @Autowired
+    UserRepository repository;
+
 
     /**
      * Gets all users
      * @return a list of all users
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<UserModel> getAllUsers() {
-        return Arrays.asList(users);
+    public List<User> getAllUsers() {
+        return (List<User>) repository.findAll();
     }
 
     /**
@@ -39,11 +45,11 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
-    public UserModel getUser(@PathVariable(value="username") String username)  {
-        for (UserModel user : users) {
-            if (user.getUsername().equals(username)) return user;
-        }
-        throw new UserNotFoundException();
+    public User getUser(@PathVariable(value="username") String username)  {
+        User user = repository.findByUsername(username);
+        if (user == null) throw new UserNotFoundException();
+        else return user;
+
     }
 
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
@@ -65,9 +71,13 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
-    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
-        // TODO this
-        throw new NotImplementedException();
+    public User createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+        if (repository.findByUsername(username) != null) throw new UsernameAlreadyExistsException();
+        else {
+            User newuser = new User(username);
+            repository.save(newuser);
+            return newuser;
+        }
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.PATCH)

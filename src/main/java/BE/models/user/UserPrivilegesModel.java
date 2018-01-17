@@ -1,21 +1,21 @@
 package BE.models.user;
 
 public class UserPrivilegesModel {
-    private String privilege;
+    private Privilege privilege;
     private String description;
     private boolean internal;
 
-    public UserPrivilegesModel(String privilege, String description, boolean internal) {
+    public UserPrivilegesModel(Privilege privilege, String description, boolean internal) {
         this.privilege = privilege;
         this.description = description;
         this.internal = internal;
     }
 
-    public String getPrivilege() {
+    public Privilege getPrivilege() {
         return privilege;
     }
 
-    public void setPrivilege(String privilege) {
+    public void setPrivilege(Privilege privilege) {
         this.privilege = privilege;
     }
 
