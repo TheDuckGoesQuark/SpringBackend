@@ -1,5 +1,6 @@
 package BE.services;
 
+import BE.entities.user.Privilege;
 import BE.entities.user.User;
 
 import java.util.List;
@@ -13,5 +14,7 @@ public interface UserService {
 
     public User updateUser(User user);
 
-    User deleteUser(String username);
+    public User deleteUser(String username);
+
+    public List<Privilege> getAllPrivileges();
 }

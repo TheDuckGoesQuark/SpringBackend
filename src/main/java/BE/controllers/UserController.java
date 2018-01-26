@@ -40,8 +40,7 @@ public class UserController {
 
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
     public List<Privilege> getListOfUserPrivileges() {
-        // TODO this
-        throw new NotImplementedException();
+        return userService.getAllPrivileges();
     }
 
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)

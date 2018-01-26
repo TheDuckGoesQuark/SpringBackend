@@ -1,8 +1,10 @@
 package BE.services;
 
+import BE.entities.user.Privilege;
 import BE.entities.user.User;
 import BE.exceptions.UserNotFoundException;
 import BE.exceptions.UserAlreadyExistsException;
+import BE.repositories.PrivilegeRepository;
 import BE.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PrivilegeRepository privilegeRepository;
 
     @Override
     public List<User> getAllUsers() {
@@ -50,5 +55,10 @@ public class UserServiceImpl implements UserService {
     public User deleteUser(String username) {
         if (userRepository.findByUsername(username) == null) throw new UserNotFoundException();
         return userRepository.deleteByUsername(username);
+    }
+
+    @Override
+    public List<Privilege> getAllPrivileges() {
+        return (List<Privilege>) privilegeRepository.findAll();
     }
 }
