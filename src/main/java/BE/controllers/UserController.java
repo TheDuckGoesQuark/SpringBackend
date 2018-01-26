@@ -4,26 +4,20 @@ import java.util.List;
 
 // Exceptions
 import BE.exceptions.NotImplementedException;
-import BE.exceptions.UserNotFoundException;
 // Models
-import BE.exceptions.UsernameAlreadyExistsException;
 import BE.models.user.UserModel;
 // Spring
 import BE.models.user.UserPrivilegesModel;
+import BE.repositories.UserRepository;
+import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController {
 
-    /**
-     * Templates for testing sake TODO remove and replace with DB connection and user service
-     */
-    private static final UserModel[] users = {
-            new UserModel("JohnSmith", null, null, null, null, null, null, null),
-            new UserModel("SomeGuy", null, null, null, null, null, null, null),
-    };
-
+    @Autowired
+    private UserService userService;
 
     /**
      * Gets all users
@@ -31,7 +25,7 @@ public class UserController {
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<UserModel> getAllUsers() {
-        throw new NotImplementedException();
+        return userService.getAllUsers();
     }
 
     /**
