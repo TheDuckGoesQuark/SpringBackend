@@ -1,7 +1,6 @@
-package BE;
+package BE.repositories;
 
 import BE.models.user.UserModel;
-import BE.repositories.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

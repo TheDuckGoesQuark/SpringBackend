@@ -5,10 +5,10 @@ import java.util.List;
 // Exceptions
 import BE.exceptions.NotImplementedException;
 // Models
+import BE.exceptions.UserNotFoundException;
 import BE.models.user.UserModel;
 // Spring
 import BE.models.user.UserPrivilegesModel;
-import BE.repositories.UserRepository;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,9 @@ public class UserController {
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
     public UserModel getUser(@PathVariable(value="username") String username)  {
-        throw new NotImplementedException();
+        UserModel user = userService.getUserByUserName(username);
+        if (user == null) throw new UserNotFoundException();
+        else return user;
     }
 
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)

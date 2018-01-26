@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package BE;
+package BE.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import BE.repositories.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +27,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+/**
+ * Tests involving calls to UserController.
+ */
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,11 +40,8 @@ public class UserControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @Test
-    public void theOneWhereWeGetAllUsers() throws Exception {
+    public void getAllUsers() throws Exception {
 
         this.mockMvc.perform(get("/users"))
                 .andDo(print())
@@ -50,13 +50,12 @@ public class UserControllerTests {
     }
 
     @Test
-    public void theOneWhereWeGetASpecificUser() throws Exception {
-
-/*        this.mockMvc.perform(get("/users/JohnSmith"))
+    public void getASpecificUser() throws Exception {
+        this.mockMvc.perform(get("/users/JohnSmith"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status")
-                .value("success"));*/
+                .value("success"));
     }
 
 }
