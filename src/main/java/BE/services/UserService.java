@@ -1,17 +1,17 @@
 package BE.services;
 
-import BE.models.user.UserModel;
+import BE.entities.user.User;
 
 import java.util.List;
 
 public interface UserService {
-    public List<UserModel> getAllUsers();
+    public List<User> getAllUsers();
 
-    public UserModel getUserByUserName(String username);
+    public User getUserByUserName(String username);
 
-    public UserModel createUser(UserModel user);
+    public User createUser(User user);
 
-    public UserModel updateUser(UserModel user);
+    public User updateUser(User user);
 
-    UserModel deleteUser(String username);
+    User deleteUser(String username);
 }

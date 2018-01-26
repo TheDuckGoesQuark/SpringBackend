@@ -1,6 +1,8 @@
 package BE.services;
 
-import BE.models.user.UserModel;
+import BE.entities.user.User;
+import BE.exceptions.UserNotFoundException;
+import BE.exceptions.UserAlreadyExistsException;
 import BE.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,25 +17,29 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     @Override
-    public List<UserModel> getAllUsers() {
-        return (List<UserModel>) userRepository.findAll();
+    public List<User> getAllUsers() {
+        return (List<User>) userRepository.findAll();
     }
 
     @Override
-    public UserModel getUserByUserName(String username) {
-        return userRepository.findByUsername(username);
+    public User getUserByUserName(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) throw new UserNotFoundException();
+        else return user;
     }
 
     @Override
     @Transactional
-    public UserModel createUser(UserModel user) {
+    public User createUser(User user) {
+        if (userRepository.findByUsername(user.getUsername()) != null) throw new UserAlreadyExistsException();
         userRepository.save(user);
         return user;
     }
 
     @Override
     @Transactional
-    public UserModel updateUser(UserModel user) {
+    public User updateUser(User user) {
+        if (userRepository.findByUsername(user.getUsername()) == null) throw new UserNotFoundException();
         // .save performs both update and creation
         userRepository.save(user);
         return user;
@@ -41,7 +47,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserModel deleteUser(String username) {
+    public User deleteUser(String username) {
+        if (userRepository.findByUsername(username) == null) throw new UserNotFoundException();
         return userRepository.deleteByUsername(username);
     }
 }

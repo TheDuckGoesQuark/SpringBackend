@@ -2,9 +2,9 @@ package BE.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class UsernameAlreadyExistsException extends BaseException {
+public class UserAlreadyExistsException extends BaseException {
 
-    public UsernameAlreadyExistsException() {
+    public UserAlreadyExistsException() {
         super(HttpStatus.ALREADY_REPORTED, "Username already in database.", "Username taken.");
     }
 }

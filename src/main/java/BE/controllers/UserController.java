@@ -3,12 +3,12 @@ package BE.controllers;
 import java.util.List;
 
 // Exceptions
+import BE.entities.user.Privilege;
 import BE.exceptions.NotImplementedException;
 // Models
 import BE.exceptions.UserNotFoundException;
-import BE.models.user.UserModel;
+import BE.entities.user.User;
 // Spring
-import BE.models.user.UserPrivilegesModel;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class UserController {
      * @return a list of all users
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<UserModel> getAllUsers() {
+    public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
@@ -34,44 +34,42 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
-    public UserModel getUser(@PathVariable(value="username") String username)  {
-        UserModel user = userService.getUserByUserName(username);
-        if (user == null) throw new UserNotFoundException();
-        else return user;
+    public User getUser(@PathVariable(value="username") String username)  {
+        return userService.getUserByUserName(username);
     }
 
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
-    public List<UserPrivilegesModel> getListOfUserPrivileges() {
+    public List<Privilege> getListOfUserPrivileges() {
         // TODO this
         throw new NotImplementedException();
     }
 
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)
-    public UserModel getCurrentUser() {
+    public User getCurrentUser() {
         //TODO this
         throw new NotImplementedException();
     }
 
     @RequestMapping(value = "/current_user", method = RequestMethod.PATCH)
-    public UserModel updateCurrentUser(@RequestBody UserModel user) {
+    public User updateCurrentUser(@RequestBody User user) {
         //TODO this
         throw new NotImplementedException();
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
-    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+    public User createUser(@PathVariable(value="username") String username, @RequestBody User user) {
         throw new NotImplementedException();
 
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.PATCH)
-    public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+    public User updateUser(@PathVariable(value="username") String username, @RequestBody User user) {
         // TODO this
         throw new NotImplementedException();
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
-    public UserModel deleteUser(@PathVariable(value="username") String username) {
+    public User deleteUser(@PathVariable(value="username") String username) {
         // TODO this
         throw new NotImplementedException();
     }

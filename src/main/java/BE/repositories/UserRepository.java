@@ -1,11 +1,11 @@
 package BE.repositories;
 
-import BE.models.user.UserModel;
+import BE.entities.user.User;
 import org.springframework.data.repository.CrudRepository;
 
-public interface UserRepository extends CrudRepository<UserModel, Integer> {
+public interface UserRepository extends CrudRepository<User, String> {
 
-    UserModel findByUsername(String username);
+    User findByUsername(String username);
 
-    UserModel deleteByUsername(String username);
+    User deleteByUsername(String username);
 }

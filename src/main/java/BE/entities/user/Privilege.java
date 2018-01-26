@@ -1,22 +1,34 @@
-package BE.models.user;
+package BE.entities.user;
 
-public class UserPrivilegesModel {
-    private Privilege privilege;
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "privilege")
+public class Privilege {
+    @Id
+    private String name;
+
     private String description;
+    @Column(columnDefinition = "TINYINT(1)")
     private boolean internal;
 
-    public UserPrivilegesModel(Privilege privilege, String description, boolean internal) {
-        this.privilege = privilege;
+    public Privilege() {
+    }
+
+    public Privilege(String name, String description, boolean internal) {
+        this.name = name;
         this.description = description;
         this.internal = internal;
     }
 
-    public Privilege getPrivilege() {
-        return privilege;
+    public String getName() {
+        return name;
     }
 
-    public void setPrivilege(Privilege privilege) {
-        this.privilege = privilege;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
