@@ -57,20 +57,17 @@ public class UserController {
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
     public User createUser(@PathVariable(value="username") String username, @RequestBody User user) {
-        throw new NotImplementedException();
-
+        return userService.createUser(user);
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.PATCH)
     public User updateUser(@PathVariable(value="username") String username, @RequestBody User user) {
-        // TODO this
-        throw new NotImplementedException();
+        return userService.updateUser(user);
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
     public User deleteUser(@PathVariable(value="username") String username) {
-        // TODO this
-        throw new NotImplementedException();
+        return userService.deleteUser(username);
     }
 
 }
