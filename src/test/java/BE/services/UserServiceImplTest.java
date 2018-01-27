@@ -1,5 +1,6 @@
 package BE.services;
 
+import BE.entities.UserProject;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
 import BE.repositories.UserRepository;
@@ -43,7 +44,8 @@ public class UserServiceImplTest {
     public void setUp() {
         Privilege[] privileges = new Privilege[1];
         privileges[0] = new Privilege("admin", "can do anything", true);
-        User alex = new User("alex", "password", "alex@isaguy.com", Arrays.asList(privileges));
+        UserProject[] userProjects = new UserProject[0];
+        User alex = new User("alex", "password", "alex@isaguy.com", Arrays.asList(privileges), Arrays.asList(userProjects));
         // When this function call is made, return this. i.e. imitate database connection
         Mockito.when(userRepository.findByUsername(alex.getUsername()))
                 .thenReturn(alex);

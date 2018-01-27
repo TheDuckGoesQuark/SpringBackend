@@ -83,6 +83,11 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>1.5.7</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-rest-repository</artifactId>
+            <version>1.1.0.M1</version>
+        </dependency>
 
     </dependencies>
 
@@ -102,13 +107,13 @@
 
     <repositories>
         <repository>
-            <id>spring-releases</id>
+            <file_id>spring-releases</file_id>
             <url>https://repo.spring.io/libs-release</url>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
-            <id>spring-releases</id>
+            <file_id>spring-releases</file_id>
             <url>https://repo.spring.io/libs-release</url>
         </pluginRepository>
     </pluginRepositories>

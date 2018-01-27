@@ -1,7 +1,5 @@
 package BE.entities.user;
 
-import org.hibernate.annotations.Type;
-
 import javax.persistence.*;
 
 @Entity
@@ -14,7 +12,7 @@ public class Privilege {
     @Column(columnDefinition = "TINYINT(1)")
     private boolean internal;
 
-    public Privilege() {
+    protected Privilege() {
     }
 
     public Privilege(String name, String description, boolean internal) {

@@ -25,9 +25,9 @@ public class ProjectController {
     }
 
     *//**
-     * Gets a project based on project name
-     * @param project_name name of project to retrieve
-     * @return project with requested name
+     * Gets a Project based on Project name
+     * @param project_name name of Project to retrieve
+     * @return Project with requested name
      *//*
     @RequestMapping(value = "/projects/{project_name}", method = RequestMethod.GET)
     public User getProject(@PathVariable(value="project_name") String project_name) throws NotImplementedException {

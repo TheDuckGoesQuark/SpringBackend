@@ -1,7 +1,9 @@
-DROP TABLE `has_privilege`;
-DROP TABLE `user`;
-DROP TABLE `privilege`;
-
+DROP TABLE IF EXISTS `has_privilege`;
+DROP TABLE IF EXISTS `involved_in`;
+DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS `privilege`;
+DROP TABLE IF EXISTS `project`;
+DROP TABLE IF EXISTS `file`;
 
 CREATE TABLE IF NOT EXISTS `user` (
   `username` VARCHAR(100) NOT NULL,
@@ -15,12 +17,16 @@ CREATE TABLE IF NOT EXISTS `privilege` (
   `internal` BOOL NOT NULL,
   PRIMARY KEY (`name`));
 
+INSERT INTO privilege (name, description, internal) VALUES
+  ("admin", "can do everything", true),
+  ("user", "can do some stuff", false);
+
 CREATE TABLE IF NOT EXISTS `has_privilege` (
   `username` VARCHAR(100) NOT NULL,
   `privilege_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`username`, `privilege_name`),
   INDEX `privilege_idx` (`privilege_name` ASC),
-  CONSTRAINT `username`
+  CONSTRAINT `user`
   FOREIGN KEY (`username`)
   REFERENCES `user` (`username`)
     ON DELETE CASCADE
@@ -30,6 +36,45 @@ CREATE TABLE IF NOT EXISTS `has_privilege` (
   REFERENCES `privilege` (`name`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS `file` (
+  `file_id` INT UNSIGNED NOT NULL,
+  `path` VARCHAR(200) NOT NULL,
+  `file_name` VARCHAR(54) NOT NULL,
+  `type` VARCHAR(45) NOT NULL,
+  `meta-data` VARCHAR(45) NOT NULL,
+  `status` VARCHAR(10) NOT NULL,
+  PRIMARY KEY (`file_id`));
+
+CREATE TABLE IF NOT EXISTS `project` (
+  `name` VARCHAR(100) NOT NULL,
+  `root_dir_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`name`),
+  UNIQUE INDEX `root_dir_id_UNIQUE` (`root_dir_id` ASC),
+  CONSTRAINT `root_dir_id`
+  FOREIGN KEY (`root_dir_id`)
+  REFERENCES `file` (`file_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+CREATE TABLE IF NOT EXISTS `involved_in` (
+  `username` VARCHAR(100) NOT NULL,
+  `project_name` VARCHAR(100) NOT NULL,
+  `role` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`username`, `project_name`),
+  INDEX `project_name_idx` (`project_name` ASC),
+  CONSTRAINT `involved_user`
+  FOREIGN KEY (`username`)
+  REFERENCES `user` (`username`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `involved_project`
+  FOREIGN KEY (`project_name`)
+  REFERENCES `project` (`name`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
 
 insert into user (username, email, password) values ('nkirkpatrick0', 'bdouche0@naver.com', 'H0v365');
 insert into user (username, email, password) values ('fthirkettle1', 'uguage1@mayoclinic.com', 'ywZryK');
@@ -232,207 +277,205 @@ insert into user (username, email, password) values ('nclows5h', 'wwedderburn5h@
 insert into user (username, email, password) values ('gonyon5i', 'aanselmi5i@bloomberg.com', 'KRONoZJKgX');
 insert into user (username, email, password) values ('tconnow5j', 'gmcdonogh5j@t.co', 'jwTQEIn2');
 
-INSERT INTO privilege (name, description, internal) VALUES
-  ("admin", "can do everything", true),
-  ("user", "can do some stuff", false);
 
-insert into has_privilege (username, privilege_name) values ('nkirkpatrick0', 'admin');
-insert into has_privilege (username, privilege_name) values ('fthirkettle1', 'user');
-insert into has_privilege (username, privilege_name) values ('dpirrie2', 'admin');
-insert into has_privilege (username, privilege_name) values ('aswaine3', 'admin');
-insert into has_privilege (username, privilege_name) values ('nrivaland4', 'user');
-insert into has_privilege (username, privilege_name) values ('qtrever5', 'user');
-insert into has_privilege (username, privilege_name) values ('jlongridge6', 'user');
-insert into has_privilege (username, privilege_name) values ('hshingfield7', 'admin');
-insert into has_privilege (username, privilege_name) values ('mfilipchikov8', 'user');
-insert into has_privilege (username, privilege_name) values ('hstadding9', 'user');
-insert into has_privilege (username, privilege_name) values ('efrietta', 'user');
-insert into has_privilege (username, privilege_name) values ('olandreb', 'user');
-insert into has_privilege (username, privilege_name) values ('emcgeeverc', 'user');
-insert into has_privilege (username, privilege_name) values ('tmosed', 'user');
-insert into has_privilege (username, privilege_name) values ('pgreschike', 'user');
-insert into has_privilege (username, privilege_name) values ('kdeernessf', 'user');
-insert into has_privilege (username, privilege_name) values ('mpatienceg', 'user');
-insert into has_privilege (username, privilege_name) values ('dharkush', 'user');
-insert into has_privilege (username, privilege_name) values ('nheddyi', 'admin');
-insert into has_privilege (username, privilege_name) values ('ocutmerej', 'user');
-insert into has_privilege (username, privilege_name) values ('skillockk', 'user');
-insert into has_privilege (username, privilege_name) values ('lfendlenl', 'admin');
-insert into has_privilege (username, privilege_name) values ('moffinm', 'admin');
-insert into has_privilege (username, privilege_name) values ('kjacquotn', 'admin');
-insert into has_privilege (username, privilege_name) values ('oschiroko', 'user');
-insert into has_privilege (username, privilege_name) values ('emaudettp', 'user');
-insert into has_privilege (username, privilege_name) values ('sgudgeonq', 'user');
-insert into has_privilege (username, privilege_name) values ('ggeorgiusr', 'user');
-insert into has_privilege (username, privilege_name) values ('emccarts', 'user');
-insert into has_privilege (username, privilege_name) values ('tlendremt', 'user');
-insert into has_privilege (username, privilege_name) values ('sglossopu', 'user');
-insert into has_privilege (username, privilege_name) values ('jpachmannv', 'user');
-insert into has_privilege (username, privilege_name) values ('wpierucciw', 'admin');
-insert into has_privilege (username, privilege_name) values ('hdulieux', 'user');
-insert into has_privilege (username, privilege_name) values ('kfortyy', 'user');
-insert into has_privilege (username, privilege_name) values ('lmooneyz', 'user');
-insert into has_privilege (username, privilege_name) values ('aswindon10', 'admin');
-insert into has_privilege (username, privilege_name) values ('dcallaway11', 'user');
-insert into has_privilege (username, privilege_name) values ('ksabine12', 'user');
-insert into has_privilege (username, privilege_name) values ('dmacduff13', 'user');
-insert into has_privilege (username, privilege_name) values ('eviste14', 'user');
-insert into has_privilege (username, privilege_name) values ('btrinkwon15', 'user');
-insert into has_privilege (username, privilege_name) values ('acrummay16', 'admin');
-insert into has_privilege (username, privilege_name) values ('bbrun17', 'admin');
-insert into has_privilege (username, privilege_name) values ('tehlerding18', 'user');
-insert into has_privilege (username, privilege_name) values ('wyukhtin19', 'user');
-insert into has_privilege (username, privilege_name) values ('rfenelow1a', 'admin');
-insert into has_privilege (username, privilege_name) values ('jcoppens1b', 'admin');
-insert into has_privilege (username, privilege_name) values ('dmcnutt1c', 'admin');
-insert into has_privilege (username, privilege_name) values ('ndeclairmont1d', 'user');
-insert into has_privilege (username, privilege_name) values ('jdradey1e', 'user');
-insert into has_privilege (username, privilege_name) values ('ghadland1f', 'admin');
-insert into has_privilege (username, privilege_name) values ('gmclurg1g', 'admin');
-insert into has_privilege (username, privilege_name) values ('chowick1h', 'user');
-insert into has_privilege (username, privilege_name) values ('wpiper1i', 'admin');
-insert into has_privilege (username, privilege_name) values ('mwison1j', 'user');
-insert into has_privilege (username, privilege_name) values ('tpellamonuten1k', 'admin');
-insert into has_privilege (username, privilege_name) values ('kreveland1l', 'admin');
-insert into has_privilege (username, privilege_name) values ('mczyz1m', 'admin');
-insert into has_privilege (username, privilege_name) values ('lbardwall1n', 'admin');
-insert into has_privilege (username, privilege_name) values ('gollerhead1o', 'user');
-insert into has_privilege (username, privilege_name) values ('jkivlehan1p', 'user');
-insert into has_privilege (username, privilege_name) values ('iberceros1q', 'admin');
-insert into has_privilege (username, privilege_name) values ('hmillery1r', 'user');
-insert into has_privilege (username, privilege_name) values ('hcodlin1s', 'user');
-insert into has_privilege (username, privilege_name) values ('lkeynes1t', 'user');
-insert into has_privilege (username, privilege_name) values ('jphilips1u', 'user');
-insert into has_privilege (username, privilege_name) values ('jmason1v', 'admin');
-insert into has_privilege (username, privilege_name) values ('fmein1w', 'user');
-insert into has_privilege (username, privilege_name) values ('rhands1x', 'user');
-insert into has_privilege (username, privilege_name) values ('efowley1y', 'user');
-insert into has_privilege (username, privilege_name) values ('dbrennand1z', 'user');
-insert into has_privilege (username, privilege_name) values ('ralmon20', 'user');
-insert into has_privilege (username, privilege_name) values ('dhumbatch21', 'user');
-insert into has_privilege (username, privilege_name) values ('bmacwhirter22', 'admin');
-insert into has_privilege (username, privilege_name) values ('kcannavan23', 'user');
-insert into has_privilege (username, privilege_name) values ('kthwaite24', 'user');
-insert into has_privilege (username, privilege_name) values ('smableson25', 'admin');
-insert into has_privilege (username, privilege_name) values ('sreina26', 'user');
-insert into has_privilege (username, privilege_name) values ('bmoors27', 'user');
-insert into has_privilege (username, privilege_name) values ('apavinese28', 'user');
-insert into has_privilege (username, privilege_name) values ('pcuddy29', 'admin');
-insert into has_privilege (username, privilege_name) values ('brobrose2a', 'user');
-insert into has_privilege (username, privilege_name) values ('hhenryson2b', 'user');
-insert into has_privilege (username, privilege_name) values ('ksouthon2c', 'user');
-insert into has_privilege (username, privilege_name) values ('lterney2d', 'admin');
-insert into has_privilege (username, privilege_name) values ('kroback2e', 'user');
-insert into has_privilege (username, privilege_name) values ('gsapena2f', 'admin');
-insert into has_privilege (username, privilege_name) values ('eblincow2g', 'admin');
-insert into has_privilege (username, privilege_name) values ('csansum2h', 'admin');
-insert into has_privilege (username, privilege_name) values ('nmccromley2i', 'user');
-insert into has_privilege (username, privilege_name) values ('ifitzgilbert2j', 'admin');
-insert into has_privilege (username, privilege_name) values ('fscad2k', 'user');
-insert into has_privilege (username, privilege_name) values ('bmattholie2l', 'user');
-insert into has_privilege (username, privilege_name) values ('bhowieson2m', 'admin');
-insert into has_privilege (username, privilege_name) values ('nseagrave2n', 'user');
-insert into has_privilege (username, privilege_name) values ('btruce2o', 'user');
-insert into has_privilege (username, privilege_name) values ('hvedeniktov2p', 'user');
-insert into has_privilege (username, privilege_name) values ('jricarde2q', 'admin');
-insert into has_privilege (username, privilege_name) values ('apipkin2r', 'admin');
-insert into has_privilege (username, privilege_name) values ('aalliker3x', 'user');
-insert into has_privilege (username, privilege_name) values ('ahenkmann4l', 'user');
-insert into has_privilege (username, privilege_name) values ('akropach32', 'user');
-insert into has_privilege (username, privilege_name) values ('amcboyle51', 'user');
-insert into has_privilege (username, privilege_name) values ('apagen4h', 'user');
-insert into has_privilege (username, privilege_name) values ('aredpath4g', 'user');
-insert into has_privilege (username, privilege_name) values ('atarpey4u', 'user');
-insert into has_privilege (username, privilege_name) values ('atomblings3s', 'user');
-insert into has_privilege (username, privilege_name) values ('bantonik5c', 'user');
-insert into has_privilege (username, privilege_name) values ('bbeisley4y', 'user');
-insert into has_privilege (username, privilege_name) values ('bbenger44', 'user');
-insert into has_privilege (username, privilege_name) values ('bdinan3p', 'user');
-insert into has_privilege (username, privilege_name) values ('bkeysall35', 'user');
-insert into has_privilege (username, privilege_name) values ('bsmooth59', 'user');
-insert into has_privilege (username, privilege_name) values ('cbaudone41', 'user');
-insert into has_privilege (username, privilege_name) values ('cbowgen5b', 'user');
-insert into has_privilege (username, privilege_name) values ('cedwardson56', 'user');
-insert into has_privilege (username, privilege_name) values ('ciapico50', 'user');
-insert into has_privilege (username, privilege_name) values ('cmidlane3q', 'user');
-insert into has_privilege (username, privilege_name) values ('cmussolini4r', 'user');
-insert into has_privilege (username, privilege_name) values ('cnorquay57', 'user');
-insert into has_privilege (username, privilege_name) values ('cwebermann3c', 'user');
-insert into has_privilege (username, privilege_name) values ('dcowtherd37', 'user');
-insert into has_privilege (username, privilege_name) values ('dkunze5f', 'user');
-insert into has_privilege (username, privilege_name) values ('dlayzell3a', 'user');
-insert into has_privilege (username, privilege_name) values ('dlodwig3g', 'user');
-insert into has_privilege (username, privilege_name) values ('drodge42', 'user');
-insert into has_privilege (username, privilege_name) values ('dtirrey4e', 'user');
-insert into has_privilege (username, privilege_name) values ('dtourle55', 'user');
-insert into has_privilege (username, privilege_name) values ('echalcraft4x', 'user');
-insert into has_privilege (username, privilege_name) values ('emansford3k', 'user');
-insert into has_privilege (username, privilege_name) values ('epadilla4j', 'user');
-insert into has_privilege (username, privilege_name) values ('etrevains34', 'user');
-insert into has_privilege (username, privilege_name) values ('ewhittles2v', 'user');
-insert into has_privilege (username, privilege_name) values ('fleel38', 'user');
-insert into has_privilege (username, privilege_name) values ('gbeavon3v', 'user');
-insert into has_privilege (username, privilege_name) values ('ggaymer2s', 'user');
-insert into has_privilege (username, privilege_name) values ('gjanak52', 'user');
-insert into has_privilege (username, privilege_name) values ('glackney3h', 'user');
-insert into has_privilege (username, privilege_name) values ('gonoulane46', 'user');
-insert into has_privilege (username, privilege_name) values ('gonyon5i', 'user');
-insert into has_privilege (username, privilege_name) values ('hquarmby3b', 'user');
-insert into has_privilege (username, privilege_name) values ('hshambrook3m', 'user');
-insert into has_privilege (username, privilege_name) values ('ilattos33', 'user');
-insert into has_privilege (username, privilege_name) values ('imarrion4k', 'user');
-insert into has_privilege (username, privilege_name) values ('jcundey58', 'user');
-insert into has_privilege (username, privilege_name) values ('jdukesbury3r', 'user');
-insert into has_privilege (username, privilege_name) values ('jelwin4n', 'user');
-insert into has_privilege (username, privilege_name) values ('jgaroghan3n', 'user');
-insert into has_privilege (username, privilege_name) values ('jgreetland2x', 'user');
-insert into has_privilege (username, privilege_name) values ('jklaessen43', 'user');
-insert into has_privilege (username, privilege_name) values ('jmarkos3d', 'user');
-insert into has_privilege (username, privilege_name) values ('jszimoni48', 'user');
-insert into has_privilege (username, privilege_name) values ('kohdirscoll3u', 'user');
-insert into has_privilege (username, privilege_name) values ('kpannaman54', 'user');
-insert into has_privilege (username, privilege_name) values ('kparry40', 'user');
-insert into has_privilege (username, privilege_name) values ('ldinsell4q', 'user');
-insert into has_privilege (username, privilege_name) values ('lmasser4a', 'user');
-insert into has_privilege (username, privilege_name) values ('lmcavin4d', 'user');
-insert into has_privilege (username, privilege_name) values ('lnawton53', 'user');
-insert into has_privilege (username, privilege_name) values ('ltoohey36', 'user');
-insert into has_privilege (username, privilege_name) values ('mbloodworth3y', 'user');
-insert into has_privilege (username, privilege_name) values ('mbraycotton4p', 'user');
-insert into has_privilege (username, privilege_name) values ('mfirmin4z', 'user');
-insert into has_privilege (username, privilege_name) values ('mhallwell4v', 'user');
-insert into has_privilege (username, privilege_name) values ('mmalia47', 'user');
-insert into has_privilege (username, privilege_name) values ('mpetticrew31', 'user');
-insert into has_privilege (username, privilege_name) values ('mpurdey4o', 'user');
-insert into has_privilege (username, privilege_name) values ('mrawlison3t', 'user');
-insert into has_privilege (username, privilege_name) values ('mroarty39', 'user');
-insert into has_privilege (username, privilege_name) values ('nattrey30', 'user');
-insert into has_privilege (username, privilege_name) values ('nboom3o', 'user');
-insert into has_privilege (username, privilege_name) values ('nclows5h', 'user');
-insert into has_privilege (username, privilege_name) values ('nllorens3j', 'user');
-insert into has_privilege (username, privilege_name) values ('nnoto3i', 'user');
-insert into has_privilege (username, privilege_name) values ('ochallen4c', 'user');
-insert into has_privilege (username, privilege_name) values ('pfleckno5d', 'user');
-insert into has_privilege (username, privilege_name) values ('pizzett2y', 'user');
-insert into has_privilege (username, privilege_name) values ('rdomerque3z', 'user');
-insert into has_privilege (username, privilege_name) values ('rfley4i', 'user');
-insert into has_privilege (username, privilege_name) values ('rjeannequin3f', 'user');
-insert into has_privilege (username, privilege_name) values ('rkobu5e', 'user');
-insert into has_privilege (username, privilege_name) values ('rmingo4f', 'user');
-insert into has_privilege (username, privilege_name) values ('rshuter5a', 'user');
-insert into has_privilege (username, privilege_name) values ('rwilkinson4w', 'user');
-insert into has_privilege (username, privilege_name) values ('shouliston2u', 'user');
-insert into has_privilege (username, privilege_name) values ('spynn45', 'user');
-insert into has_privilege (username, privilege_name) values ('sskelton4s', 'user');
-insert into has_privilege (username, privilege_name) values ('svandenbroek2z', 'user');
-insert into has_privilege (username, privilege_name) values ('swastie3l', 'user');
-insert into has_privilege (username, privilege_name) values ('tcomley49', 'user');
-insert into has_privilege (username, privilege_name) values ('tconnow5j', 'user');
-insert into has_privilege (username, privilege_name) values ('tenstone3e', 'user');
-insert into has_privilege (username, privilege_name) values ('tferonet2t', 'user');
-insert into has_privilege (username, privilege_name) values ('tgrinishin2w', 'user');
-insert into has_privilege (username, privilege_name) values ('triccardini5g', 'user');
-insert into has_privilege (username, privilege_name) values ('ubenner4m', 'user');
-insert into has_privilege (username, privilege_name) values ('varnett4t', 'user');
-insert into has_privilege (username, privilege_name) values ('vmcreynold3w', 'user');
-insert into has_privilege (username, privilege_name) values ('whasely4b', 'user');
+
+insert into has_privilege (username,privilege_name) values ('nkirkpatrick0', 'admin');
+insert into has_privilege (username,privilege_name) values ('fthirkettle1', 'user');
+insert into has_privilege (username,privilege_name) values ('dpirrie2', 'admin');
+insert into has_privilege (username,privilege_name) values ('aswaine3', 'admin');
+insert into has_privilege (username,privilege_name) values ('nrivaland4', 'user');
+insert into has_privilege (username,privilege_name) values ('qtrever5', 'user');
+insert into has_privilege (username,privilege_name) values ('jlongridge6', 'user');
+insert into has_privilege (username,privilege_name) values ('hshingfield7', 'admin');
+insert into has_privilege (username,privilege_name) values ('mfilipchikov8', 'user');
+insert into has_privilege (username,privilege_name) values ('hstadding9', 'user');
+insert into has_privilege (username,privilege_name) values ('efrietta', 'user');
+insert into has_privilege (username,privilege_name) values ('olandreb', 'user');
+insert into has_privilege (username,privilege_name) values ('emcgeeverc', 'user');
+insert into has_privilege (username,privilege_name) values ('tmosed', 'user');
+insert into has_privilege (username,privilege_name) values ('pgreschike', 'user');
+insert into has_privilege (username,privilege_name) values ('kdeernessf', 'user');
+insert into has_privilege (username,privilege_name) values ('mpatienceg', 'user');
+insert into has_privilege (username,privilege_name) values ('dharkush', 'user');
+insert into has_privilege (username,privilege_name) values ('nheddyi', 'admin');
+insert into has_privilege (username,privilege_name) values ('ocutmerej', 'user');
+insert into has_privilege (username,privilege_name) values ('skillockk', 'user');
+insert into has_privilege (username,privilege_name) values ('lfendlenl', 'admin');
+insert into has_privilege (username,privilege_name) values ('moffinm', 'admin');
+insert into has_privilege (username,privilege_name) values ('kjacquotn', 'admin');
+insert into has_privilege (username,privilege_name) values ('oschiroko', 'user');
+insert into has_privilege (username,privilege_name) values ('emaudettp', 'user');
+insert into has_privilege (username,privilege_name) values ('sgudgeonq', 'user');
+insert into has_privilege (username,privilege_name) values ('ggeorgiusr', 'user');
+insert into has_privilege (username,privilege_name) values ('emccarts', 'user');
+insert into has_privilege (username,privilege_name) values ('tlendremt', 'user');
+insert into has_privilege (username,privilege_name) values ('sglossopu', 'user');
+insert into has_privilege (username,privilege_name) values ('jpachmannv', 'user');
+insert into has_privilege (username,privilege_name) values ('wpierucciw', 'admin');
+insert into has_privilege (username,privilege_name) values ('hdulieux', 'user');
+insert into has_privilege (username,privilege_name) values ('kfortyy', 'user');
+insert into has_privilege (username,privilege_name) values ('lmooneyz', 'user');
+insert into has_privilege (username,privilege_name) values ('aswindon10', 'admin');
+insert into has_privilege (username,privilege_name) values ('dcallaway11', 'user');
+insert into has_privilege (username,privilege_name) values ('ksabine12', 'user');
+insert into has_privilege (username,privilege_name) values ('dmacduff13', 'user');
+insert into has_privilege (username,privilege_name) values ('eviste14', 'user');
+insert into has_privilege (username,privilege_name) values ('btrinkwon15', 'user');
+insert into has_privilege (username,privilege_name) values ('acrummay16', 'admin');
+insert into has_privilege (username,privilege_name) values ('bbrun17', 'admin');
+insert into has_privilege (username,privilege_name) values ('tehlerding18', 'user');
+insert into has_privilege (username,privilege_name) values ('wyukhtin19', 'user');
+insert into has_privilege (username,privilege_name) values ('rfenelow1a', 'admin');
+insert into has_privilege (username,privilege_name) values ('jcoppens1b', 'admin');
+insert into has_privilege (username,privilege_name) values ('dmcnutt1c', 'admin');
+insert into has_privilege (username,privilege_name) values ('ndeclairmont1d', 'user');
+insert into has_privilege (username,privilege_name) values ('jdradey1e', 'user');
+insert into has_privilege (username,privilege_name) values ('ghadland1f', 'admin');
+insert into has_privilege (username,privilege_name) values ('gmclurg1g', 'admin');
+insert into has_privilege (username,privilege_name) values ('chowick1h', 'user');
+insert into has_privilege (username,privilege_name) values ('wpiper1i', 'admin');
+insert into has_privilege (username,privilege_name) values ('mwison1j', 'user');
+insert into has_privilege (username,privilege_name) values ('tpellamonuten1k', 'admin');
+insert into has_privilege (username,privilege_name) values ('kreveland1l', 'admin');
+insert into has_privilege (username,privilege_name) values ('mczyz1m', 'admin');
+insert into has_privilege (username,privilege_name) values ('lbardwall1n', 'admin');
+insert into has_privilege (username,privilege_name) values ('gollerhead1o', 'user');
+insert into has_privilege (username,privilege_name) values ('jkivlehan1p', 'user');
+insert into has_privilege (username,privilege_name) values ('iberceros1q', 'admin');
+insert into has_privilege (username,privilege_name) values ('hmillery1r', 'user');
+insert into has_privilege (username,privilege_name) values ('hcodlin1s', 'user');
+insert into has_privilege (username,privilege_name) values ('lkeynes1t', 'user');
+insert into has_privilege (username,privilege_name) values ('jphilips1u', 'user');
+insert into has_privilege (username,privilege_name) values ('jmason1v', 'admin');
+insert into has_privilege (username,privilege_name) values ('fmein1w', 'user');
+insert into has_privilege (username,privilege_name) values ('rhands1x', 'user');
+insert into has_privilege (username,privilege_name) values ('efowley1y', 'user');
+insert into has_privilege (username,privilege_name) values ('dbrennand1z', 'user');
+insert into has_privilege (username,privilege_name) values ('ralmon20', 'user');
+insert into has_privilege (username,privilege_name) values ('dhumbatch21', 'user');
+insert into has_privilege (username,privilege_name) values ('bmacwhirter22', 'admin');
+insert into has_privilege (username,privilege_name) values ('kcannavan23', 'user');
+insert into has_privilege (username,privilege_name) values ('kthwaite24', 'user');
+insert into has_privilege (username,privilege_name) values ('smableson25', 'admin');
+insert into has_privilege (username,privilege_name) values ('sreina26', 'user');
+insert into has_privilege (username,privilege_name) values ('bmoors27', 'user');
+insert into has_privilege (username,privilege_name) values ('apavinese28', 'user');
+insert into has_privilege (username,privilege_name) values ('pcuddy29', 'admin');
+insert into has_privilege (username,privilege_name) values ('brobrose2a', 'user');
+insert into has_privilege (username,privilege_name) values ('hhenryson2b', 'user');
+insert into has_privilege (username,privilege_name) values ('ksouthon2c', 'user');
+insert into has_privilege (username,privilege_name) values ('lterney2d', 'admin');
+insert into has_privilege (username,privilege_name) values ('kroback2e', 'user');
+insert into has_privilege (username,privilege_name) values ('gsapena2f', 'admin');
+insert into has_privilege (username,privilege_name) values ('eblincow2g', 'admin');
+insert into has_privilege (username,privilege_name) values ('csansum2h', 'admin');
+insert into has_privilege (username,privilege_name) values ('nmccromley2i', 'user');
+insert into has_privilege (username,privilege_name) values ('ifitzgilbert2j', 'admin');
+insert into has_privilege (username,privilege_name) values ('fscad2k', 'user');
+insert into has_privilege (username,privilege_name) values ('bmattholie2l', 'user');
+insert into has_privilege (username,privilege_name) values ('bhowieson2m', 'admin');
+insert into has_privilege (username,privilege_name) values ('nseagrave2n', 'user');
+insert into has_privilege (username,privilege_name) values ('btruce2o', 'user');
+insert into has_privilege (username,privilege_name) values ('hvedeniktov2p', 'user');
+insert into has_privilege (username,privilege_name) values ('jricarde2q', 'admin');
+insert into has_privilege (username,privilege_name) values ('apipkin2r', 'admin');
+insert into has_privilege (username,privilege_name) values ('aalliker3x', 'user');
+insert into has_privilege (username,privilege_name) values ('ahenkmann4l', 'user');
+insert into has_privilege (username,privilege_name) values ('akropach32', 'user');
+insert into has_privilege (username,privilege_name) values ('amcboyle51', 'user');
+insert into has_privilege (username,privilege_name) values ('apagen4h', 'user');
+insert into has_privilege (username,privilege_name) values ('aredpath4g', 'user');
+insert into has_privilege (username,privilege_name) values ('atarpey4u', 'user');
+insert into has_privilege (username,privilege_name) values ('atomblings3s', 'user');
+insert into has_privilege (username,privilege_name) values ('bantonik5c', 'user');
+insert into has_privilege (username,privilege_name) values ('bbeisley4y', 'user');
+insert into has_privilege (username,privilege_name) values ('bbenger44', 'user');
+insert into has_privilege (username,privilege_name) values ('bdinan3p', 'user');
+insert into has_privilege (username,privilege_name) values ('bkeysall35', 'user');
+insert into has_privilege (username,privilege_name) values ('bsmooth59', 'user');
+insert into has_privilege (username,privilege_name) values ('cbaudone41', 'user');
+insert into has_privilege (username,privilege_name) values ('cbowgen5b', 'user');
+insert into has_privilege (username,privilege_name) values ('cedwardson56', 'user');
+insert into has_privilege (username,privilege_name) values ('ciapico50', 'user');
+insert into has_privilege (username,privilege_name) values ('cmidlane3q', 'user');
+insert into has_privilege (username,privilege_name) values ('cmussolini4r', 'user');
+insert into has_privilege (username,privilege_name) values ('cnorquay57', 'user');
+insert into has_privilege (username,privilege_name) values ('cwebermann3c', 'user');
+insert into has_privilege (username,privilege_name) values ('dcowtherd37', 'user');
+insert into has_privilege (username,privilege_name) values ('dkunze5f', 'user');
+insert into has_privilege (username,privilege_name) values ('dlayzell3a', 'user');
+insert into has_privilege (username,privilege_name) values ('dlodwig3g', 'user');
+insert into has_privilege (username,privilege_name) values ('drodge42', 'user');
+insert into has_privilege (username,privilege_name) values ('dtirrey4e', 'user');
+insert into has_privilege (username,privilege_name) values ('dtourle55', 'user');
+insert into has_privilege (username,privilege_name) values ('echalcraft4x', 'user');
+insert into has_privilege (username,privilege_name) values ('emansford3k', 'user');
+insert into has_privilege (username,privilege_name) values ('epadilla4j', 'user');
+insert into has_privilege (username,privilege_name) values ('etrevains34', 'user');
+insert into has_privilege (username,privilege_name) values ('ewhittles2v', 'user');
+insert into has_privilege (username,privilege_name) values ('fleel38', 'user');
+insert into has_privilege (username,privilege_name) values ('gbeavon3v', 'user');
+insert into has_privilege (username,privilege_name) values ('ggaymer2s', 'user');
+insert into has_privilege (username,privilege_name) values ('gjanak52', 'user');
+insert into has_privilege (username,privilege_name) values ('glackney3h', 'user');
+insert into has_privilege (username,privilege_name) values ('gonoulane46', 'user');
+insert into has_privilege (username,privilege_name) values ('gonyon5i', 'user');
+insert into has_privilege (username,privilege_name) values ('hquarmby3b', 'user');
+insert into has_privilege (username,privilege_name) values ('hshambrook3m', 'user');
+insert into has_privilege (username,privilege_name) values ('ilattos33', 'user');
+insert into has_privilege (username,privilege_name) values ('imarrion4k', 'user');
+insert into has_privilege (username,privilege_name) values ('jcundey58', 'user');
+insert into has_privilege (username,privilege_name) values ('jdukesbury3r', 'user');
+insert into has_privilege (username,privilege_name) values ('jelwin4n', 'user');
+insert into has_privilege (username,privilege_name) values ('jgaroghan3n', 'user');
+insert into has_privilege (username,privilege_name) values ('jgreetland2x', 'user');
+insert into has_privilege (username,privilege_name) values ('jklaessen43', 'user');
+insert into has_privilege (username,privilege_name) values ('jmarkos3d', 'user');
+insert into has_privilege (username,privilege_name) values ('jszimoni48', 'user');
+insert into has_privilege (username,privilege_name) values ('kohdirscoll3u', 'user');
+insert into has_privilege (username,privilege_name) values ('kpannaman54', 'user');
+insert into has_privilege (username,privilege_name) values ('kparry40', 'user');
+insert into has_privilege (username,privilege_name) values ('ldinsell4q', 'user');
+insert into has_privilege (username,privilege_name) values ('lmasser4a', 'user');
+insert into has_privilege (username,privilege_name) values ('lmcavin4d', 'user');
+insert into has_privilege (username,privilege_name) values ('lnawton53', 'user');
+insert into has_privilege (username,privilege_name) values ('ltoohey36', 'user');
+insert into has_privilege (username,privilege_name) values ('mbloodworth3y', 'user');
+insert into has_privilege (username,privilege_name) values ('mbraycotton4p', 'user');
+insert into has_privilege (username,privilege_name) values ('mfirmin4z', 'user');
+insert into has_privilege (username,privilege_name) values ('mhallwell4v', 'user');
+insert into has_privilege (username,privilege_name) values ('mmalia47', 'user');
+insert into has_privilege (username,privilege_name) values ('mpetticrew31', 'user');
+insert into has_privilege (username,privilege_name) values ('mpurdey4o', 'user');
+insert into has_privilege (username,privilege_name) values ('mrawlison3t', 'user');
+insert into has_privilege (username,privilege_name) values ('mroarty39', 'user');
+insert into has_privilege (username,privilege_name) values ('nattrey30', 'user');
+insert into has_privilege (username,privilege_name) values ('nboom3o', 'user');
+insert into has_privilege (username,privilege_name) values ('nclows5h', 'user');
+insert into has_privilege (username,privilege_name) values ('nllorens3j', 'user');
+insert into has_privilege (username,privilege_name) values ('nnoto3i', 'user');
+insert into has_privilege (username,privilege_name) values ('ochallen4c', 'user');
+insert into has_privilege (username,privilege_name) values ('pfleckno5d', 'user');
+insert into has_privilege (username,privilege_name) values ('pizzett2y', 'user');
+insert into has_privilege (username,privilege_name) values ('rdomerque3z', 'user');
+insert into has_privilege (username,privilege_name) values ('rfley4i', 'user');
+insert into has_privilege (username,privilege_name) values ('rjeannequin3f', 'user');
+insert into has_privilege (username,privilege_name) values ('rkobu5e', 'user');
+insert into has_privilege (username,privilege_name) values ('rmingo4f', 'user');
+insert into has_privilege (username,privilege_name) values ('rshuter5a', 'user');
+insert into has_privilege (username,privilege_name) values ('rwilkinson4w', 'user');
+insert into has_privilege (username,privilege_name) values ('shouliston2u', 'user');
+insert into has_privilege (username,privilege_name) values ('spynn45', 'user');
+insert into has_privilege (username,privilege_name) values ('sskelton4s', 'user');
+insert into has_privilege (username,privilege_name) values ('svandenbroek2z', 'user');
+insert into has_privilege (username,privilege_name) values ('swastie3l', 'user');
+insert into has_privilege (username,privilege_name) values ('tcomley49', 'user');
+insert into has_privilege (username,privilege_name) values ('tconnow5j', 'user');
+insert into has_privilege (username,privilege_name) values ('tenstone3e', 'user');
+insert into has_privilege (username,privilege_name) values ('tferonet2t', 'user');
+insert into has_privilege (username,privilege_name) values ('tgrinishin2w', 'user');
+insert into has_privilege (username,privilege_name) values ('triccardini5g', 'user');
+insert into has_privilege (username,privilege_name) values ('ubenner4m', 'user');
+insert into has_privilege (username,privilege_name) values ('varnett4t', 'user');
+insert into has_privilege (username,privilege_name) values ('vmcreynold3w', 'user');
+insert into has_privilege (username,privilege_name) values ('whasely4b', 'user');

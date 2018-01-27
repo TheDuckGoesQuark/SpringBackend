@@ -1,5 +1,7 @@
 package BE.entities.user;
 
+import BE.entities.UserProject;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -20,14 +22,18 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "privilege_name", referencedColumnName = "name"))
     private List<Privilege> privileges;
 
+    @OneToMany(mappedBy = "user")
+    private List<UserProject> userProjects;
+
     protected User() {
     }
 
-    public User(String username, String password, String email, List<Privilege> privileges) {
+    public User(String username, String password, String email, List<Privilege> privileges, List<UserProject> userProjects) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.privileges = privileges;
+        this.userProjects = userProjects;
     }
 
     public String getUsername() {
@@ -62,5 +68,11 @@ public class User {
         this.privileges = privileges;
     }
 
+    public List<UserProject> getUserProjects() {
+        return userProjects;
+    }
 
+    public void setUserProjects(List<UserProject> userProjects) {
+        this.userProjects = userProjects;
+    }
 }
