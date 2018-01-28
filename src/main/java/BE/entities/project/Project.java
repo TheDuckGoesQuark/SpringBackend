@@ -2,6 +2,7 @@ package BE.entities.project;
 
 
 import BE.entities.UserProject;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 public class Project {
 
     @Id
+    @JsonProperty("project_name")
     private String name;
 
     @JoinColumn(name = "root_dir_id")

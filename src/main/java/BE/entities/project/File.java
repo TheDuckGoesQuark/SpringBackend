@@ -1,5 +1,7 @@
 package BE.entities.project;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -17,6 +19,7 @@ public class File {
     private String type;
 
     @OneToOne(mappedBy = "root_dir")
+    @JsonIgnore
     private Project project;
 
     protected File() {
