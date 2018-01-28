@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class File {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int file_id;
 
     private String path;
@@ -22,7 +22,7 @@ public class File {
     protected File() {
     }
 
-    public File(String path, String name, String type, Project project) {
+    public File(String path, String name, String type) {
         this.path = path;
         this.file_name = name;
         this.type = type;

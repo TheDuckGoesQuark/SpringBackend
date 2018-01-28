@@ -1,9 +1,11 @@
 package BE.services;
 
+import BE.entities.project.File;
+import BE.entities.project.FileTypes;
 import BE.entities.project.Project;
-import BE.entities.user.User;
 import BE.exceptions.ProjectAlreadyExistsException;
 import BE.exceptions.ProjectNotFoundException;
+import BE.repositories.FileRepository;
 import BE.repositories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     ProjectRepository projectRepository;
+
+    @Autowired
+    FileRepository fileRepository;
 
     @Override
     public List<Project> getAllProjects() {
@@ -33,7 +38,15 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public Project createProject(String project_name) {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
-        Project project = new Project(project_name, null, null);
+        // TODO add creating user to project during creation logic
+        // Create root directory
+        File file = new File("/", "root", FileTypes.DIR);
+        // Create project
+        Project project = new Project(project_name, file);
+        // Link project to root file
+        file.setProject(project);
+        project.setRoot_dir(file);
+        // Save to database
         projectRepository.save(project);
         return project;
     }

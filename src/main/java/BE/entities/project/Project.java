@@ -23,10 +23,9 @@ public class Project {
     protected Project() {
     }
 
-    public Project(String name, File root_dir, List<UserProject> userProjects) {
+    public Project(String name, File root_dir) {
         this.name = name;
         this.root_dir = root_dir;
-        this.userProjects = userProjects;
     }
 
     public String getName() {
