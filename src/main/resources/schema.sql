@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS `file` (
   `path` VARCHAR(200) NOT NULL,
   `file_name` VARCHAR(54) NOT NULL,
   `type` VARCHAR(45) NOT NULL,
-  `meta-data` VARCHAR(45) NOT NULL,
-  `status` VARCHAR(10) NOT NULL,
+/*  `meta-data` VARCHAR(45) NOT NULL,
+  `status` VARCHAR(10) NOT NULL,*/
   PRIMARY KEY (`file_id`));
 
 CREATE TABLE IF NOT EXISTS `project` (

@@ -13,9 +13,9 @@ public class Project {
     @Id
     private String name;
 
-    /*@JoinColumn(name = "file_id")
+    @JoinColumn(name = "root_dir_id")
     @OneToOne(cascade = CascadeType.ALL)
-    private File root_dir;*/
+    private File root_dir;
 
     @OneToMany(mappedBy = "project")
     private List<UserProject> userProjects;
@@ -23,9 +23,9 @@ public class Project {
     protected Project() {
     }
 
-    public Project(String name, /*File root_dir,*/ List<UserProject> userProjects) {
+    public Project(String name, File root_dir, List<UserProject> userProjects) {
         this.name = name;
-        /*this.root_dir = root_dir;*/
+        this.root_dir = root_dir;
         this.userProjects = userProjects;
     }
 
@@ -37,13 +37,13 @@ public class Project {
         this.name = name;
     }
 
-/*    public File getRoot_dir() {
+    public File getRoot_dir() {
         return root_dir;
     }
 
     public void setRoot_dir(File root_dir) {
         this.root_dir = root_dir;
-    }*/
+    }
 
     public List<UserProject> getUserProjects() {
         return userProjects;

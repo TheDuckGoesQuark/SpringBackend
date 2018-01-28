@@ -1,4 +1,3 @@
-/*
 package BE.entities.project;
 
 import javax.persistence.*;
@@ -9,7 +8,6 @@ public class File {
 
     @Id
     @GeneratedValue
-    @Column(name = "file_id")
     private int file_id;
 
     private String path;
@@ -18,13 +16,17 @@ public class File {
 
     private String type;
 
+    @OneToOne(mappedBy = "root_dir")
+    private Project project;
+
     protected File() {
     }
 
-    public File(String path, String name, String type) {
+    public File(String path, String name, String type, Project project) {
         this.path = path;
         this.file_name = name;
         this.type = type;
+        this.project = project;
     }
 
     public int getFile_id() {
@@ -58,5 +60,12 @@ public class File {
     public void setType(String type) {
         this.type = type;
     }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
 }
-*/

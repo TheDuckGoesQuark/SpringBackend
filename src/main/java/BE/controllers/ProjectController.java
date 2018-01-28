@@ -1,7 +1,6 @@
 package BE.controllers;
 
 // Entities
-import BE.entities.user.User;
 import BE.services.ProjectService;
 // Exceptions
 import BE.entities.project.Project;

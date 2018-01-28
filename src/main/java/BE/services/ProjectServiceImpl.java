@@ -33,7 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public Project createProject(String project_name) {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
-        Project project = new Project(project_name, null);
+        Project project = new Project(project_name, null, null);
         projectRepository.save(project);
         return project;
     }
