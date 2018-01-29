@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface FileRepository extends CrudRepository<File, Integer> {
 
-    public List<File> findByProjectName(String projectName);
+    public File findByProjectName(String projectName);
 
 }

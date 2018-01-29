@@ -21,15 +21,15 @@ public class FileController {
     public List<File> getAllFiles(@PathVariable(value="project_name") String project_name) {
         return fileService.getAllFiles(project_name);
     }
-
+//
 //    /**
 //     * @param project_name
 //     * @return
-//     * @throws NotImplementedException
 //     */
-//    @RequestMapping(value = "/projects/{project_name}", method = RequestMethod.GET)
-//    public Project getProject(@PathVariable(value="project_name") String project_name) {
-//        return projectService.getProjectByName(project_name);
+//    @RequestMapping(value = "/projects/{project_name}/{file_path}", method = RequestMethod.GET)
+//    public File getFile(@PathVariable(value="project_name") String project_name,
+//                        @PathVariable(value="file_path") String file_path) {
+//        return fileService.getFile(project_name, file_path);
 //    }
 //
 //    /**

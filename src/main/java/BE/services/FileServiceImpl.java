@@ -3,6 +3,7 @@ package BE.services;
 import BE.entities.project.File;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
+import BE.exceptions.FileNotFoundException;
 import BE.exceptions.UserNotFoundException;
 import BE.exceptions.UserAlreadyExistsException;
 import BE.repositories.FileRepository;
@@ -27,9 +28,21 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<File> getAllFiles(String projectName) {
         List<File> files = new ArrayList<>();
-        FileRepository.findByProjectName(projectName).forEach(files::add);
+        File root_dir = FileRepository.findByProjectName(projectName);
+        FileRepository.findAll().forEach( file->{if(file.getPath().startsWith(root_dir.getPath())) files.add(file);});
         return files;
     }
+
+//    @Override
+//    public File getFile(String projectName, String filePath) {
+//        List<File> files = new ArrayList<>();
+//        FileRepository.findByProjectName(projectName).forEach(files::add);
+//        for(File file : files)
+//            if(file.getPath().equals(filePath))
+//                return file;
+//
+//        throw new FileNotFoundException();
+//    }
 
 //    @Override
 //    public User getUserByUserName(String username) {
