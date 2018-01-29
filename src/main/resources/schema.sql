@@ -481,3 +481,6 @@ insert into has_privilege (username,privilege_name) values ('ubenner4m', 'userna
 insert into has_privilege (username,privilege_name) values ('varnett4t', 'username');
 insert into has_privilege (username,privilege_name) values ('vmcreynold3w', 'username');
 insert into has_privilege (username,privilege_name) values ('whasely4b', 'username');
+
+insert into file (file_id, path, file_name, type) values ('12324', '/','root1', 'dir');
+insert into project (name, root_dir_id) values ('Protege', '12324');
