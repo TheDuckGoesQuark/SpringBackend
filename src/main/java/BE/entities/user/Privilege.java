@@ -1,5 +1,7 @@
 package BE.entities.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 
 @Entity
