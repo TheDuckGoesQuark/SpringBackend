@@ -1,4 +1,4 @@
-// Author nd33 
+/*Author nd33*/
 
 DROP TABLE IF EXISTS `has_privilege`;
 DROP TABLE IF EXISTS `involved_in`;
