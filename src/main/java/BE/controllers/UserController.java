@@ -1,6 +1,7 @@
 package BE.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 // Exceptions
 import BE.entities.user.Privilege;
@@ -9,6 +10,7 @@ import BE.exceptions.NotImplementedException;
 import BE.exceptions.UserNotFoundException;
 import BE.entities.user.User;
 // Spring
+import BE.responsemodels.PrivilegeModel;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,8 +41,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
-    public List<Privilege> getListOfUserPrivileges() {
-        return userService.getAllPrivileges();
+    public List<PrivilegeModel> getListOfUserPrivileges() {
+        // Maps database entity to response model requested by protocol.
+        return userService.getAllPrivileges().stream().map(
+                privilege -> new PrivilegeModel(
+                        privilege.getName(),
+                        privilege.getDescription(),
+                        privilege.isInternal())
+        ).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)

@@ -12,7 +12,6 @@ import java.util.List;
 public class Project {
 
     @Id
-    @JsonProperty("project_name")
     private String name;
 
     @JoinColumn(name = "root_dir_id")
