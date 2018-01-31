@@ -4,7 +4,9 @@ import BE.entities.project.File;
 import BE.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -21,17 +23,19 @@ public class FileController {
     public List<File> getAllFiles(@PathVariable(value="project_name") String project_name) {
         return fileService.getAllFiles(project_name);
     }
-//
-//    /**
-//     * @param project_name
-//     * @return
-//     */
-//    @RequestMapping(value = "/projects/{project_name}/{file_path}", method = RequestMethod.GET)
-//    public File getFile(@PathVariable(value="project_name") String project_name,
-//                        @PathVariable(value="file_path") String file_path) {
-//        return fileService.getFile(project_name, file_path);
-//    }
-//
+
+    /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.GET)
+    public File getFile(@PathVariable(value="project_name") String project_name,
+                        HttpServletRequest request) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        return fileService.getFile(project_name, path);
+    }
+
 //    /**
 //     * @param project_name
 //     * @return

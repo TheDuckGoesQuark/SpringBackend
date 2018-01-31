@@ -33,16 +33,14 @@ public class FileServiceImpl implements FileService {
         return files;
     }
 
-//    @Override
-//    public File getFile(String projectName, String filePath) {
-//        List<File> files = new ArrayList<>();
-//        FileRepository.findByProjectName(projectName).forEach(files::add);
-//        for(File file : files)
-//            if(file.getPath().equals(filePath))
-//                return file;
-//
-//        throw new FileNotFoundException();
-//    }
+    @Override
+    public File getFile(String projectName, String filePath) {
+        List<File> files = this.getAllFiles(projectName);
+        for(File file : files)
+            if(file.getPath().equals(filePath))
+                return file;
+        throw new FileNotFoundException();
+    }
 
 //    @Override
 //    public User getUserByUserName(String username) {
