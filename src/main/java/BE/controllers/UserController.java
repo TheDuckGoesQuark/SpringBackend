@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
 
+    //TODO move mapping DTOs to models into the service layer. Controllers should be independant of persistance logic.
+
     @Autowired
     private UserService userService;
 

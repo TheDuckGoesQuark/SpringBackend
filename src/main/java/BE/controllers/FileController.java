@@ -26,7 +26,7 @@ public class FileController {
 
     /**
      * @param project_name
-     * @return
+     * @return a particular file
      */
     @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.GET)
     public File getFile(@PathVariable(value="project_name") String project_name,
@@ -36,14 +36,16 @@ public class FileController {
         return fileService.getFile(project_name, path);
     }
 
-//    /**
-//     * @param project_name
-//     * @return
-//     */
-//    @RequestMapping(value = "/project/{project_name}", method = RequestMethod.POST)
-//    public Project createProject(@PathVariable(value="project_name") String project_name) {
-//        return projectService.createProject(project_name);
-//    }
+    /**
+     * @return
+     */
+    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.POST)
+    public File createFile(@PathVariable(value="project_name") String file_name,
+                           HttpServletRequest request) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        return fileService.createFile(file_name, path);
+    }
 //
 //    /**
 //     * @param project_name

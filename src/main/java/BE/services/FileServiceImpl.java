@@ -9,6 +9,7 @@ import BE.exceptions.UserAlreadyExistsException;
 import BE.repositories.FileRepository;
 import BE.repositories.PrivilegeRepository;
 import BE.repositories.UserRepository;
+import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,13 +50,20 @@ public class FileServiceImpl implements FileService {
 //        else return user;
 //    }
 //
-//    @Override
-//    @Transactional
-//    public User createUser(User user) {
-//        if (userRepository.findByUsername(user.getUsername()) != null) throw new UserAlreadyExistsException();
-//        userRepository.save(user);
-//        return user;
-//    }
+    @Override
+    @Transactional
+    public File createFile(String projectName, String filePath) {
+//        if (this.getFile(projectName,filePath).getPath() != null) throw new UserAlreadyExistsException();
+        File file;
+        String file_name = filePath.substring(filePath.lastIndexOf("/"));
+        //TODO may want to change distinguishing between file and dir?
+        if(filePath.contains("."))
+            file = new File(filePath,file_name, "file");
+        else
+            file = new File(filePath,file_name, "dir");
+        FileRepository.save(file);
+        return file;
+    }
 //
 //    @Override
 //    @Transactional

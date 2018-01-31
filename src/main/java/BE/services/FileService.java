@@ -7,6 +7,7 @@ import java.util.List;
 public interface FileService {
     public List<File> getAllFiles(String projectName);
     public File getFile(String projectName, String filePath);
+    public File createFile(String projectName, String filePath);
 
 }
 
