@@ -1,4 +1,4 @@
-package BE.controllers;
+package BE.controllers.wrapped;
 
 import java.util.List;
 import java.util.stream.Collectors;

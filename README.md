@@ -68,6 +68,7 @@ Configuration classes for Spring, such as security endpoints and filters.
 #### controllers/
 REST Controller classes, which maps URLS to the corresponding service call, and extracts any data
 from the request body.
+> Controllers within wrapped/ package will have their responses wrapped by JSONAdvisor.
 #### entities/
 Hibernate entities for ORM from database. Different to 'models' which are used for transforming 
 these entities into the requested structure for the controllers.
