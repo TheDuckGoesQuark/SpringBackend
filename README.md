@@ -33,7 +33,9 @@ Install the necessary packages and build the project:
 > confirm the success of the project.
 > You can avoid this by including the flag: 
 >
->```-DskipTests```
+>```
+>-DskipTests
+>```
 
 ```
 mvn clean install
