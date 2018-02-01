@@ -1,4 +1,4 @@
-package BE.controllers.wrapped;
+package BE.controllers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +12,7 @@ import BE.entities.user.User;
 // Spring
 import BE.responsemodels.PrivilegeModel;
 import BE.services.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     //TODO move mapping DTOs to models into the service layer. Controllers should be independant of persistance logic.
+
+    private static final Logger logger = Logger.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;

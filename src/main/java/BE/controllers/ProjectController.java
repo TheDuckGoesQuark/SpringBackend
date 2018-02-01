@@ -1,4 +1,4 @@
-package BE.controllers.wrapped;
+package BE.controllers;
 
 // Entities
 import BE.entities.project.File;
@@ -9,6 +9,7 @@ import BE.entities.project.Project;
 import BE.entities.project.Role;
 import BE.exceptions.NotImplementedException;
 // Spring
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
@@ -18,6 +19,8 @@ import java.util.List;
 
 @RestController
 public class ProjectController {
+
+    private static final Logger logger = Logger.getLogger(ProjectController.class);
 
     @Autowired
     ProjectService projectService;

@@ -6,6 +6,8 @@ public class SupportedProtocolListModel {
     private List<String> supported;
     private List<String> required;
 
+    protected SupportedProtocolListModel() {}
+
     public SupportedProtocolListModel(List<String> supported, List<String> required) {
         this.supported = supported;
         this.required = required;
