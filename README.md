@@ -9,27 +9,47 @@ These instructions will get you a copy of the project_name up and running on you
 
 What things you need to install the software and how to install them
 
-```
-Give examples
-```
+* Git
+* Maven
+
 
 ### Installing
 
 A step by step series of examples that tell you have to get a development env running
 
-Say what the step will be
+Clone the repo to your directory of choice:
 
 ```
-Give the example
+git clone https://gitlab.cs.st-andrews.ac.uk/cs3099group-be-5/project-code.git
 ```
 
-And repeat
+>If using Intellij as your IDEA, you can use the import project option 
+>and select the pom.xml 
+>file as build instructions.
+
+Install the necessary packages and build the project:
+> Note: The test suite will be ran automatically after building to 
+> confirm the success of the project.
+> You can avoid this by including the flag: 
+>
+>```-DskipTests```
 
 ```
-until finished
+mvn clean install
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+To deploy the application (tests can be skipped as above)
+```
+mvn clean package // Package the application
+cd target // Move into where the packaged application exists 
+java -jar JH-BE7-0.1.0.jar // Run package (0.1.0 is the version number, which may be different)
+```
+
+With the project now running, go to:
+
+[http://localhost:8080/swagger-ui.html/](http://localhost:8080/swagger-ui.html/)
+
+To see examples of how to use the API.
 
 ## Project Structure
 
