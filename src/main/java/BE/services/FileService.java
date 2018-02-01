@@ -8,6 +8,7 @@ public interface FileService {
     public List<File> getAllFiles(String projectName);
     public File getFile(String projectName, String filePath);
     public File createFile(String projectName, String filePath);
+    public File deleteFile(String projectName, String filePath);
 
 }
 

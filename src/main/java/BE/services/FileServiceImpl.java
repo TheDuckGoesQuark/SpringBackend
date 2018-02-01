@@ -67,12 +67,14 @@ public class FileServiceImpl implements FileService {
 //        return user;
 //    }
 //
-//    @Override
-//    @Transactional
-//    public User deleteUser(String username) {
-//        if (userRepository.findByUsername(username) == null) throw new UserNotFoundException();
-//        return userRepository.deleteByUsername(username);
-//    }
+    @Override
+    @Transactional
+    public File deleteFile(String projectName, String filePath) {
+        File file = this.getFile(projectName, filePath);
+        if (file == null) throw new FileNotFoundException();
+        FileRepository.delete(file);
+        return file;
+    }
 //
 //    @Override
 //    public List<Privilege> getAllPrivileges() {

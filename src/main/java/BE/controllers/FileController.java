@@ -61,10 +61,13 @@ public class FileController {
 //     * @param project_name
 //     * @return
 //     */
-//    @RequestMapping(value = "/project/{project_name}", method = RequestMethod.DELETE)
-//    public Project deleteProject(@PathVariable(value="project_name") String project_name) {
-//        return projectService.deleteProject(project_name);
-//    }
+    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.DELETE)
+    public File deleteFile(@PathVariable(value="project_name") String project_name,
+                           HttpServletRequest request) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        return fileService.deleteFile(project_name, path);
+    }
 //
 //    @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
 //    public Role getProjectRoles() throws NotImplementedException {
