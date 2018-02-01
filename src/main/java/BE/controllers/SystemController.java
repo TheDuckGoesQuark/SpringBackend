@@ -1,15 +1,14 @@
 package BE.controllers;
 
-import BE.entities.project.File;
-import BE.services.FileService;
-import org.springframework.beans.factory.annotation.Autowired;
+import BE.entities.user.User;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.HandlerMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController
 public class SystemController {
-    
+
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
+    public User createUser(@PathVariable(value="username") String username, @RequestBody User user) {
+        return userService.createUser(user);
+    }
+
 }
