@@ -60,7 +60,7 @@ public class UserController {
         throw new NotImplementedException();
     }
 
-    @RequestMapping(value = "/current_user",params = {"action=update"}, method = RequestMethod.PATCH)
+    @RequestMapping(value = "/current_user",params = {"action=update"}, method = RequestMethod.POST)
     public User updateCurrentUser(@RequestBody User user) {
         //TODO this
         throw new NotImplementedException();
