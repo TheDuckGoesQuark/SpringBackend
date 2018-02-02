@@ -27,6 +27,7 @@ public class FileServiceImpl implements FileService {
         return files;
     }
 
+    //TODO recursive function to search through closure table(dir_contains) and build up path to find a file
     @Override
     public File getFile(String projectName, String filePath) {
         List<File> files = this.getAllFiles(projectName);

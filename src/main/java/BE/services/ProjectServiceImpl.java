@@ -40,7 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
         // TODO add creating user to project during creation logic
         // Create root directory
-        File file = new File("/", "root", FileTypes.DIR);
+        File file = new File("/" + project_name, project_name, FileTypes.DIR);
         // Create project
         Project project = new Project(project_name, file);
         // Link project to root file
