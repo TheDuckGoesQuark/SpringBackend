@@ -5,15 +5,10 @@ import BE.exceptions.TokenNotFoundException;
 import BE.repositories.TokenRepository;
 import BE.responsemodels.security.TokenModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -23,6 +18,14 @@ public class TokenServiceImpl implements TokenService {
 
     private final
     UserService userService;
+
+    private final int REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS = 60000; // 1 minute
+    private final int TOKEN_LIFETIME_MILLISECONDS = 21600000; // 6 hours
+
+    @Scheduled(fixedDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS, initialDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS)
+    public void removeExpiredTokens() {
+        tokenRepository.removeExpiredTokens(TOKEN_LIFETIME_MILLISECONDS);
+    }
 
     public static int subtractTimeStamps(java.sql.Timestamp newTime, java.sql.Timestamp oldTime) {
         long milliseconds1 = oldTime.getTime();
