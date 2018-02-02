@@ -24,11 +24,14 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
-    @Autowired
+    private final
     ProjectRepository projectRepository;
 
+
     @Autowired
-    FileRepository fileRepository;
+    public ProjectServiceImpl(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
 
     // Conversion Functions
     private static ProjectModel projectToProjectModel(Project project) {

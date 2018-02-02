@@ -78,6 +78,22 @@ CREATE TABLE IF NOT EXISTS `involved_in` (
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
+CREATE TABLE IF NOT EXISTS `oauth_access_token` (
+  `token_id` VARCHAR(256) NOT NULL,
+  `username` VARCHAR(100) NOT NULL,
+  `created` TIMESTAMP NOT NULL,
+  `refresh_token` VARCHAR(256),
+  PRIMARY KEY (`token_id`),
+  INDEX `user_id_idx` (`username` ASC),
+  CONSTRAINT `user_id`
+  FOREIGN KEY (`username`)
+  REFERENCES `user` (`username`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+
+
 
 insert into user (username, email, password) values ('nkirkpatrick0', 'bdouche0@naver.com', 'H0v365');
 insert into user (username, email, password) values ('fthirkettle1', 'uguage1@mayoclinic.com', 'ywZryK');

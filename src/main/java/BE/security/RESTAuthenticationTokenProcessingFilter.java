@@ -1,7 +1,10 @@
 /*
 package BE.security;
 
+import com.google.common.reflect.TypeToken;
+import org.springframework.security.core.token.Token;
 import org.springframework.security.core.token.TokenService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.GenericFilterBean;
 
 import org.slf4j.Logger;
@@ -79,14 +82,14 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
     }
 
     private void updateLastLogin(final Token token) {
-        Thread updateTokenShread;
-        updateTokenShread = new Thread(new Runnable() {
+        Thread updateTokenThread;
+        updateTokenThread = new Thread(new Runnable() {
             public void run() {
                 tokenService.updateLastLoginByCurrentDate(token);
             }
         });
-        updateTokenShread.setName("RESTTokenThread-" + RandomStringUtils.randomNumeric(4));
-        updateTokenShread.start();
+        updateTokenThread.setName("RESTTokenThread-" + RandomStringUtils.randomNumeric(4));
+        updateTokenThread.start();
 
     }
 
@@ -123,13 +126,11 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
 
 
     private String extractAuthTokenFromRequest(HttpServletRequest httpRequest) {
-        */
-/* Get token from header *//*
+        // Get token from header
 
         String authToken = httpRequest.getHeader("X-Auth-Token");
 
-		*/
-/* If token not found get it from request parameter *//*
+        // If token not found get it from request parameter
 
         if (authToken == null) {
             authToken = httpRequest.getParameter("token");
@@ -139,4 +140,5 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
     }
 
 
-}*/
+}
+*/

@@ -13,8 +13,13 @@ import java.util.List;
 @Service
 public class FileServiceImpl implements FileService {
 
-    @Autowired
+    private final
     FileRepository FileRepository;
+
+    @Autowired
+    public FileServiceImpl(FileRepository FileRepository) {
+        this.FileRepository = FileRepository;
+    }
 
 //    @Autowired
 //    ProjectRepository projectRepository;

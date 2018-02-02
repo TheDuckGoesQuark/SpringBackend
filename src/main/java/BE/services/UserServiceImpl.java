@@ -24,11 +24,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
+    private final
     UserRepository userRepository;
 
-    @Autowired
+    private final
     PrivilegeRepository privilegeRepository;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, PrivilegeRepository privilegeRepository) {
+        this.userRepository = userRepository;
+        this.privilegeRepository = privilegeRepository;
+    }
 
     // Conversion Functions
     private static UserModel userToUserModel(User user) {

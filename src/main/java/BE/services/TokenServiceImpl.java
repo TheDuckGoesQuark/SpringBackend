@@ -1,92 +1,58 @@
-/*
 package BE.services;
 
-import org.springframework.security.core.token.Token;
-import org.springframework.security.core.token.TokenService;
+import BE.entities.security.Token;
+import BE.exceptions.TokenNotFoundException;
+import BE.repositories.TokenRepository;
+import BE.responsemodels.security.TokenModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
-*/
-/**
- * Created by lavi on 29.03.2015.
- *//*
 
 @Service
 public class TokenServiceImpl implements TokenService {
 
-    @Autowired
+    private final
     TokenRepository tokenRepository;
 
-    @Override
-    @Transactional
-    public Token getTokenByKey(String tokenKey) {
-        return tokenRepository.findByKey(tokenKey);
+    private final
+    UserService userService;
+
+    public static int subtractTimeStamps(java.sql.Timestamp newTime, java.sql.Timestamp oldTime) {
+        long milliseconds1 = oldTime.getTime();
+        long milliseconds2 = newTime.getTime();
+        Long diff = (milliseconds2 - milliseconds1) / 1000;
+        return diff.intValue();
     }
 
-    @Transactional
-    public List<Token> getTokens() {
-        return tokenRepository.findAll();
-    }
-
-    @Override
-    @Transactional
-    public void addToken(Token token) {
-        tokenRepository.saveAndFlush(token);
-    }
-
-    @Override
-    public Token generateToken(Date expiredDate) {
-        Token token = new Token();
-        token.setExpired(expiredDate);
-        token.setCreated(new Date());
-        token.setKey(UUID.randomUUID().toString().toUpperCase());
-        token.setToken(PasswordEncryption.encrypt(String.valueOf(System.nanoTime())));
-        return token;
+    @Autowired
+    public TokenServiceImpl(TokenRepository tokenRepository, UserService userService) {
+        this.tokenRepository = tokenRepository;
+        this.userService = userService;
     }
 
     @Override
-    @Transactional
-    public void updateLastLoginByCurrentDate(Token token) {
-        token.setLastUsed(new Date());
-        tokenRepository.saveAndFlush(token);
-    }
-
-    @Override
-    @Transactional
-    public void updateToken(Token token) {
-        tokenRepository.saveAndFlush(token);
-    }
-
-    @Transactional
-    public void deleteToken(Integer tokenId) {
+    public void deleteToken(String tokenId) {
         tokenRepository.delete(tokenId);
     }
 
-    @Transactional
-    public Page<Token> getTokens(Pageable pageable) {
-        return tokenRepository.findAll(pageable);
+    @Override
+    public TokenModel getTokenById(String tokenId) {
+        Token token = tokenRepository.findByToken_id(tokenId);
+        if (token == null) throw new TokenNotFoundException();
+        else return new TokenModel(null,
+                tokenId, token.getRefresh_token(),
+                subtractTimeStamps(new Timestamp(System.currentTimeMillis()), token.getCreated()));
     }
 
     @Override
-    @Transactional
-    public Token getTokenById(Integer tokenId) {
-        return tokenRepository.findOne(tokenId);
-    }
-
-    @Override
-    public Token allocateToken(String s) {
+    public TokenModel allocateToken(String username) {
         return null;
     }
-
-    @Override
-    public Token verifyToken(String s) {
-        return null;
-    }
-}*/
+}
