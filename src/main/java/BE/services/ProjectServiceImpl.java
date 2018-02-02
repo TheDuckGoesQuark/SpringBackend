@@ -13,6 +13,7 @@ import BE.repositories.ProjectRepository;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
 import BE.responsemodels.project.UserListModel;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,10 +88,18 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public ProjectModel updateGrant(String project_name, UserListModel grant) {
+        throw new NotImplementedException();
+    }
+
+    @Override
     @Transactional
     public ProjectModel deleteProject(String project_name) {
         if (projectRepository.findByName(project_name) == null) throw new ProjectNotFoundException();
-        else return projectToProjectModel(projectRepository.deleteByName(project_name));
+        else {
+             projectRepository.deleteByName(project_name);
+             return null;
+        }
     }
 
     @Override

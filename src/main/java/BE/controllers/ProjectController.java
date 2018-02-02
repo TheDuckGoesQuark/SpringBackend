@@ -4,6 +4,7 @@ package BE.controllers;
 import BE.entities.project.File;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
+import BE.responsemodels.project.UserListModel;
 import BE.services.FileService;
 import BE.services.ProjectService;
 // Exceptions
@@ -53,7 +54,7 @@ public class ProjectController {
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}", method = RequestMethod.POST)
+    @RequestMapping(value = "/project/{project_name}", params = {"action=create"}, method = RequestMethod.POST)
     public ProjectModel createProject(@PathVariable(value="project_name") String project_name) {
         return projectService.createProject(project_name);
     }
@@ -63,7 +64,7 @@ public class ProjectController {
      * @param project
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/project/{project_name}", params = {"action=update"}, method = RequestMethod.POST)
     public ProjectModel updateProject(@PathVariable(value="project_name") String project_name, @RequestBody ProjectModel project) {
         return projectService.updateProject(project);
     }
@@ -72,9 +73,18 @@ public class ProjectController {
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}", method = RequestMethod.DELETE)
-    public ProjectModel deleteProject(@PathVariable(value="project_name") String project_name) {
-        return projectService.deleteProject(project_name);
+    @RequestMapping(value = "/project/{project_name}", params = {"action=delete"}, method = RequestMethod.POST)
+    public void deleteProject(@PathVariable(value="project_name") String project_name) {
+        projectService.deleteProject(project_name);
+    }
+
+    /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/project/{project_name}", params = {"action=update_grant"}, method = RequestMethod.POST)
+    public void updateGrant(@PathVariable(value="project_name") String project_name, @RequestBody UserListModel userListModel) {
+        projectService.updateGrant(project_name, userListModel);
     }
 
     @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
