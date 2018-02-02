@@ -54,6 +54,7 @@ public class FileServiceImpl implements FileService {
             file = new File(filePath,file_name, "file");
         else
             file = new File(filePath,file_name, "dir");
+        //TODO create a file outside the DB before saving the metadata
         FileRepository.save(file);
         return file;
     }
