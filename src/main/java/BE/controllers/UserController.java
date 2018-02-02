@@ -4,13 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // Exceptions
-import BE.entities.user.Privilege;
 import BE.exceptions.NotImplementedException;
 // Models
-import BE.exceptions.UserNotFoundException;
 import BE.entities.user.User;
 // Spring
-import BE.responsemodels.PrivilegeModel;
+import BE.responsemodels.user.PrivilegeModel;
 import BE.services.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

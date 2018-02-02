@@ -2,6 +2,8 @@ package BE.controllers;
 
 // Entities
 import BE.entities.project.File;
+import BE.responsemodels.project.ProjectModel;
+import BE.responsemodels.project.ProjectRoleModel;
 import BE.services.FileService;
 import BE.services.ProjectService;
 // Exceptions
@@ -33,7 +35,7 @@ public class ProjectController {
      * @return a list of all projects
      **/
     @RequestMapping(value = "/projects", method = RequestMethod.GET)
-    public List<Project> getAllProjects() {
+    public List<ProjectModel> getAllProjects() {
         return projectService.getAllProjects();
     }
 
@@ -76,7 +78,7 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
-    public Role getProjectRoles() throws NotImplementedException {
+    public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
         throw new NotImplementedException();
     }
