@@ -12,13 +12,16 @@ public class UserModel {
 
     private List<ProjectListModel> projects;
 
+    private List<String> privileges;
+
     protected UserModel() {}
 
-    public UserModel(String username, String password, String email, List<ProjectListModel> projects) {
+    public UserModel(String username, String password, String email, List<ProjectListModel> projects, List<String> privileges) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.projects = projects;
+        this.privileges = privileges;
     }
 
     public String getUsername() {
@@ -51,5 +54,13 @@ public class UserModel {
 
     public void setProjects(List<ProjectListModel> projects) {
         this.projects = projects;
+    }
+
+    public List<String> getPrivileges() {
+        return privileges;
+    }
+
+    public void setPrivileges(List<String> privileges) {
+        this.privileges = privileges;
     }
 }
