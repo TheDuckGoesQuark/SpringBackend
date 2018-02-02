@@ -37,6 +37,15 @@ public class FileServiceImpl implements FileService {
         throw new FileNotFoundException();
     }
 
+    @Override
+    public File getFileByID(String projectName, int file_id) {
+        List<File> files = this.getAllFiles(projectName);
+        for(File file : files)
+            if(file.getFile_id() == file_id)
+                return file;
+        throw new FileNotFoundException();
+    }
+
 //    @Override
 //    public User getUserByUserName(String username) {
 //        User user = userRepository.findByUsername(username);

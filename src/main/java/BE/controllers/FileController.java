@@ -28,7 +28,7 @@ public class FileController {
      * @param project_name
      * @return a particular file
      */
-    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.GET)
+    @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
     public File getFile(@PathVariable(value="project_name") String project_name,
                         HttpServletRequest request) {
         String path  = (String) request.getAttribute(
@@ -37,9 +37,20 @@ public class FileController {
     }
 
     /**
+     * @param project_name
+     * @param file_id
+     * @return a particular file
+     */
+    @RequestMapping(value = "/projects/{project_name}/files/{file_id}", method = RequestMethod.GET)
+    public File getFileByID(@PathVariable(value="project_name") String project_name,
+                        @PathVariable(value="file_id") int file_id) {
+        return fileService.getFileByID(project_name, file_id);
+    }
+
+    /**
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.POST)
     public File createFile(@PathVariable(value="project_name") String file_name,
                            HttpServletRequest request) {
         String path  = (String) request.getAttribute(
@@ -61,7 +72,7 @@ public class FileController {
 //     * @param project_name
 //     * @return
 //     */
-    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.DELETE)
     public File deleteFile(@PathVariable(value="project_name") String project_name,
                            HttpServletRequest request) {
         String path  = (String) request.getAttribute(
