@@ -62,23 +62,23 @@ public class UserController {
         throw new NotImplementedException();
     }
 
-    @RequestMapping(value = "/current_user", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/current_user",params = {"action=update"}, method = RequestMethod.PATCH)
     public User updateCurrentUser(@RequestBody User user) {
         //TODO this
         throw new NotImplementedException();
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
+    @RequestMapping(value = "/users/{username}",params = {"action=create"}, method = RequestMethod.POST)
     public User createUser(@PathVariable(value="username") String username, @RequestBody User user) {
         return userService.createUser(user);
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/users/{username}",params = {"action=update"}, method = RequestMethod.POST)
     public User updateUser(@PathVariable(value="username") String username, @RequestBody User user) {
         return userService.updateUser(user);
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/users/{username}",params = {"action=delete"}, method = RequestMethod.POST)
     public User deleteUser(@PathVariable(value="username") String username) {
         return userService.deleteUser(username);
     }
