@@ -78,11 +78,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public ProjectModel updateProject(Project project) {
-        if (projectRepository.findByName(project.getName()) == null) throw new ProjectNotFoundException();
+    public ProjectModel updateProject(ProjectModel project) {
+        Project updated = projectRepository.findByName(project.getProject_name());
+        if (updated == null) throw new ProjectNotFoundException();
         // .save performs both update and creation
-        projectRepository.save(project);
-        return projectToProjectModel(project);
+        // TODO method updates project meta-data, which we don't track yet :(
+        throw new NotImplementedException();
     }
 
     @Override

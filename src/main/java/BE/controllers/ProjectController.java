@@ -45,7 +45,7 @@ public class ProjectController {
      * @throws NotImplementedException
      */
     @RequestMapping(value = "/projects/{project_name}", method = RequestMethod.GET)
-    public Project getProject(@PathVariable(value="project_name") String project_name) {
+    public ProjectModel getProject(@PathVariable(value="project_name") String project_name) {
         return projectService.getProjectByName(project_name);
     }
 
@@ -54,7 +54,7 @@ public class ProjectController {
      * @return
      */
     @RequestMapping(value = "/project/{project_name}", method = RequestMethod.POST)
-    public Project createProject(@PathVariable(value="project_name") String project_name) {
+    public ProjectModel createProject(@PathVariable(value="project_name") String project_name) {
         return projectService.createProject(project_name);
     }
 
@@ -64,7 +64,7 @@ public class ProjectController {
      * @return
      */
     @RequestMapping(value = "/project/{project_name}", method = RequestMethod.PATCH)
-    public Project updateProject(@PathVariable(value="project_name") String project_name, @RequestBody Project project) {
+    public ProjectModel updateProject(@PathVariable(value="project_name") String project_name, @RequestBody ProjectModel project) {
         return projectService.updateProject(project);
     }
 
@@ -73,7 +73,7 @@ public class ProjectController {
      * @return
      */
     @RequestMapping(value = "/project/{project_name}", method = RequestMethod.DELETE)
-    public Project deleteProject(@PathVariable(value="project_name") String project_name) {
+    public ProjectModel deleteProject(@PathVariable(value="project_name") String project_name) {
         return projectService.deleteProject(project_name);
     }
 

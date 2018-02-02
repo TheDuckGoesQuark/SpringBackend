@@ -16,7 +16,7 @@ public interface ProjectService {
 
     public ProjectModel createProject(String project_name);
 
-    public ProjectModel updateProject(Project project);
+    public ProjectModel updateProject(ProjectModel project);
 
     public ProjectModel deleteProject(String project_name);
 
