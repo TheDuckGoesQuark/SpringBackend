@@ -4,21 +4,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // Exceptions
-import BE.entities.user.Privilege;
 import BE.exceptions.NotImplementedException;
 // Models
-import BE.exceptions.UserNotFoundException;
 import BE.entities.user.User;
 // Spring
-import BE.responsemodels.PrivilegeModel;
+import BE.responsemodels.user.PrivilegeModel;
+import BE.responsemodels.user.UserModel;
 import BE.services.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController {
 
-    //TODO move mapping DTOs to models into the service layer. Controllers should be independant of persistance logic.
+    private static final Logger logger = Logger.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;
@@ -28,7 +28,7 @@ public class UserController {
      * @return a list of all users
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<User> getAllUsers() {
+    public List<UserModel> getAllUsers() {
         return userService.getAllUsers();
     }
 
@@ -38,45 +38,39 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
-    public User getUser(@PathVariable(value="username") String username)  {
+    public UserModel getUser(@PathVariable(value="username") String username)  {
         return userService.getUserByUserName(username);
     }
 
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
     public List<PrivilegeModel> getListOfUserPrivileges() {
-        // Maps database entity to response model requested by protocol.
-        return userService.getAllPrivileges().stream().map(
-                privilege -> new PrivilegeModel(
-                        privilege.getName(),
-                        privilege.getDescription(),
-                        privilege.isInternal())
-        ).collect(Collectors.toList());
+        return userService.getAllPrivileges();
     }
 
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)
-    public User getCurrentUser() {
+    public UserModel getCurrentUser() {
         //TODO this
         throw new NotImplementedException();
     }
 
-    @RequestMapping(value = "/current_user", method = RequestMethod.PATCH)
-    public User updateCurrentUser(@RequestBody User user) {
+    @RequestMapping(value = "/current_user",params = {"action=update"}, method = RequestMethod.POST)
+    public UserModel updateCurrentUser(@RequestBody UserModel user) {
         //TODO this
         throw new NotImplementedException();
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
-    public User createUser(@PathVariable(value="username") String username, @RequestBody User user) {
+    @RequestMapping(value = "/users/{username}",params = {"action=create"}, method = RequestMethod.POST)
+    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         return userService.createUser(user);
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.PATCH)
-    public User updateUser(@PathVariable(value="username") String username, @RequestBody User user) {
+    @RequestMapping(value = "/users/{username}",params = {"action=update"}, method = RequestMethod.POST)
+    public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         return userService.updateUser(user);
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
-    public User deleteUser(@PathVariable(value="username") String username) {
+    @RequestMapping(value = "/users/{username}",params = {"action=delete"}, method = RequestMethod.POST)
+    public UserModel deleteUser(@PathVariable(value="username") String username) {
         return userService.deleteUser(username);
     }
 

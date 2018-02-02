@@ -1,16 +1,17 @@
 package BE.aspects;
 
+import BE.controllers.SystemController;
+import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
-import java.util.logging.Logger;
 
 @Aspect
 @Component
 public class TimerAspect {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = Logger.getLogger(TimerAspect.class);
 
     /**
      * Performance tracking for controllers.

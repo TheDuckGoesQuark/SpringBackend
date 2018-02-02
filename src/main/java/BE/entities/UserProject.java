@@ -29,6 +29,38 @@ public class UserProject {
     @Column(name = "role")
     private String role;
 
+    @Column(name = "access_level")
+    private String access_level;
 
+    public User getUser() {
+        return user;
+    }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getAccess_level() {
+        return access_level;
+    }
+
+    public void setAccess_level(String access_level) {
+        this.access_level = access_level;
+    }
 }

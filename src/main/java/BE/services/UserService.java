@@ -1,20 +1,20 @@
 package BE.services;
 
-import BE.entities.user.Privilege;
-import BE.entities.user.User;
+import BE.responsemodels.user.PrivilegeModel;
+import BE.responsemodels.user.UserModel;
 
 import java.util.List;
 
 public interface UserService {
-    public List<User> getAllUsers();
+    public List<UserModel> getAllUsers();
 
-    public User getUserByUserName(String username);
+    public UserModel getUserByUserName(String username);
 
-    public User createUser(User user);
+    public UserModel createUser(UserModel user);
 
-    public User updateUser(User user);
+    public UserModel updateUser(UserModel user);
 
-    public User deleteUser(String username);
+    public UserModel deleteUser(String username);
 
-    public List<Privilege> getAllPrivileges();
+    public List<PrivilegeModel> getAllPrivileges();
 }

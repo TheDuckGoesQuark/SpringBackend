@@ -1,15 +1,8 @@
 package BE.services;
 
 import BE.entities.project.File;
-import BE.entities.user.Privilege;
-import BE.entities.user.User;
 import BE.exceptions.FileNotFoundException;
-import BE.exceptions.UserNotFoundException;
-import BE.exceptions.UserAlreadyExistsException;
 import BE.repositories.FileRepository;
-import BE.repositories.PrivilegeRepository;
-import BE.repositories.UserRepository;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
