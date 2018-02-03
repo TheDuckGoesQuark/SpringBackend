@@ -1,20 +1,18 @@
-/*
 package BE.security;
 
-import com.google.common.reflect.TypeToken;
-import org.springframework.security.core.token.Token;
-import org.springframework.security.core.token.TokenService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.filter.GenericFilterBean;
-
+import BE.responsemodels.security.TokenModel;
+import BE.responsemodels.security.TokenRequestModel;
+import BE.responsemodels.user.UserModel;
+import BE.services.TokenService;
+import BE.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,22 +20,21 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
 
-    public RESTAuthenticationTokenProcessingFilter(){}
+    public RESTAuthenticationTokenProcessingFilter() {
+    }
 
-    public RESTAuthenticationTokenProcessingFilter(UserDetailsService userService, String restUser) {
+    public RESTAuthenticationTokenProcessingFilter(UserService userService, String restUser) {
         this.userService = userService;
         this.REST_USER = restUser;
     }
 
     @Autowired
     private TokenService tokenService;
-    private UserDetailsService userService;
+    private UserService userService;
     private String REST_USER;
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -46,41 +43,40 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = getAsHttpRequest(request);
 
         String authToken = extractAuthTokenFromRequest(httpRequest);
-        String[] parts = authToken.split(":");
+        String[] parts = authToken.split(" ");
 
         if (parts.length == 2) {
             String tokenKey = parts[0];
             String tokenSecret = parts[1];
             if (validateTokenKey(tokenKey)) {
-                Token token = tokenService.getTokenByKey(tokenKey);
-                List<String> allowedIPs = new Gson().fromJson(token.getAllowedIP(), new TypeToken<ArrayList<String>>() {}.getType());
-                if (isAllowIP(allowedIPs, request.getRemoteAddr())) {
-                    if (token != null) {
-                        if (token.getToken().equals(tokenSecret) && token.getExpired().getTime() > System.currentTimeMillis()) {
-                            UserDetails userDetails = userService.loadUserByUsername(REST_USER);
-                            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-                            SecurityContextHolder.getContext().setAuthentication(authentication);
-                            log.info("Authenticated " + token.getKey() + " via IP: " + request.getRemoteAddr());
-                            updateLastLogin(token);
-                        }
-                        else {
-                            log.info("Unable to authenticate the token: " + authToken + ". Incorrect secret or token is expired");
-                        }
+                TokenModel token = tokenService.getTokenById(tokenKey);
+                //List<String> allowedIPs = new Gson().fromJson(token.getAllowedIP(), new TypeToken<ArrayList<String>>() {}.getType());
+                //if (isAllowIP(allowedIPs, request.getRemoteAddr())) {
+                if (token != null) {
+                    if (token.getToken().equals(tokenSecret) && token.getExpired().getTime() > System.currentTimeMillis()) {
+                        UserModel user = userService.getUserByUserName(REST_USER);
+                        TokenRequestModel authentication = new TokenRequestModel(userDetails, null, userDetails.getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        log.info("Authenticated " + token.getKey() + " via IP: " + request.getRemoteAddr());
+                        updateLastLogin(token);
+                    } else {
+                        log.info("Unable to authenticate the token: " + authToken + ". Incorrect secret or token is expired");
                     }
                 }
-                else {
-                    log.info("Unable to authenticate the token: " + authToken + ". IP - " + request.getRemoteAddr() + " is not allowed");
-                }
+                //} else {
+                //log.info("Unable to authenticate the token: " + authToken + ". IP - " + request.getRemoteAddr() + " is not allowed");
             }
-            else {
-                log.info("Unable to authenticate the token: " + authToken + ". Key is broken");
-            }
-        }
+        } else {
+            log.info("Unable to authenticate the token: " + authToken + ". Key is broken");
 
-        chain.doFilter(request, response);
+        }
     }
 
+        chain.doFilter(request,response);
+}
+
+    /*
     private void updateLastLogin(final Token token) {
         Thread updateTokenThread;
         updateTokenThread = new Thread(new Runnable() {
@@ -110,6 +106,7 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
             return allowedIp.equals(remoteAddr);
         }
     }
+    */
 
     private boolean validateTokenKey(String tokenKey) {
         String[] parts = tokenKey.split("-");
@@ -128,12 +125,12 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
     private String extractAuthTokenFromRequest(HttpServletRequest httpRequest) {
         // Get token from header
 
-        String authToken = httpRequest.getHeader("X-Auth-Token");
+        String authToken = httpRequest.getHeader("Authorisation");
 
         // If token not found get it from request parameter
 
         if (authToken == null) {
-            authToken = httpRequest.getParameter("token");
+            authToken = httpRequest.getParameter("access_token");
         }
 
         return authToken;
@@ -141,4 +138,3 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
 
 
 }
-*/
