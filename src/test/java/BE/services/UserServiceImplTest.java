@@ -4,6 +4,7 @@ import BE.entities.UserProject;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
 import BE.repositories.UserRepository;
+import BE.responsemodels.user.UserModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +55,7 @@ public class UserServiceImplTest {
     @Test
     public void validNameReturnsValidUser() {
         String username = "alex";
-        User found = userService.getUserByUserName(username);
+        UserModel found = userService.getUserByUserName(username);
         assertTrue(found.getUsername().equals(username));
     }
 

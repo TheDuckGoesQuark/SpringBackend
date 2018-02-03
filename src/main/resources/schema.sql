@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS `involved_in` (
   `username` VARCHAR(100) NOT NULL,
   `project_name` VARCHAR(100) NOT NULL,
   `role` VARCHAR(45) NOT NULL,
+  `access_level` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`username`, `project_name`),
   INDEX `project_name_idx` (`project_name` ASC),
   CONSTRAINT `involved_user`
