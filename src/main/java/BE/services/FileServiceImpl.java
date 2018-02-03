@@ -56,6 +56,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public File createFile(String projectName, String filePath) {
+        //TODO check if file with same name already exists in directory
 //        if (this.getFile(projectName,filePath).getPath() != null) throw new UserAlreadyExistsException();
         File file;
         String file_name = filePath.substring(filePath.lastIndexOf("/"));
