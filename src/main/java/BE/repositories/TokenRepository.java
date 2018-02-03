@@ -16,4 +16,5 @@ public interface TokenRepository extends CrudRepository<Token, String> {
     )
     void removeExpiredTokens(@Param("duration") int duration);
 
+    public Token findByRefresh_token(String refresh_token_id);
 }

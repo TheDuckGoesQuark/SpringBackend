@@ -12,6 +12,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+
 @Service
 public class TokenServiceImpl implements TokenService {
 
@@ -43,6 +45,20 @@ public class TokenServiceImpl implements TokenService {
         return diff.intValue();
     }
 
+    private Token generateToken(String username) {
+        Token token = new Token(username, new Timestamp(System.currentTimeMillis()));
+        return tokenRepository.save(token);
+    }
+
+    private TokenModel tokenToTokenModel(Token token) {
+        return new TokenModel(
+                null,
+                token.getToken_id(),
+                token.getRefresh_token(),
+                calcTimeSinceCreation(token.getCreated())
+        );
+    }
+
     @Override
     @Transactional
     public void deleteToken(String tokenId) {
@@ -53,26 +69,23 @@ public class TokenServiceImpl implements TokenService {
     public TokenModel getTokenById(String tokenId) {
         Token token = tokenRepository.findByToken_id(tokenId);
         if (token == null) throw new TokenNotFoundException();
-        return new TokenModel(
-            null,
-            tokenId,
-            token.getRefresh_token(),
-            (TOKEN_LIFETIME_MILLISECONDS - calcTimeSinceCreation(token.getCreated()))
-        );
+        return tokenToTokenModel(token);
     }
 
     @Override
     @Transactional
     public TokenModel allocateToken(String username) {
-        return null;
+        Token token = generateToken(username);
+        return tokenToTokenModel(token);
     }
 
     @Transactional
     public TokenModel refreshToken(String tokenId) {
-        Token token = tokenRepository.findByToken_id(tokenId);
+        Token token = tokenRepository.findByRefresh_token(tokenId);
         if (token == null) throw new TokenNotFoundException();
         if (calcTimeSinceCreation(token.getCreated()) > TOKEN_LIFETIME_MILLISECONDS) throw new TokenExpiredException();
-
+        token = generateToken(token.getUsername());
+        return tokenToTokenModel(token);
     }
 
     @Override

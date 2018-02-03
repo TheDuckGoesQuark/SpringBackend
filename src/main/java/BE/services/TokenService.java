@@ -13,7 +13,8 @@ public interface TokenService {
 
     public TokenModel allocateToken(String username);
 
-    public TokenModel refreshToken(String tokenId);
+    public TokenModel refreshToken(String refresh_token_id);
 
     public UserModel getUserFromTokenId(String tokenId);
+
 }

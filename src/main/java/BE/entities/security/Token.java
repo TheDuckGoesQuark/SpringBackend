@@ -29,8 +29,7 @@ public class Token {
     protected Token() {
     }
 
-    public Token(String token_id, String username, Timestamp created, Token refresh_token) {
-        this.token_id = token_id;
+    public Token(String username, Timestamp created) {
         this.username = username;
         this.created = created;
     }
