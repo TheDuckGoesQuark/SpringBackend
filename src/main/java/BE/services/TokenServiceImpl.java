@@ -73,7 +73,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public TokenModel getTokenById(String tokenId) {
-        Token token = tokenRepository.findByToken_id(tokenId);
+        Token token = tokenRepository.findOne(tokenId);
         if (token == null) throw new TokenNotFoundException();
         return tokenToTokenModel(token);
     }
@@ -96,7 +96,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public UserModel getUserFromTokenId(String tokenId) {
-        Token token = tokenRepository.findByToken_id(tokenId);
+        Token token = tokenRepository.findOne(tokenId);
         if (token == null) throw new TokenNotFoundException();
         UserModel user = userService.getUserByUserName(token.getUser().getUsername());
         if (user == null) throw new UserNotFoundException();

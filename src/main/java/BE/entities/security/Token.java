@@ -35,12 +35,15 @@ public class Token {
         this.created = created;
     }
 
-    public String getToken_id() {
-        return token_id;
+    public Token(String token_id, User user, Timestamp created, String refresh_token) {
+        this.token_id = token_id;
+        this.user = user;
+        this.created = created;
+        this.refresh_token = refresh_token;
     }
 
-    public void setToken_id(String token_id) {
-        this.token_id = token_id;
+    public String getToken_id() {
+        return token_id;
     }
 
     public User getUser() {
@@ -55,17 +58,8 @@ public class Token {
         return created;
     }
 
-    public void setCreated(Timestamp created) {
-        this.created = created;
-    }
-
     public String getRefresh_token() {
         return refresh_token;
     }
-
-    public void setRefresh_token(String refresh_token) {
-        this.refresh_token = refresh_token;
-    }
-
 
 }
