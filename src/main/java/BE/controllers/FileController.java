@@ -33,6 +33,9 @@ public class FileController {
                         HttpServletRequest request) {
         String path  = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
+        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
+        path = path.replace("/files", "");
         return fileService.getFile(project_name, path);
     }
 
@@ -41,7 +44,7 @@ public class FileController {
      * @param file_id
      * @return a particular file
      */
-    @RequestMapping(value = "/projects/{project_name}/files/{file_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
     public File getFileByID(@PathVariable(value="project_name") String project_name,
                         @PathVariable(value="file_id") int file_id) {
         return fileService.getFileByID(project_name, file_id);
