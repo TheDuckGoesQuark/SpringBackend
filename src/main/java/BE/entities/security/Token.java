@@ -1,5 +1,6 @@
 package BE.entities.security;
 
+import BE.entities.user.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -15,9 +16,9 @@ public class Token {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String token_id;
 
-    @OneToOne
-    @JoinColumn(name = "username")
-    private String username;
+    @OneToOne(cascade=CascadeType.ALL)
+    @PrimaryKeyJoinColumn(name = "username")
+    private User user;
 
     @CreationTimestamp
     private Timestamp created;
@@ -29,8 +30,8 @@ public class Token {
     protected Token() {
     }
 
-    public Token(String username, Timestamp created) {
-        this.username = username;
+    public Token(User user, Timestamp created) {
+        this.user = user;
         this.created = created;
     }
 
@@ -42,12 +43,12 @@ public class Token {
         this.token_id = token_id;
     }
 
-    public String getUsername() {
-        return username;
+    public User getUser() {
+        return user;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Timestamp getCreated() {

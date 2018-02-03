@@ -1,10 +1,12 @@
 package BE.services;
 
 import BE.entities.security.Token;
+import BE.entities.user.User;
 import BE.exceptions.TokenExpiredException;
 import BE.exceptions.TokenNotFoundException;
 import BE.exceptions.UserNotFoundException;
 import BE.repositories.TokenRepository;
+import BE.repositories.UserRepository;
 import BE.responsemodels.security.TokenModel;
 import BE.responsemodels.user.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +23,18 @@ public class TokenServiceImpl implements TokenService {
     TokenRepository tokenRepository;
 
     private final
+    UserRepository userRepository;
+
+    private final
     UserService userService;
 
     private final int REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS = 60000; // 1 minute
     private final int TOKEN_LIFETIME_MILLISECONDS = 21600000; // 6 hours
 
     @Autowired
-    public TokenServiceImpl(TokenRepository tokenRepository, UserService userService) {
+    public TokenServiceImpl(TokenRepository tokenRepository, UserRepository userRepository, UserService userService) {
         this.tokenRepository = tokenRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
     }
 
@@ -45,8 +51,8 @@ public class TokenServiceImpl implements TokenService {
         return diff.intValue();
     }
 
-    private Token generateToken(String username) {
-        Token token = new Token(username, new Timestamp(System.currentTimeMillis()));
+    private Token generateToken(User user) {
+        Token token = new Token(user, new Timestamp(System.currentTimeMillis()));
         return tokenRepository.save(token);
     }
 
@@ -75,7 +81,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     @Transactional
     public TokenModel allocateToken(String username) {
-        Token token = generateToken(username);
+        Token token = generateToken(userRepository.findByUsername(username));
         return tokenToTokenModel(token);
     }
 
@@ -84,7 +90,7 @@ public class TokenServiceImpl implements TokenService {
         Token token = tokenRepository.findByRefresh_token(tokenId);
         if (token == null) throw new TokenNotFoundException();
         if (calcTimeSinceCreation(token.getCreated()) > TOKEN_LIFETIME_MILLISECONDS) throw new TokenExpiredException();
-        token = generateToken(token.getUsername());
+        token = generateToken(token.getUser());
         return tokenToTokenModel(token);
     }
 
@@ -92,7 +98,7 @@ public class TokenServiceImpl implements TokenService {
     public UserModel getUserFromTokenId(String tokenId) {
         Token token = tokenRepository.findByToken_id(tokenId);
         if (token == null) throw new TokenNotFoundException();
-        UserModel user = userService.getUserByUserName(token.getUsername());
+        UserModel user = userService.getUserByUserName(token.getUser().getUsername());
         if (user == null) throw new UserNotFoundException();
         return user;
     }
