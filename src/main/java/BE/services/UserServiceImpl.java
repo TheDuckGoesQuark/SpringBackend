@@ -8,12 +8,13 @@ import BE.exceptions.UserNotFoundException;
 import BE.exceptions.UserAlreadyExistsException;
 import BE.repositories.PrivilegeRepository;
 import BE.repositories.UserRepository;
-import BE.responsemodels.project.ProjectModel;
-import BE.responsemodels.project.UserListModel;
 import BE.responsemodels.user.PrivilegeModel;
 import BE.responsemodels.user.ProjectListModel;
 import BE.responsemodels.user.UserModel;
+import BE.security.SpringSecurityCustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +73,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel getUserByUserName(String username) {
+    public UserModel getUserByUserName(String username) throws UsernameNotFoundException, UserNotFoundException {
         User user = userRepository.findByUsername(username);
         if (user == null) throw new UserNotFoundException();
         else return userToUserModel(user);
@@ -131,5 +132,13 @@ public class UserServiceImpl implements UserService {
                 .parallelStream()
                 .map(UserServiceImpl::privilegeToPrivilegeModel)
                 .collect(Collectors.toList());
+    }
+
+    // Method used by spring security for providing user information
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(s);
+        if (user == null) throw new UserNotFoundException();
+        else return new SpringSecurityCustomUser(user);
     }
 }

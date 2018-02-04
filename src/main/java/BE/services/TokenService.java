@@ -1,6 +1,7 @@
 package BE.services;
 
 import BE.responsemodels.security.TokenModel;
+import BE.responsemodels.security.TokenRequestModel;
 import BE.responsemodels.user.UserModel;
 
 import java.util.List;

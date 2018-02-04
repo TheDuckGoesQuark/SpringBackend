@@ -1,16 +1,16 @@
 package BE.responsemodels.security;
 
-public class TokenRequestModel {
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+public class TokenRequestModel extends UsernamePasswordAuthenticationToken {
 
     private String grant_type;
     private String refresh_token;
     private String username;
     private String password;
 
-    protected TokenRequestModel() {
-    }
-
     public TokenRequestModel(String grant_type, String refresh_token, String username, String password) {
+        super(username, password);
         this.grant_type = grant_type;
         this.refresh_token = refresh_token;
         this.username = username;

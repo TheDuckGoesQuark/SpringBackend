@@ -1,6 +1,7 @@
 package BE.entities.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
@@ -46,4 +47,5 @@ public class Privilege {
     public void setInternal(boolean internal) {
         this.internal = internal;
     }
+
 }
