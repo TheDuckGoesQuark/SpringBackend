@@ -1,6 +1,7 @@
 package BE.repositories;
 
 import BE.entities.security.Token;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +14,7 @@ public interface TokenRepository extends CrudRepository<Token, String> {
     )
     void removeExpiredTokens(@Param("duration") int duration);
 
+    @Modifying
     @Query(
             value = "SELECT * FROM oauth_access_token t WHERE t.refresh_token = :refresh_token",
             nativeQuery = true

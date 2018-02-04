@@ -26,6 +26,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<UserProject> userProjects;
 
+    protected User() {}
+
     public User(String username, String password, String email, List<Privilege> privileges, List<UserProject> userProjects) {
         this.username = username;
         this.password = password;
