@@ -10,13 +10,22 @@ public class File {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int file_id;
+    @Column(name = "file_id")
+    private int fileId;
 
     private String path;
 
     private String file_name;
 
     private String type;
+
+    private String status;
+
+    @Column(name = "meta-data")
+    private String meta_data;
+
+
+
 
     @OneToOne(mappedBy = "root_dir")
     @JsonIgnore
@@ -25,19 +34,20 @@ public class File {
     protected File() {
     }
 
-    public File(String path, String name, String type) {
+    public File(String path, String file_name, String type, String status, String meta_data) {
         this.path = path;
-        this.file_name = name;
+        this.file_name = file_name;
         this.type = type;
-        this.project = project;
+        this.status = status;
+        this.meta_data = meta_data;
     }
 
-    public int getFile_id() {
-        return file_id;
+    public int getFileId() {
+        return fileId;
     }
 
-    public void setFile_id(int file_id) {
-        this.file_id = file_id;
+    public void setFileId(int fileId) {
+        this.fileId = fileId;
     }
 
     public String getPath() {
@@ -70,5 +80,21 @@ public class File {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getMeta_data() {
+        return meta_data;
+    }
+
+    public void setMeta_data(String meta_data) {
+        this.meta_data = meta_data;
     }
 }

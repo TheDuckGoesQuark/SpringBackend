@@ -1,16 +1,18 @@
 package BE.services;
 
 import BE.entities.project.File;
+import BE.responsemodels.file.FileMetaModel;
 
 import java.util.List;
 
 public interface FileService {
-    public List<File> getAllFiles(String projectName);
-    public File getFile(String projectName, String filePath);
-    public File createFile(String projectName, String filePath);
-    public File deleteFile(String projectName, String filePath);
-    public File getFileByID(String projectName, int file_id);
-
+    public List<FileMetaModel> getAllFiles(String projectName);
+    public FileMetaModel getFile(String projectName, String filePath);
+    public FileMetaModel createFile(String projectName, String filePath);
+    public FileMetaModel deleteFile(String projectName, String filePath);
+    public FileMetaModel getFileByID(String projectName, int file_id);
+    public FileMetaModel updateFile(File file);
+    //TODO methods for FileDataModel (probably NO just have a FileModel class with meta and data constructors)
 }
 
 
