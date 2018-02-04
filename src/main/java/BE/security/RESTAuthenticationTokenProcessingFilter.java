@@ -1,5 +1,7 @@
 package BE.security;
 
+import BE.exceptions.AuthorisationFailureTypes;
+import BE.exceptions.NotAuthorisedException;
 import BE.responsemodels.security.TokenModel;
 import BE.responsemodels.security.TokenRequestModel;
 import BE.services.TokenService;
@@ -8,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -42,9 +43,7 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = getAsHttpRequest(request);
-        log.info("http: "+ httpRequest.getHeader("Authorisation"));
         String authToken = extractAuthTokenFromRequest(httpRequest);
-        log.info("token: "+ authToken);
         String[] parts = authToken.split(" ");
 
         if (parts.length == 2) {
@@ -62,6 +61,7 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
                         log.info("Authenticated " + token.getAccess_token() + " via IP: " + request.getRemoteAddr());
                     } else {
                         log.info("Unable to authenticate the token: " + authToken + ". Incorrect secret or token is expired");
+                        throw new NotAuthorisedException(AuthorisationFailureTypes.INVALID_REQUEST);
                     }
                     //} else {
                     //log.info("Unable to authenticate the token: " + authToken + ". IP - " + request.getRemoteAddr() + " is not allowed");l
@@ -69,7 +69,7 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
             }
         } else {
             log.info("Unable to authenticate the token: " + authToken + ". Key is broken");
-
+            throw new NotAuthorisedException(AuthorisationFailureTypes.INVALID_REQUEST);
         }
         chain.doFilter(request, response);
     }
@@ -124,7 +124,7 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
     private String extractAuthTokenFromRequest(HttpServletRequest httpRequest) {
         // Get token from header
 
-        String authToken = httpRequest.getHeader("Authorisation");
+        String authToken = httpRequest.getHeader("authorisation");
 
         // If token not found get it from request parameter
 
