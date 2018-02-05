@@ -29,15 +29,21 @@ public class FileController {
      * @param project_name
      * @return a particular file
      */
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view=view_name"}, method = RequestMethod.GET)
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = "view", method = RequestMethod.GET)
     public FileMetaModel getFile(@PathVariable(value="project_name") String project_name,
-                        HttpServletRequest request) {
+                        HttpServletRequest request,
+                                 @RequestParam("view") String view) {
+        //TODO first iterate through views to see if supported otherwise throw UnsupportedFileViewException
         String path  = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
         // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
         path = path.replace("/files", "");
-        return fileService.getFile(project_name, path);
+        if(view.equals("") || view.equals("meta"))
+            return fileService.getFile(project_name, path);
+        else
+            //TODO return other views
+            return fileService.getFile(project_name, path);
     }
 
     /**

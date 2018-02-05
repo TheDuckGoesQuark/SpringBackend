@@ -502,4 +502,7 @@ insert into file (file_id, path, file_name, type, metadata, status) values ('123
 insert into file (file_id, path, file_name, type, metadata, status) values ('1231', '/projects/Protege/root1/oze','oze', 'dir', 'file meta-data', 'status');
 insert into file (file_id, path, file_name, type, metadata, status) values ('1232', '/projects/Protege/root1/oze/file1','file1', 'file', 'file meta-data', 'status');
 insert into project (name, root_dir_id) values ('Protege', '12324');
+insert into supported_view(file_id, view)  values ('12324', 'meta');
+insert into supported_view(file_id, view)  values ('1232', 'meta');
+insert into supported_view(file_id, view)  values ('1232', 'raw');
 
