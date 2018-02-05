@@ -4,7 +4,7 @@ import BE.entities.project.Supported_view;
 
 import java.util.List;
 //TODO this may actually have to be named FileModel containing two constructors one for file meta protocol and one for file data protocol.
-public class FileMetaModel {
+public class FileModel {
 
     private String path;
 
@@ -20,7 +20,10 @@ public class FileMetaModel {
 
     private String status;
 
-    public FileMetaModel(String path, String file_name, int file_id, List<Supported_view> views, String metadata, String type, String status) {
+    private List<FileModel> children;
+
+    //file meta model
+    public FileModel(String path, String file_name, int file_id, List<Supported_view> views, String metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -28,6 +31,11 @@ public class FileMetaModel {
         this.metadata = metadata;
         this.type = type;
         this.status = status;
+    }
+
+    //dir meta model
+    public FileModel(List<FileModel> children) {
+        this.children = children;
     }
 
     public int getFile_id() {

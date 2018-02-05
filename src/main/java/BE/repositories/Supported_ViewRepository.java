@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface Supported_ViewRepository extends CrudRepository<Supported_view, Supported_view> { // may have to be Supported_view_PK class
+public interface Supported_ViewRepository extends CrudRepository<Supported_view, Supported_view> {
     List<Supported_view> findByFileFileId(int file_Id);
 }

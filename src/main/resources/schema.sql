@@ -8,7 +8,9 @@ DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS `privilege`;
 DROP TABLE IF EXISTS `project`;
 DROP TABLE IF EXISTS `supported_view`;
+DROP TABLE IF EXISTS `dir_contains`;
 DROP TABLE IF EXISTS `file`;
+
 
 CREATE TABLE IF NOT EXISTS `user` (
   `username` VARCHAR(100) NOT NULL,
@@ -86,6 +88,22 @@ CREATE TABLE IF NOT EXISTS `supported_view` (
   `view` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`file_id`, `view`),
   CONSTRAINT `file_id`
+  FOREIGN KEY (`file_id`)
+  REFERENCES `file` (`file_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS `dir_contains` (
+  `dir_id` INT UNSIGNED NOT NULL,
+  `file_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`dir_id`, `file_id`),
+  INDEX `dir_contains.idx` (`dir_id` ASC),
+  CONSTRAINT `dir_id`
+  FOREIGN KEY (`dir_id`)
+  REFERENCES `file` (`file_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `file`
   FOREIGN KEY (`file_id`)
   REFERENCES `file` (`file_id`)
     ON DELETE CASCADE
