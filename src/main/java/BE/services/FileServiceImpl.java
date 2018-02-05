@@ -72,9 +72,9 @@ public class FileServiceImpl implements FileService {
         String file_name = filePath.substring(filePath.lastIndexOf("/"));
         //TODO may want to change distinguishing between file and dir?
         if(filePath.contains("."))
-            file = new File(filePath,file_name, "filetype...", "file status...", "file metadata...");
+            file = new File(filePath,file_name, "filetype...", "status", "file metadata...");
         else
-            file = new File(filePath,file_name, "dir",  "file status...", "file metadata...");
+            file = new File(filePath,file_name, "dir",  "status", "file metadata...");
         //TODO create a file outside the DB before saving the metadata
         FileRepository.save(file);
         return this.fileToMetaModel(file);
