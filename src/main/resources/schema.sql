@@ -2,6 +2,7 @@
 
 DROP TABLE IF EXISTS `has_privilege`;
 DROP TABLE IF EXISTS `involved_in`;
+DROP TABLE IF EXISTS `oauth_access_token`;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS `privilege`;
 DROP TABLE IF EXISTS `project`;
