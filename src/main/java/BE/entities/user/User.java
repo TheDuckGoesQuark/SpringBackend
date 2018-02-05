@@ -1,6 +1,7 @@
 package BE.entities.user;
 
 import BE.entities.UserProject;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.util.List;
@@ -17,7 +18,7 @@ public class User {
 
     private String email;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch= FetchType.EAGER)
     @JoinTable(name = "has_privilege",
             joinColumns = @JoinColumn(name = "username", referencedColumnName = "username"),
             inverseJoinColumns = @JoinColumn(name = "privilege_name", referencedColumnName = "name"))

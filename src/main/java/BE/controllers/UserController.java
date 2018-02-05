@@ -1,5 +1,6 @@
 package BE.controllers;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,9 +49,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)
-    public UserModel getCurrentUser() {
-        //TODO this
-        throw new NotImplementedException();
+    public UserModel getCurrentUser(Principal principal) {
+        return userService.getUserByUserName(principal.getName());
     }
 
     @RequestMapping(value = "/current_user",params = {"action=update"}, method = RequestMethod.POST)
