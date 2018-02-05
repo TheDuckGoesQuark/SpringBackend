@@ -11,7 +11,7 @@ import BE.repositories.UserRepository;
 import BE.responsemodels.user.PrivilegeModel;
 import BE.responsemodels.user.ProjectListModel;
 import BE.responsemodels.user.UserModel;
-import BE.security.SpringSecurityCustomUser;
+import BE.security.UserAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -139,6 +139,6 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(s);
         if (user == null) throw new UserNotFoundException();
-        else return new SpringSecurityCustomUser(user);
+        else return new UserAdapter(user);
     }
 }
