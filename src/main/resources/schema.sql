@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `file` (
   `path` VARCHAR(200) NOT NULL,
   `file_name` VARCHAR(54) NOT NULL,
   `type` VARCHAR(45) NOT NULL,
-  `meta-data` VARCHAR(45) NOT NULL,
+  `metadata` VARCHAR(45) NOT NULL,
   `status` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`file_id`));
 
@@ -497,9 +497,9 @@ insert into has_privilege (username,privilege_name) values ('varnett4t', 'userna
 insert into has_privilege (username,privilege_name) values ('vmcreynold3w', 'username');
 insert into has_privilege (username,privilege_name) values ('whasely4b', 'username');
 
-insert into file (file_id, path, file_name, type, `meta-data`, status) values ('12323', 'ohaa','ohaa', 'dir', 'file meta-data', 'status');
-insert into file (file_id, path, file_name, type, `meta-data`, status) values ('12324', '/projects/Protege/root1','root1', 'dir', 'file meta-data', 'status');
-insert into file (file_id, path, file_name, type, `meta-data`, status) values ('1231', '/projects/Protege/root1/oze','oze', 'dir', 'file meta-data', 'status');
-insert into file (file_id, path, file_name, type, `meta-data`, status) values ('1232', '/projects/Protege/root1/oze/file1','file1', 'file', 'file meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('12323', 'ohaa','ohaa', 'dir', 'file meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('12324', '/projects/Protege/root1','root1', 'dir', 'file meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('1231', '/projects/Protege/root1/oze','oze', 'dir', 'file meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('1232', '/projects/Protege/root1/oze/file1','file1', 'file', 'file meta-data', 'status');
 insert into project (name, root_dir_id) values ('Protege', '12324');
 

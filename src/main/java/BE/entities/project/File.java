@@ -21,8 +21,7 @@ public class File {
 
     private String status;
 
-    @Column(name = "meta-data")
-    private String meta_data;
+    private String metadata;
 
 
 
@@ -34,12 +33,12 @@ public class File {
     protected File() {
     }
 
-    public File(String path, String file_name, String type, String status, String meta_data) {
+    public File(String path, String file_name, String type, String status, String metadata) {
         this.path = path;
         this.file_name = file_name;
         this.type = type;
         this.status = status;
-        this.meta_data = meta_data;
+        this.metadata = metadata;
     }
 
     public int getFileId() {
@@ -90,11 +89,11 @@ public class File {
         this.status = status;
     }
 
-    public String getMeta_data() {
-        return meta_data;
+    public String getMetadata() {
+        return metadata;
     }
 
-    public void setMeta_data(String meta_data) {
-        this.meta_data = meta_data;
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 }

@@ -30,7 +30,7 @@ public class FileServiceImpl implements FileService {
                 // get supported views from table
                 //TODO get key/value (view/additional_data_of_view) pairs by protocol
                 Supported_ViewRepository.findByFileFileId(file.getFileId()),
-                file.getMeta_data(),
+                file.getMetadata(),
                 file.getType(),
                 file.getStatus()
         );
