@@ -44,6 +44,7 @@ public class RESTAuthenticationTokenProcessingFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = getAsHttpRequest(request);
         String authToken = extractAuthTokenFromRequest(httpRequest);
+        if (authToken == null) throw new NotAuthorisedException(AuthorisationFailureTypes.INVALID_REQUEST);
         String[] parts = authToken.split(" ");
 
         if (parts.length == 2) {

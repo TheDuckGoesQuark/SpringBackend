@@ -38,8 +38,8 @@ public class TokenServiceImpl implements TokenService {
         this.userService = userService;
     }
 
-    @Scheduled(fixedDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS, initialDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS)
     @Transactional
+    @Scheduled(fixedDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS, initialDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS)
     public void removeExpiredTokens() {
         tokenRepository.removeExpiredTokens(TOKEN_LIFETIME_MILLISECONDS);
     }
