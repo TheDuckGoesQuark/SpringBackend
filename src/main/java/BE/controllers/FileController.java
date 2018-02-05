@@ -91,6 +91,9 @@ public class FileController {
                            HttpServletRequest request) {
         String path  = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
+        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
+        path = path.replace("/files", "");
         return fileService.deleteFile(project_name, path);
     }
 }
