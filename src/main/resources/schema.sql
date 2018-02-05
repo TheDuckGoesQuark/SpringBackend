@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS `privilege`;
 DROP TABLE IF EXISTS `project`;
 DROP TABLE IF EXISTS `supported_view`;
+DROP TABLE IF EXISTS `dir_contains`;
 DROP TABLE IF EXISTS `file`;
 
 CREATE TABLE IF NOT EXISTS `user` (
