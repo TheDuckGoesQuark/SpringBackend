@@ -7,11 +7,13 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "privilege")
-public class Privilege {
+public class Privilege implements GrantedAuthority {
+
     @Id
     private String name;
 
     private String description;
+
     @Column(columnDefinition = "TINYINT(1)")
     private boolean internal;
 
@@ -48,4 +50,8 @@ public class Privilege {
         this.internal = internal;
     }
 
+    @Override
+    public String getAuthority() {
+        return this.getName();
+    }
 }
