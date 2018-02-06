@@ -2,7 +2,6 @@ package BE.security;
 
 import BE.responsemodels.security.TokenModel;
 import BE.responsemodels.security.TokenRequestModel;
-import BE.responsemodels.user.UserModel;
 import BE.services.TokenService;
 import BE.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -22,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static BE.security.FilterUtils.validateRequestStructure;
+import static BE.security.SecurityUtils.validateRequestStructure;
 
 /**
  * Handles initial request for token i.e. through username and password
@@ -50,11 +48,6 @@ public class CustomFormAuthenticationFilter extends AbstractAuthenticationProces
 
         // Validate structure
         validateRequestStructure(username, password, grant_type, null);
-
-/*        // Validate user credentials TODO include hash
-        UserDetails user = userService.loadUserByUsername(username);
-        if (user == null || !user.getPassword().equals(password))
-            throw new CustomAuthenticationException(INVALID_CREDENTIALS_ERROR_MESSAGE, AuthenticationFailureType.INVALID_GRANT);*/
 
         // Create token object for credentials
         TokenRequestModel tokenModel = new TokenRequestModel(grant_type, null, username, password);
