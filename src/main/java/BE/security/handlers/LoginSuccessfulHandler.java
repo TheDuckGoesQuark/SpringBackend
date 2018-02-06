@@ -1,4 +1,4 @@
-package BE.security;
+package BE.security.handlers;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.json.JSONObject;
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class CustomLoginSuccessfulHandler implements AuthenticationSuccessHandler {
+public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         httpServletResponse.setStatus(HttpStatus.OK.value());

@@ -1,13 +1,13 @@
-package BE.security;
+package BE.exceptions.excludedFromBaseException;
 
+import BE.security.enums.AuthenticationFailureType;
 import org.json.JSONObject;
-import org.springframework.security.core.AuthenticationException;
 
-public class CustomAuthenticationException extends AuthenticationException {
+public class AuthenticationException extends org.springframework.security.core.AuthenticationException {
     
     private AuthenticationFailureType authenticationFailureType;
 
-    CustomAuthenticationException(String msg, AuthenticationFailureType authenticationFailureType) {
+    public AuthenticationException(String msg, AuthenticationFailureType authenticationFailureType) {
         super(msg);
         this.authenticationFailureType = authenticationFailureType;
     }

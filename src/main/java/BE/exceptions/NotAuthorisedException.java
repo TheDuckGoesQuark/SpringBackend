@@ -1,6 +1,6 @@
 package BE.exceptions;
 
-import BE.security.AuthenticationFailureType;
+import BE.security.enums.AuthenticationFailureType;
 import org.springframework.http.HttpStatus;
 
 public class NotAuthorisedException extends BaseException {

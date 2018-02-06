@@ -1,4 +1,4 @@
-package BE.security;
+package BE.security.enums;
 
 public enum AuthenticationFailureType {
     INVALID_GRANT("invalid_grant"), INVALID_REQUEST("invalid_request"), UNSUPPORTED_GRANT_TYPE("unsupported_grant_type");

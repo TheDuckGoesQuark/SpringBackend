@@ -1,11 +1,13 @@
-package BE.security;
+package BE.security.passwordAuth;
 
+import BE.exceptions.excludedFromBaseException.AuthenticationException;
+import BE.security.enums.AuthenticationFailureType;
+import BE.security.SecurityUtils;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -20,13 +22,13 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) throws org.springframework.security.core.AuthenticationException {
         String username = (String) authentication.getPrincipal();
         String password = (String) authentication.getCredentials();
 
         UserDetails user = userService.loadUserByUsername(username);
         if (user == null || !user.getPassword().equals(password)) {
-            throw new CustomAuthenticationException(
+            throw new AuthenticationException(
                     SecurityUtils.INVALID_CREDENTIALS_ERROR_MESSAGE,
                     AuthenticationFailureType.INVALID_GRANT
             );

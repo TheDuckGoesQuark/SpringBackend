@@ -1,16 +1,15 @@
-package BE.security;
+package BE.security.passwordAuth;
 
 import BE.responsemodels.security.TokenModel;
 import BE.responsemodels.security.TokenRequestModel;
+import BE.exceptions.excludedFromBaseException.AuthenticationException;
 import BE.services.TokenService;
-import BE.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -25,21 +24,21 @@ import static BE.security.SecurityUtils.validateRequestStructure;
 /**
  * Handles initial request for token i.e. through username and password (or possibly refresh_tokens too)
  */
-public class CustomFormAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class FormAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String CHARACTER_ENCODING_UTF_8 = "UTF-8";
 
     private TokenService tokenService;
 
     @Autowired
-    public CustomFormAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher, TokenService tokenService) {
+    public FormAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher, TokenService tokenService) {
         super(requiresAuthenticationRequestMatcher);
         this.tokenService = tokenService;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
+            throws org.springframework.security.core.AuthenticationException, IOException, ServletException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         // String refresh_token = request.getParameter("refresh_token");
@@ -67,12 +66,12 @@ public class CustomFormAuthenticationFilter extends AbstractAuthenticationProces
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException failed)
             throws IOException, ServletException {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(CHARACTER_ENCODING_UTF_8);
-        JSONObject jsonResponse = ((CustomAuthenticationException) failed).getErrorResponse();
+        JSONObject jsonResponse = ((AuthenticationException) failed).getErrorResponse();
         response.getWriter().write(jsonResponse.toString());
     }
 }

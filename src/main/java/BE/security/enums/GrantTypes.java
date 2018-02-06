@@ -1,4 +1,4 @@
-package BE.security;
+package BE.security.enums;
 
 public enum GrantTypes {
 

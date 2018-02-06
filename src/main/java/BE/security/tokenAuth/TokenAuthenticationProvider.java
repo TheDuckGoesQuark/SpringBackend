@@ -1,4 +1,4 @@
-package BE.security;
+package BE.security.tokenAuth;
 
 import BE.responsemodels.security.TokenHeaderModel;
 import BE.services.TokenService;

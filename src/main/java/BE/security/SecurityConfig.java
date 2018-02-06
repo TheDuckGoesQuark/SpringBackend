@@ -1,5 +1,9 @@
 package BE.security;
 
+import BE.security.passwordAuth.FormAuthenticationFilter;
+import BE.security.passwordAuth.FormAuthenticationProvider;
+import BE.security.tokenAuth.TokenAuthenticationFilter;
+import BE.security.tokenAuth.TokenAuthenticationProvider;
 import BE.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +19,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -45,10 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    protected CustomFormAuthenticationFilter getFormAuthenticationFilter(String pattern) {
-        CustomFormAuthenticationFilter customFormAuthenticationFilter = new CustomFormAuthenticationFilter(new AntPathRequestMatcher(pattern), tokenService);
-        customFormAuthenticationFilter.setAuthenticationManager(this.authenticationManager);
-        return customFormAuthenticationFilter;
+    protected FormAuthenticationFilter getFormAuthenticationFilter(String pattern) {
+        FormAuthenticationFilter formAuthenticationFilter = new FormAuthenticationFilter(new AntPathRequestMatcher(pattern), tokenService);
+        formAuthenticationFilter.setAuthenticationManager(this.authenticationManager);
+        return formAuthenticationFilter;
     }
 
     protected TokenAuthenticationFilter getTokenAuthenticationFilter(String pattern) {
