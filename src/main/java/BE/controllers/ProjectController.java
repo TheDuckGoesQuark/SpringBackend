@@ -1,24 +1,45 @@
 package BE.controllers;
 
-// Entities
-import BE.entities.project.File;
+// JavaIO
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+
+// Models
+import BE.responsemodels.file.FileModel;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
 import BE.responsemodels.project.UserListModel;
+
+// Services
 import BE.services.FileService;
 import BE.services.ProjectService;
+
 // Exceptions
-import BE.entities.project.Project;
-import BE.entities.project.Role;
 import BE.exceptions.NotImplementedException;
-// Spring
+import java.io.IOException;
+
+// Apache
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.http.fileupload.FileItemIterator;
+import org.apache.tomcat.util.http.fileupload.FileItemStream;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+
+// Spring
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 
+//Other
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController
 public class ProjectController {
@@ -27,6 +48,9 @@ public class ProjectController {
 
     @Autowired
     ProjectService projectService;
+
+    @Autowired
+    FileService fileService;
 
     /**
      * Gets all projects
@@ -88,6 +112,80 @@ public class ProjectController {
     public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
         throw new NotImplementedException();
+    }
+
+
+    /**
+     * Gets all files of a project
+     * @return a list of all projects
+     **/
+    @RequestMapping(value = "/projects/{project_name}/files", method = RequestMethod.GET)
+    public List<FileModel> getAllFiles(@PathVariable(value="project_name") String project_name) {
+        return fileService.getAllFiles(project_name);
+    }
+
+    /**
+     * @param project_name
+     * @return a particular file
+     */
+    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.GET)
+    public FileModel getFile(@PathVariable(value="project_name") String project_name,
+                        HttpServletRequest request) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        return fileService.getFile(project_name, path);
+    }
+
+    /**
+     * @return
+     */
+    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.POST)
+    public FileModel createFile(@PathVariable(value="project_name") String file_name,
+                           HttpServletRequest request) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        return fileService.createFile(file_name, path);
+    }
+
+    @RequestMapping(value="/upload", method= RequestMethod.POST)
+    public void upload(HttpServletRequest request) {
+        try {
+        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        if (!isMultipart) {
+            // Inform user about invalid request
+            System.out.println("Invalid request");
+            return;
+        }
+
+        // Create a new file upload handler
+        ServletFileUpload upload = new ServletFileUpload();
+
+        // Parse the request
+            FileItemIterator iterator = upload.getItemIterator(request);
+            while (iterator.hasNext()) {
+                FileItemStream item = iterator.next();
+                String name = item.getFieldName();
+                InputStream stream = item.openStream();
+                if (!item.isFormField()) {
+                    String filename = item.getName();
+                    // Process the input stream
+                    System.out.println("File detected");
+                    OutputStream out = new FileOutputStream(filename);
+                    IOUtils.copy(stream, out);
+                    stream.close();
+                    out.close();
+                }
+            }
+        }catch (FileUploadException | IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/uploader", method = RequestMethod.GET)
+    public ModelAndView uploaderPage() {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("uploader");
+        return model;
     }
 
 }

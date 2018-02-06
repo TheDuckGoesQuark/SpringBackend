@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,6 +113,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserModel deleteUser(String username) {
         if (userRepository.findByUsername(username) == null) throw new UserNotFoundException();
+        Logger logger = Logger.getAnonymousLogger();
+        logger.info(username);
         userRepository.deleteByUsername(username);
         return null;
     }
