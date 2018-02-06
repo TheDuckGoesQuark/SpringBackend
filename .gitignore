@@ -23,3 +23,4 @@ tasks.xml
 *.tar.gz
 *.rar
 
+target/classes/schema.sql
