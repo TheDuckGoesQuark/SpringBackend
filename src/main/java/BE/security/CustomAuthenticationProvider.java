@@ -16,10 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    final
+    private final
     UserService userService;
 
-    final
+    private final
     TokenService tokenService;
 
     @SuppressWarnings("SpringJavaAutowiredMembersInspection")
