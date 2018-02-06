@@ -12,7 +12,7 @@ public interface PrivilegeRepository extends CrudRepository<Privilege, String> {
     Privilege findByName(String name);
 
     @Query(
-            value = "SELECT p FROM privilege p WHERE p.name IN :names",
+            value = "SELECT * FROM privilege WHERE name IN :names",
             nativeQuery = true
     )
     List<Privilege> findAllByNameIn(@Param("names") List<String> names);
