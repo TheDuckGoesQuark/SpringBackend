@@ -54,8 +54,15 @@ public class UserControllerTests {
         this.mockMvc.perform(get("/users/JohnSmith"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status")
-                .value("success"));
+                .andExpect(jsonPath("$.status").value("success"));
+    }
+
+    @Test
+    public void getListOfUserPriviledges() throws Exception {
+        this.mockMvc.perform(get("/user_privileges"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("success"));
     }
 
 }
