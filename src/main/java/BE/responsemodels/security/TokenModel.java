@@ -2,8 +2,11 @@ package BE.responsemodels.security;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.io.Serializable;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TokenModel {
+public class TokenModel implements Serializable {
+
     private String token_type = "bearer";
     private String access_token;
     private String refresh_token;
@@ -11,7 +14,7 @@ public class TokenModel {
 
     protected TokenModel() {}
 
-    public TokenModel(String token_type, String access_token, String refresh_token, Integer expires_in) {
+    public TokenModel(String access_token, String refresh_token, Integer expires_in) {
         this.token_type = token_type;
         this.access_token = access_token;
         this.refresh_token = refresh_token;

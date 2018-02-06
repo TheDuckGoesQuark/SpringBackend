@@ -1,18 +1,21 @@
 package BE.security;
 
-import BE.exceptions.NotAuthorisedException;
+import org.json.JSONObject;
 import org.springframework.security.core.AuthenticationException;
 
 public class CustomAuthenticationException extends AuthenticationException {
+    
+    private AuthenticationFailureType authenticationFailureType;
 
-    private NotAuthorisedException notAuthorisedException;
-
-    public CustomAuthenticationException(NotAuthorisedException e) {
-        super(e.getError_description());
-        this.notAuthorisedException = e;
+    CustomAuthenticationException(String msg, AuthenticationFailureType authenticationFailureType) {
+        super(msg);
+        this.authenticationFailureType = authenticationFailureType;
     }
 
-    public NotAuthorisedException getNotAuthorisedException() {
-        return notAuthorisedException;
+    public JSONObject getErrorResponse() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("error", authenticationFailureType.toString());
+        jsonObject.put("error_description", this.getMessage());
+        return jsonObject;
     }
 }

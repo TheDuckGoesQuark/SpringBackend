@@ -1,6 +1,5 @@
 package BE.security;
 
-import BE.exceptions.AuthorisationFailureTypes;
 import BE.exceptions.NotAuthorisedException;
 import BE.responsemodels.security.TokenModel;
 import BE.responsemodels.security.TokenRequestModel;
@@ -37,7 +36,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = credentials.toString();
         // TODO implement hashing and salting of passwords
         UserDetails user = userService.loadUserByUsername(username);
-        if (!user.getPassword().equals(password)) throw new NotAuthorisedException(AuthorisationFailureTypes.INVALID_REQUEST);
+        if (!user.getPassword().equals(password)) throw new NotAuthorisedException(AuthenticationFailureType.INVALID_REQUEST);
         TokenModel tokenModel = tokenService.allocateToken(user.getUsername());
         authentication.setAuthenticated(true);
         return authentication;
