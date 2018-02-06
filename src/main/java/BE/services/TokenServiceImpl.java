@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -25,17 +26,13 @@ public class TokenServiceImpl implements TokenService {
     private final
     UserRepository userRepository;
 
-    private final
-    UserService userService;
-
     private final int REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS = 60000; // 1 minute
     private final int TOKEN_LIFETIME_MILLISECONDS = 21600000; // 6 hours
 
     @Autowired
-    public TokenServiceImpl(TokenRepository tokenRepository, UserRepository userRepository, UserService userService) {
+    public TokenServiceImpl(TokenRepository tokenRepository, UserRepository userRepository) {
         this.tokenRepository = tokenRepository;
         this.userRepository = userRepository;
-        this.userService = userService;
     }
 
     @Transactional
@@ -52,16 +49,15 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private Token generateToken(User user) {
-        Token token = new Token(user, new Timestamp(System.currentTimeMillis()));
+        Token token = new Token(user, UUID.randomUUID().toString());
         return tokenRepository.save(token);
     }
 
     private TokenModel tokenToTokenModel(Token token) {
         return new TokenModel(
-                null,
                 token.getToken_id(),
                 token.getRefresh_token(),
-                calcTimeSinceCreation(token.getCreated())
+                TOKEN_LIFETIME_MILLISECONDS - calcTimeSinceCreation(token.getCreated())
         );
     }
 
@@ -95,10 +91,10 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public UserModel getUserFromTokenId(String tokenId) {
+    public String getUsernameFromTokenId(String tokenId) {
         Token token = tokenRepository.findOne(tokenId);
         if (token == null) throw new TokenNotFoundException();
-        UserModel user = userService.getUserByUserName(token.getUser().getUsername());
+        String user = token.getUser().getUsername();
         if (user == null) throw new UserNotFoundException();
         return user;
     }

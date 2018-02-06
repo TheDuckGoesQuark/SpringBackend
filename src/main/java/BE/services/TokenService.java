@@ -16,6 +16,6 @@ public interface TokenService {
 
     public TokenModel refreshToken(String refresh_token_id);
 
-    public UserModel getUserFromTokenId(String tokenId);
+    public String getUsernameFromTokenId(String tokenId);
 
 }

@@ -1,7 +1,10 @@
 package BE.security;
 
+import BE.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +17,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.sql.DataSource;
 
@@ -23,21 +28,48 @@ import javax.sql.DataSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private AuthenticationSuccessHandler loginSuccessfulHandler;
-    @Autowired
-    private AuthenticationFailureHandler loginFailureHandler;
-    @Autowired
     private AccessDeniedHandler customAccessDeniedHandler;
     @Autowired
     private AuthenticationEntryPoint customAuthenticationEntryPoint;
     @Autowired
     private UserDetailsService userService;
     @Autowired
+    private TokenService tokenService;
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
     private DataSource datasource;
+    @Autowired
+    private FormAuthenticationProvider formAuthenticationProvider;
+    @Autowired
+    private TokenAuthenticationProvider tokenAuthenticationProvider;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    protected CustomFormAuthenticationFilter getFormAuthenticationFilter(String pattern) {
+        CustomFormAuthenticationFilter customFormAuthenticationFilter = new CustomFormAuthenticationFilter(new AntPathRequestMatcher(pattern), tokenService);
+        customFormAuthenticationFilter.setAuthenticationManager(this.authenticationManager);
+        return customFormAuthenticationFilter;
+    }
+
+    protected TokenAuthenticationFilter getTokenAuthenticationFilter(String pattern) {
+        TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(new AntPathRequestMatcher(pattern));
+        tokenAuthenticationFilter.setAuthenticationManager(this.authenticationManager);
+        return tokenAuthenticationFilter;
+    }
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).and().jdbcAuthentication().dataSource(datasource);
+        auth.authenticationProvider(formAuthenticationProvider);
+        auth.authenticationProvider(tokenAuthenticationProvider)
+                .userDetailsService(userService)
+                .and()
+                .jdbcAuthentication().dataSource(datasource);
     }
 
     @Override
@@ -52,20 +84,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable() // disable CSRF for this application
                 .formLogin() // Using form based login instead of Basic Authentication
-                .loginProcessingUrl("/oauth/token") // Endpoint which will process the authentication request. This is where we will post our credentials to authenticate
-                .successHandler(loginSuccessfulHandler)
-                .failureHandler(loginFailureHandler)
+                    .loginProcessingUrl("/oauth/token") // Endpoint which will process the authentication request. This is where we will post our credentials to authenticate
                 .and()
-                .authorizeRequests()
-                .antMatchers("/oauth/token").permitAll() // Enabling URL to be accessed by all users (even un-authenticated)
-                .antMatchers("/swagger-ui.html").permitAll()
-                //.antMatchers("/secure/admin").access("hasRole('ADMIN')") // Configures specified URL to be accessed with user having role as ADMIN
-                .anyRequest().authenticated() // Any resources not mentioned above needs to be authenticated
+                    .authorizeRequests()
+                    .antMatchers("/oauth/token").permitAll() // Enabling URL to be accessed by all users (even un-authenticated)
                 .and()
-                .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler)
-                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                    .authorizeRequests()
+                    .antMatchers("/swagger-ui.html").permitAll()
                 .and()
+                        .authorizeRequests()
+                        //.antMatchers("/secure/admin").access("hasRole('ADMIN')") // Configures specified URL to be accessed with user having role as ADMIN
+                        .anyRequest().authenticated() // Any resources not mentioned above needs to be authenticated
+                    .and()
+                        .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                    .and()
+                        .addFilterBefore(getFormAuthenticationFilter("/oauth/token"), UsernamePasswordAuthenticationFilter.class)
+                        .addFilterBefore(getTokenAuthenticationFilter("/**"), UsernamePasswordAuthenticationFilter.class)
                 .anonymous()
-                .disable(); // Disables anonymous authentication with anonymous role.
+                    .disable(); // Disables anonymous authentication with anonymous role.
     }
 }

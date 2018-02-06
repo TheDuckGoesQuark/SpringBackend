@@ -17,22 +17,20 @@ public class Token {
     private String token_id;
 
     @OneToOne(cascade=CascadeType.ALL)
-    @PrimaryKeyJoinColumn(name = "username")
+    @JoinColumn(name = "username", nullable = false, updatable = false, insertable = true)
     private User user;
 
     @CreationTimestamp
     private Timestamp created;
 
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String refresh_token;
 
     protected Token() {
     }
 
-    public Token(User user, Timestamp created) {
+    public Token(User user, String refresh_token) {
         this.user = user;
-        this.created = created;
+        this.refresh_token = refresh_token;
     }
 
     public Token(String token_id, User user, Timestamp created, String refresh_token) {
@@ -40,6 +38,11 @@ public class Token {
         this.user = user;
         this.created = created;
         this.refresh_token = refresh_token;
+    }
+
+    @PrePersist
+    void created() {
+        this.created = new Timestamp(System.currentTimeMillis());
     }
 
     public String getToken_id() {

@@ -132,3 +132,4 @@ We used [Gitlab](https://gitlab.cs.st-andrews.ac.uk/) for VC. For the versions a
 
 * Susmit Sarkar for supervising and helping us with the project.
 * The many contributors to the huge [Baeldung](http://www.baeldung.com/) collection of Spring tutorials.
+* Anil KC for a [thorough guide on custom spring security for rest services.](http://anilkc.me/securing-spring-based-rest-services-spring-security/)

@@ -1,5 +1,10 @@
 package BE.security;
 
 public enum AuthenticationFailureType {
-    INVALID_GRANT, INVALID_REQUEST, UNSUPPORTED_GRANT_TYPE
+    INVALID_GRANT("invalid_grant"), INVALID_REQUEST("invalid_request"), UNSUPPORTED_GRANT_TYPE("unsupported_grant_type");
+
+    private String type;
+    AuthenticationFailureType(String type) {
+        this.type = type;
+    }
 }

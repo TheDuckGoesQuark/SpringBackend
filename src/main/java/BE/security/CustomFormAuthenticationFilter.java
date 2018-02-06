@@ -23,19 +23,17 @@ import java.io.IOException;
 import static BE.security.SecurityUtils.validateRequestStructure;
 
 /**
- * Handles initial request for token i.e. through username and password
+ * Handles initial request for token i.e. through username and password (or possibly refresh_tokens too)
  */
 public class CustomFormAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String CHARACTER_ENCODING_UTF_8 = "UTF-8";
 
-    private UserService userService;
     private TokenService tokenService;
 
     @Autowired
-    public CustomFormAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher, UserService userService, TokenService tokenService) {
+    public CustomFormAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher, TokenService tokenService) {
         super(requiresAuthenticationRequestMatcher);
-        this.userService = userService;
         this.tokenService = tokenService;
     }
 
@@ -44,6 +42,7 @@ public class CustomFormAuthenticationFilter extends AbstractAuthenticationProces
             throws AuthenticationException, IOException, ServletException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        // String refresh_token = request.getParameter("refresh_token");
         String grant_type = request.getParameter("grant_type");
 
         // Validate structure
