@@ -19,6 +19,9 @@ public class Dir_contains implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private File file;
 
+    public Dir_contains() {
+    }
+
     public Dir_contains(File dir, File file) {
         this.dir = dir;
         this.file = file;
