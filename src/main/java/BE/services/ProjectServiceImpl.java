@@ -33,9 +33,11 @@ public class ProjectServiceImpl implements ProjectService {
     // Conversion Functions
     private static ProjectModel projectToProjectModel(Project project) {
         return new ProjectModel(project.getName(),
-                project.getUserProjects().stream().map(
+//TODO get user projects returns null and that causes the program to terminate with NullPointerException
+/*                project.getUserProjects().stream().map(
                         ProjectServiceImpl::userProjectToUserListModel
-                ).collect(Collectors.toList()));
+                ).collect(Collectors.toList())*/
+                null);
     }
 
     private static UserListModel userProjectToUserListModel(UserProject userProject) {
