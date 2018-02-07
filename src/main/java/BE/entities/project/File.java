@@ -3,6 +3,8 @@ package BE.entities.project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "file")
@@ -29,6 +31,10 @@ public class File {
     @OneToOne(mappedBy = "root_dir")
     @JsonIgnore
     private Project project;
+
+//    @OneToMany
+//    @JoinColumn(name = "dir_id")
+//    private List<Dir_contains> contents = new ArrayList<Dir_contains>();
 
     protected File() {
     }
@@ -96,4 +102,12 @@ public class File {
     public void setMetadata(String metadata) {
         this.metadata = metadata;
     }
+
+//    public List<Dir_contains> getContents() {
+//        return contents;
+//    }
+//
+//    public void setContents(List<Dir_contains> contents) {
+//        this.contents = contents;
+//    }
 }

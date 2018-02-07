@@ -37,6 +37,7 @@ public class FileServiceImpl implements FileService {
                 file.getMetadata(),
                 file.getType(),
                 file.getStatus()
+//                file.getContents()
         );
     }
 
@@ -52,7 +53,10 @@ public class FileServiceImpl implements FileService {
     public List<FileModel> getChildren(String projectName, String filePath) {
         List<FileModel> children = new ArrayList<>();
         FileModel dir = this.getFile(projectName, filePath);
-        Dir_containsRepository.findByDirId(dir.getFile_id()).forEach( dir_contains->{children.add(this.getFileByID(projectName,dir_contains.getFile().getFileId()));});
+//        for(Dir_contains file : dir.getContents()){
+//            children.add(this.getFileByID(projectName,file.getFile().getFileId()));
+//        }
+        Dir_containsRepository.findByDirId(dir.getFile_id()).forEach(dir_contains->{children.add(this.getFileByID(projectName,dir_contains.getFile().getFileId()));});
         return children;
     }
 
@@ -76,6 +80,7 @@ public class FileServiceImpl implements FileService {
         throw new FileNotFoundException();
     }
     //TODO file metadata must be initial_metadata on creation by protocol ??
+    //TODO populate dir_contains with parent/child key pair.
     @Override
     @Transactional
     public FileModel createFile(String projectName, String filePath) {

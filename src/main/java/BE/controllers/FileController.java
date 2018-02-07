@@ -8,6 +8,7 @@ package BE.controllers;
         import org.springframework.web.servlet.HandlerMapping;
 
         import javax.servlet.http.HttpServletRequest;
+        import java.util.ArrayList;
         import java.util.List;
 //TODO remove all logic if any from controller to service
 @RestController
@@ -47,20 +48,22 @@ public class FileController {
     }
 
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view","include_children"}, method = RequestMethod.GET)
-    public FileModel getDirContents(@PathVariable(value="project_name") String project_name,
-                             HttpServletRequest request) {
+    public List<FileModel> getDirContents(@PathVariable(value="project_name") String project_name,
+                             HttpServletRequest request, @RequestParam("view") String view) {
         String path  = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         //TODO REPLACE this is error prone because /files can be contained somewhere in filepath.
         // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
         path = path.replace("/files", "");
+        List<FileModel> list = new ArrayList<>();
         //check if dir exists
         FileModel dir = fileService.getFile(project_name, path);
+        list.add(dir);
         //TODO transfer logic to file service
-        if(dir.getType().equals("dir")){
-            fileService.getChildren(project_name, path);
+        if(dir.getType().equals("dir") && view.equals("meta")){
+            return fileService.getChildren(project_name, path);
         }
-            return null;
+            return list;
     }
 
     /**

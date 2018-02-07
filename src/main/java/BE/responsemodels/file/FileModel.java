@@ -1,5 +1,6 @@
 package BE.responsemodels.file;
 
+import BE.entities.project.Dir_contains;
 import BE.entities.project.Supported_view;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class FileModel {
 
     private String status;
 
-    private List<FileModel> children;
+//    private List<Dir_contains> contents;
 
     //file meta model
     public FileModel(String path, String file_name, int file_id, List<Supported_view> views, String metadata, String type, String status) {
@@ -31,12 +32,13 @@ public class FileModel {
         this.metadata = metadata;
         this.type = type;
         this.status = status;
+//        this.contents = contents;
     }
 
     //dir meta model
-    public FileModel(List<FileModel> children) {
-        this.children = children;
-    }
+//    public FileModel(List<Dir_contains> contents) {
+//        this.contents = contents;
+//    }
 
     public int getFile_id() {
         return file_id;
@@ -93,4 +95,12 @@ public class FileModel {
     public void setMetadata(String metadata) {
         this.metadata = metadata;
     }
+
+//    public List<Dir_contains> getContents() {
+//        return contents;
+//    }
+//
+//    public void setContents(List<Dir_contains> contents) {
+//        this.contents = contents;
+//    }
 }

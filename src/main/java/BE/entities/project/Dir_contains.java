@@ -10,8 +10,8 @@ import java.io.Serializable;
 @Table(name = "Dir_contains")
 public class Dir_contains implements Serializable {
     @Id
-    @JoinColumn(name = "file_id")
-    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "dir_id")
+    @ManyToOne(cascade = CascadeType.ALL)
     private File dir;
 
     @Id
