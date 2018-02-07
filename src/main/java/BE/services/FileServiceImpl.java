@@ -124,4 +124,16 @@ public class FileServiceImpl implements FileService {
         FileRepository.delete(file.getFile_id());
         return file;
     }
+
+    //TODO 12.8 Uploading
+    //TODO 12.9 Changing metadata
+    //TODO 12.10 Creating directories
+    //TODO 12.11 Deleting
+    //TODO 12.12 Moving
+    //TODO 12.13 Copying
+    //TODO 12.14 Extra file types
+    //TODO 12.13 Tabular files
+    //TODO 13.1 The tabular view
+    //TODO 14 Zoommable image files
+    //TODO 14.1 The Scalable Image view
 }
