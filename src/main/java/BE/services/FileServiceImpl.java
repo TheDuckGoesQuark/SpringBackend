@@ -2,8 +2,10 @@ package BE.services;
 
 import BE.entities.project.File;
 import BE.exceptions.FileNotFoundException;
+import BE.exceptions.ProjectNotFoundException;
 import BE.repositories.Dir_containsRepository;
 import BE.repositories.FileRepository;
+import BE.repositories.ProjectRepository;
 import BE.repositories.Supported_ViewRepository;
 import BE.responsemodels.file.FileModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import java.util.List;
 
 @Service
 public class FileServiceImpl implements FileService {
+
+    @Autowired
+    ProjectRepository ProjectRepository;
 
     @Autowired
     FileRepository FileRepository;
@@ -43,6 +48,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<FileModel> getAllFiles(String projectName) {
+        if(ProjectRepository.findByName(projectName) == null)
+            throw new ProjectNotFoundException();
         List<FileModel> files = new ArrayList<>();
         File root_dir = FileRepository.findByProjectName(projectName);
         FileRepository.findAll().forEach( file->{if(file.getPath().startsWith(root_dir.getPath())) files.add(this.fileToMetaModel(file));});
