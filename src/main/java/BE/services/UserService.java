@@ -19,5 +19,4 @@ public interface UserService {
 
     public List<PrivilegeModel> getAllPrivileges();
 
-    public Boolean userExists(String username);
 }

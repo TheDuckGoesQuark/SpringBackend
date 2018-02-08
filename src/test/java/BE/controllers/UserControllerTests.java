@@ -22,8 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import BE.entities.UserProject;
+import BE.entities.project.Project;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
+import BE.repositories.UserRepository;
 import BE.responsemodels.user.PrivilegeModel;
 import BE.responsemodels.user.ProjectListModel;
 import BE.responsemodels.user.UserModel;
@@ -165,13 +167,20 @@ public class UserControllerTests {
         List<ProjectListModel> testProject=null;
         UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 
+        Privilege privilege = new Privilege("username","user rights", false);
+        List<Privilege> privileges = Arrays.asList(privilege);
+        List<UserProject> projects = null;
+        User user = new User("testUserModel","testPazz", "testModel@email.com",privileges,projects);
+
+        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(user);
         when(userService.createUser(testUser)).thenReturn(testUser);
         mockMvc.perform(post("/users/testUser?action=create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
-                .andDo(print())
-                .andExpect(status().isCreated());
-                verify(userService, times(1)).createUser(testUser);
+                .andDo(print());
+                //.andExpect(status().isCreated());
+        verify(userRepository, times(1)).findByUsername(testUser.getUsername());
+        verify(userService, times(1)).createUser(testUser);
         verifyNoMoreInteractions(userService);
     }
 
