@@ -1,24 +1,47 @@
 package BE.controllers;
 
-// Entities
+// JavaIO
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+
+// Entities TODO THERE SHOULD BE NO ENTITIES IN A CONTROLLER
 import BE.entities.project.File;
+
+// Models
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
 import BE.responsemodels.project.UserListModel;
+
+// Services
 import BE.services.FileService;
 import BE.services.ProjectService;
+
 // Exceptions
-import BE.entities.project.Project;
-import BE.entities.project.Role;
 import BE.exceptions.NotImplementedException;
-// Spring
+import java.io.IOException;
+
+// Apache
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.http.fileupload.FileItemIterator;
+import org.apache.tomcat.util.http.fileupload.FileItemStream;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+
+// Spring
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 
+//Other
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController
 public class ProjectController {
@@ -125,30 +148,46 @@ public class ProjectController {
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         return fileService.createFile(file_name, path);
     }
-//
-//    /**
-//     * @param project_name
-//     * @param project
-//     * @return
-//     */
-//    @RequestMapping(value = "/projects/{project_name}", method = RequestMethod.PATCH)
-//    public Project updateProject(@PathVariable(value="project_name") String project_name, @RequestBody Project project) {
-//        return projectService.updateProject(project);
-//    }
-//
-//    /**
-//     * @param project_name
-//     * @return
-//     */
-//    @RequestMapping(value = "/project/{project_name}", method = RequestMethod.DELETE)
-//    public Project deleteProject(@PathVariable(value="project_name") String project_name) {
-//        return projectService.deleteProject(project_name);
-//    }
-//
-//    @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
-//    public Role getProjectRoles() throws NotImplementedException {
-//        //TODO this
-//        throw new NotImplementedException();
-//    }
+
+    @RequestMapping(value="/upload", method= RequestMethod.POST)
+    public void upload(HttpServletRequest request) {
+        try {
+        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        if (!isMultipart) {
+            // Inform user about invalid request
+            System.out.println("Invalid request");
+            return;
+        }
+
+        // Create a new file upload handler
+        ServletFileUpload upload = new ServletFileUpload();
+
+        // Parse the request
+            FileItemIterator iterator = upload.getItemIterator(request);
+            while (iterator.hasNext()) {
+                FileItemStream item = iterator.next();
+                String name = item.getFieldName();
+                InputStream stream = item.openStream();
+                if (!item.isFormField()) {
+                    String filename = item.getName();
+                    // Process the input stream
+                    System.out.println("File detected");
+                    OutputStream out = new FileOutputStream(filename);
+                    IOUtils.copy(stream, out);
+                    stream.close();
+                    out.close();
+                }
+            }
+        }catch (FileUploadException | IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/uploader", method = RequestMethod.GET)
+    public ModelAndView uploaderPage() {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("uploader");
+        return model;
+    }
 
 }
