@@ -16,6 +16,7 @@ import BE.responsemodels.user.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,9 +33,12 @@ public class UserServiceImpl implements UserService {
 
     // Conversion Functions
     private static UserModel userToUserModel(User user) {
+        Pbkdf2PasswordEncoder PBKDF2encoder = new Pbkdf2PasswordEncoder(); // Can change width of hash
+        String userPassword = user.getPassword();
+        String hashedPassword = PBKDF2encoder.encode(userPassword);
         return new UserModel(
                 user.getUsername(),
-                user.getPassword(),
+                hashedPassword,
                 user.getEmail(),
                 // convert user projects to project list
                 user.getUserProjects().stream().map(
