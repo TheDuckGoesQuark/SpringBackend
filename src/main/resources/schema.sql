@@ -3,7 +3,6 @@
 DROP TABLE IF EXISTS `oauth_access_token`;
 DROP TABLE IF EXISTS `has_privilege`;
 DROP TABLE IF EXISTS `involved_in`;
-DROP TABLE IF EXISTS `oauth_access_token`;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS `privilege`;
 DROP TABLE IF EXISTS `project`;
@@ -82,6 +81,22 @@ CREATE TABLE IF NOT EXISTS `involved_in` (
   REFERENCES `project` (`name`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS `oauth_access_token` (
+  `token_id` VARCHAR(256) NOT NULL,
+  `username` VARCHAR(100) NOT NULL,
+  `created` TIMESTAMP NOT NULL,
+  `refresh_token` VARCHAR(256),
+  PRIMARY KEY (`token_id`),
+  INDEX `user_id_idx` (`username` ASC),
+  CONSTRAINT `user_id`
+  FOREIGN KEY (`username`)
+  REFERENCES `user` (`username`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+
 
 CREATE TABLE IF NOT EXISTS `supported_view` (
   `file_id` INT UNSIGNED NOT NULL,

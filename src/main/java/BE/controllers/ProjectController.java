@@ -4,9 +4,11 @@ package BE.controllers;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 // Models
+import BE.entities.project.File;
 import BE.responsemodels.file.FileModel;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
@@ -114,7 +116,6 @@ public class ProjectController {
         throw new NotImplementedException();
     }
 
-
     /**
      * Gets all files of a project
      * @return a list of all projects
@@ -128,20 +129,88 @@ public class ProjectController {
      * @param project_name
      * @return a particular file
      */
-    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.GET)
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = "view", method = RequestMethod.GET)
     public FileModel getFile(@PathVariable(value="project_name") String project_name,
-                        HttpServletRequest request) {
+                             HttpServletRequest request,
+                             @RequestParam("view") String view) {
+        //TODO first iterate through views to see if supported otherwise throw UnsupportedFileViewException
         String path  = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return fileService.getFile(project_name, path);
+        //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
+        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
+        path = path.replace("/files", "");
+        if(view.equals("") || view.equals("meta"))
+            return fileService.getFile(project_name, path);
+        else
+            //TODO return other views
+            return fileService.getFile(project_name, path);
+    }
+
+    /**
+     * @param project_name
+     * @param file_id
+     * @return a particular file
+     */
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
+    public FileModel getFileByID(@PathVariable(value="project_name") String project_name,
+                                 @PathVariable(value="file_id") int file_id) {
+        return fileService.getFileByID(project_name, file_id);
+    }
+
+    /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.PATCH)
+    public FileModel updateFile(@PathVariable(value="project_name") String project_name,
+                                HttpServletRequest request,
+                                @RequestBody File file) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        return fileService.updateFile(file);
+    }
+
+    /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.DELETE)
+    public FileModel deleteFile(@PathVariable(value="project_name") String project_name,
+                                HttpServletRequest request) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
+        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
+        path = path.replace("/files", "");
+        return fileService.deleteFile(project_name, path);
+    }
+
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view","include_children"}, method = RequestMethod.GET)
+    public List<FileModel> getDirContents(@PathVariable(value="project_name") String project_name,
+                                          HttpServletRequest request, @RequestParam("view") String view) {
+        String path  = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        //TODO REPLACE this is error prone because /files can be contained somewhere in filepath.
+        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
+        path = path.replace("/files", "");
+        List<FileModel> list = new ArrayList<>();
+        //check if dir exists
+        FileModel dir = fileService.getFile(project_name, path);
+        list.add(dir);
+        //TODO transfer logic to file service
+        if(dir.getType().equals("dir") && view.equals("meta")){
+            return fileService.getChildren(project_name, path);
+        }
+        return list;
     }
 
     /**
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.POST)
+    //TODO provide additional parameters support by protocol
+    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.POST)
     public FileModel createFile(@PathVariable(value="project_name") String file_name,
-                           HttpServletRequest request) {
+                                HttpServletRequest request) {
         String path  = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         return fileService.createFile(file_name, path);

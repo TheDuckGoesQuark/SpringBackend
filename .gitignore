@@ -24,4 +24,4 @@ tasks.xml
 *.rar
 
 application.properties
-target/classes/schema.sql
+target/*
