@@ -8,12 +8,13 @@ import BE.exceptions.UserNotFoundException;
 import BE.exceptions.UserAlreadyExistsException;
 import BE.repositories.PrivilegeRepository;
 import BE.repositories.UserRepository;
-import BE.responsemodels.project.ProjectModel;
-import BE.responsemodels.project.UserListModel;
 import BE.responsemodels.user.PrivilegeModel;
 import BE.responsemodels.user.ProjectListModel;
 import BE.responsemodels.user.UserModel;
+import BE.security.UserAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
@@ -25,11 +26,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
+    private final
     UserRepository userRepository;
 
-    @Autowired
+    private final
     PrivilegeRepository privilegeRepository;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, PrivilegeRepository privilegeRepository) {
+        this.userRepository = userRepository;
+        this.privilegeRepository = privilegeRepository;
+    }
 
     // Conversion Functions
     private static UserModel userToUserModel(User user) {
@@ -70,7 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel getUserByUserName(String username) {
+    public UserModel getUserByUserName(String username) throws UsernameNotFoundException, UserNotFoundException {
         User user = userRepository.findByUsername(username);
         if (user == null) throw new UserNotFoundException();
         else return userToUserModel(user);
@@ -129,5 +136,13 @@ public class UserServiceImpl implements UserService {
                 .parallelStream()
                 .map(UserServiceImpl::privilegeToPrivilegeModel)
                 .collect(Collectors.toList());
+    }
+
+    // Method used by spring security for providing user information
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(s);
+        if (user == null) throw new UserNotFoundException();
+        else return new UserAdapter(user);
     }
 }

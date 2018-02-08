@@ -26,14 +26,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringRunner.class)
 public class UserServiceImplTest {
 
-    @TestConfiguration
-    static class UserServiceImplTestContextConfiguration {
-        @Bean
-        public UserService userService() {
-            return new UserServiceImpl();
-        }
-    }
-
+    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Autowired
     private UserService userService;
 

@@ -23,3 +23,5 @@ tasks.xml
 *.tar.gz
 *.rar
 
+application.properties
+target/*

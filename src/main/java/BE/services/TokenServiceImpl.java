@@ -1,92 +1,101 @@
-/*
 package BE.services;
 
-import org.springframework.security.core.token.Token;
-import org.springframework.security.core.token.TokenService;
+import BE.entities.security.Token;
+import BE.entities.user.User;
+import BE.exceptions.TokenExpiredException;
+import BE.exceptions.TokenNotFoundException;
+import BE.exceptions.UserNotFoundException;
+import BE.repositories.TokenRepository;
+import BE.repositories.UserRepository;
+import BE.responsemodels.security.TokenModel;
+import BE.responsemodels.user.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.sql.Timestamp;
 import java.util.UUID;
-
-*/
-/**
- * Created by lavi on 29.03.2015.
- *//*
 
 @Service
 public class TokenServiceImpl implements TokenService {
 
-    @Autowired
+    private final
     TokenRepository tokenRepository;
 
+    private final
+    UserRepository userRepository;
+
+    private final int REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS = 60000; // 1 minute
+    private final int TOKEN_LIFETIME_MILLISECONDS = 21600000; // 6 hours
+
+    @Autowired
+    public TokenServiceImpl(TokenRepository tokenRepository, UserRepository userRepository) {
+        this.tokenRepository = tokenRepository;
+        this.userRepository = userRepository;
+    }
+
+    @Transactional
+    @Scheduled(fixedDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS, initialDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS)
+    public void removeExpiredTokens() {
+        tokenRepository.removeExpiredTokens(TOKEN_LIFETIME_MILLISECONDS);
+    }
+
+    private static int calcTimeSinceCreation(java.sql.Timestamp time_of_creation) {
+        long milliseconds1 = time_of_creation.getTime();
+        long milliseconds2 = System.currentTimeMillis();
+        Long diff = (milliseconds2 - milliseconds1) / 1000;
+        return diff.intValue();
+    }
+
+    private Token generateToken(User user) {
+        Token token = new Token(user, UUID.randomUUID().toString());
+        return tokenRepository.save(token);
+    }
+
+    private TokenModel tokenToTokenModel(Token token) {
+        return new TokenModel(
+                token.getToken_id(),
+                token.getRefresh_token(),
+                TOKEN_LIFETIME_MILLISECONDS - calcTimeSinceCreation(token.getCreated())
+        );
+    }
+
     @Override
     @Transactional
-    public Token getTokenByKey(String tokenKey) {
-        return tokenRepository.findByKey(tokenKey);
-    }
-
-    @Transactional
-    public List<Token> getTokens() {
-        return tokenRepository.findAll();
-    }
-
-    @Override
-    @Transactional
-    public void addToken(Token token) {
-        tokenRepository.saveAndFlush(token);
-    }
-
-    @Override
-    public Token generateToken(Date expiredDate) {
-        Token token = new Token();
-        token.setExpired(expiredDate);
-        token.setCreated(new Date());
-        token.setKey(UUID.randomUUID().toString().toUpperCase());
-        token.setToken(PasswordEncryption.encrypt(String.valueOf(System.nanoTime())));
-        return token;
-    }
-
-    @Override
-    @Transactional
-    public void updateLastLoginByCurrentDate(Token token) {
-        token.setLastUsed(new Date());
-        tokenRepository.saveAndFlush(token);
-    }
-
-    @Override
-    @Transactional
-    public void updateToken(Token token) {
-        tokenRepository.saveAndFlush(token);
-    }
-
-    @Transactional
-    public void deleteToken(Integer tokenId) {
+    public void deleteToken(String tokenId) {
         tokenRepository.delete(tokenId);
     }
 
-    @Transactional
-    public Page<Token> getTokens(Pageable pageable) {
-        return tokenRepository.findAll(pageable);
+    @Override
+    public TokenModel getTokenById(String tokenId) {
+        Token token = tokenRepository.findOne(tokenId);
+        if (token == null) throw new TokenNotFoundException();
+        return tokenToTokenModel(token);
     }
 
     @Override
     @Transactional
-    public Token getTokenById(Integer tokenId) {
-        return tokenRepository.findOne(tokenId);
+    public TokenModel allocateToken(String username) {
+        Token token = generateToken(userRepository.findByUsername(username));
+        return tokenToTokenModel(token);
+    }
+
+    @Transactional
+    public TokenModel refreshToken(String tokenId) {
+        Token token = tokenRepository.findByRefresh_token(tokenId);
+        if (token == null) throw new TokenNotFoundException();
+        if (calcTimeSinceCreation(token.getCreated()) > TOKEN_LIFETIME_MILLISECONDS) throw new TokenExpiredException();
+        token = generateToken(token.getUser());
+        return tokenToTokenModel(token);
     }
 
     @Override
-    public Token allocateToken(String s) {
-        return null;
+    public String getUsernameFromTokenId(String tokenId) {
+        Token token = tokenRepository.findOne(tokenId);
+        if (token == null) throw new TokenNotFoundException();
+        String user = token.getUser().getUsername();
+        if (user == null) throw new UserNotFoundException();
+        return user;
     }
-
-    @Override
-    public Token verifyToken(String s) {
-        return null;
-    }
-}*/
+}
