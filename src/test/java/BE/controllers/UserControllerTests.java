@@ -172,14 +172,14 @@ public class UserControllerTests {
         List<UserProject> projects = null;
         User user = new User("testUserModel","testPazz", "testModel@email.com",privileges,projects);
 
-        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(user);
+        //when(userRepository.findByUsername(testUser.getUsername())).thenReturn(user);
         when(userService.createUser(testUser)).thenReturn(testUser);
         mockMvc.perform(post("/users/testUser?action=create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
                 .andDo(print());
                 //.andExpect(status().isCreated());
-        verify(userRepository, times(1)).findByUsername(testUser.getUsername());
+        //verify(userRepository, times(1)).findByUsername(testUser.getUsername());
         verify(userService, times(1)).createUser(testUser);
         verifyNoMoreInteractions(userService);
     }
