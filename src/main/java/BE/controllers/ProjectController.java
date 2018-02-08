@@ -20,6 +20,7 @@ import BE.services.ProjectService;
 
 // Exceptions
 import BE.exceptions.NotImplementedException;
+//import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
 import java.io.IOException;
 
 // Apache
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
@@ -149,14 +149,13 @@ public class ProjectController {
         return fileService.createFile(file_name, path);
     }
 
-    @RequestMapping(value="/upload", method= RequestMethod.POST)
-    public void upload(HttpServletRequest request) {
+    @RequestMapping(value = "/project/{project_name}/upload", method = RequestMethod.POST)
+    public void upload(HttpServletRequest request) throws Exception {
         try {
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
         if (!isMultipart) {
             // Inform user about invalid request
-            System.out.println("Invalid request");
-            return;
+            throw new Exception();//InvalidRequestException("Invalid file.");
         }
 
         // Create a new file upload handler
@@ -166,13 +165,13 @@ public class ProjectController {
             FileItemIterator iterator = upload.getItemIterator(request);
             while (iterator.hasNext()) {
                 FileItemStream item = iterator.next();
-                String name = item.getFieldName();
+//                String name = item.getFieldName();
                 InputStream stream = item.openStream();
                 if (!item.isFormField()) {
-                    String filename = item.getName();
+//                    String filename = item.getName();
                     // Process the input stream
                     System.out.println("File detected");
-                    OutputStream out = new FileOutputStream(filename);
+                    OutputStream out = new FileOutputStream("testFile.txt");
                     IOUtils.copy(stream, out);
                     stream.close();
                     out.close();
@@ -181,13 +180,6 @@ public class ProjectController {
         }catch (FileUploadException | IOException e){
             e.printStackTrace();
         }
-    }
-
-    @RequestMapping(value = "/uploader", method = RequestMethod.GET)
-    public ModelAndView uploaderPage() {
-        ModelAndView model = new ModelAndView();
-        model.setViewName("uploader");
-        return model;
     }
 
 }
