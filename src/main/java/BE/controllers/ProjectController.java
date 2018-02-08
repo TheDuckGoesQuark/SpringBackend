@@ -6,10 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-// Entities TODO THERE SHOULD BE NO ENTITIES IN A CONTROLLER
-import BE.entities.project.File;
-
 // Models
+import BE.responsemodels.file.FileModel;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
 import BE.responsemodels.project.UserListModel;
@@ -114,39 +112,6 @@ public class ProjectController {
     public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
         throw new NotImplementedException();
-    }
-
-
-    /**
-     * Gets all files of a project
-     * @return a list of all projects
-     **/
-    @RequestMapping(value = "/projects/{project_name}/files", method = RequestMethod.GET)
-    public List<File> getAllFiles(@PathVariable(value="project_name") String project_name) {
-        return fileService.getAllFiles(project_name);
-    }
-
-    /**
-     * @param project_name
-     * @return a particular file
-     */
-    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.GET)
-    public File getFile(@PathVariable(value="project_name") String project_name,
-                        HttpServletRequest request) {
-        String path  = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return fileService.getFile(project_name, path);
-    }
-
-    /**
-     * @return
-     */
-    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.POST)
-    public File createFile(@PathVariable(value="project_name") String file_name,
-                           HttpServletRequest request) {
-        String path  = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return fileService.createFile(file_name, path);
     }
 
     @RequestMapping(value="/upload", method= RequestMethod.POST)

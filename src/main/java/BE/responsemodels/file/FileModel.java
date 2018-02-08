@@ -1,58 +1,51 @@
-package BE.entities.project;
+package BE.responsemodels.file;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import BE.entities.project.Dir_contains;
+import BE.entities.project.Supported_view;
 
-import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
-
-@Entity
-@Table(name = "file")
-public class File {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "file_id")
-    private int fileId;
+//TODO this may actually have to be named FileModel containing two constructors one for file meta protocol and one for file data protocol.
+public class FileModel {
 
     private String path;
 
     private String file_name;
 
+    private int file_id;
+
+    private List<Supported_view> views;
+
+    private String metadata;
+
     private String type;
 
     private String status;
 
-    private String metadata;
+//    private List<Dir_contains> contents;
 
-
-
-
-    @OneToOne(mappedBy = "root_dir")
-    @JsonIgnore
-    private Project project;
-
-//    @OneToMany
-//    @JoinColumn(name = "dir_id")
-//    private List<Dir_contains> contents = new ArrayList<Dir_contains>();
-
-    protected File() {
-    }
-
-    public File(String path, String file_name, String type, String status, String metadata) {
+    //file meta model
+    public FileModel(String path, String file_name, int file_id, List<Supported_view> views, String metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
+        this.file_id = file_id;
+        this.views = views;
+        this.metadata = metadata;
         this.type = type;
         this.status = status;
-        this.metadata = metadata;
+//        this.contents = contents;
     }
 
-    public int getFileId() {
-        return fileId;
+    //dir meta model
+//    public FileModel(List<Dir_contains> contents) {
+//        this.contents = contents;
+//    }
+
+    public int getFile_id() {
+        return file_id;
     }
 
-    public void setFileId(int fileId) {
-        this.fileId = fileId;
+    public void setFile_id(int file_id) {
+        this.file_id = file_id;
     }
 
     public String getPath() {
@@ -79,12 +72,12 @@ public class File {
         this.type = type;
     }
 
-    public Project getProject() {
-        return project;
+    public List<Supported_view> getViews() {
+        return views;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setViews(List<Supported_view> views) {
+        this.views = views;
     }
 
     public String getStatus() {
