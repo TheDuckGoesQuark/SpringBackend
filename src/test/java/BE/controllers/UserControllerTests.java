@@ -89,25 +89,24 @@ public class UserControllerTests {
 
     //Initialised test helpers
 
-    List<String> testPrivileges= Arrays.asList("username");
-    List<String> testPrivileges2 = Arrays.asList("username","admin");
-    List<ProjectListModel> testProject=null;
-    List<UserModel> usersG = Arrays.asList(
-            new UserModel("testUser","testPass","test@email.com",testProject,testPrivileges),
-            new UserModel("testUser2","testPass2","test2@email.com",testProject,testPrivileges2));
-    PrivilegeModel testPrivilege = new PrivilegeModel("username","standard user access", false);
-    PrivilegeModel testPrivilege2 = new PrivilegeModel("admin","admin access", true);
-    List<PrivilegeModel> testPrivilegeList = Arrays.asList(testPrivilege, testPrivilege2);
-    UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 
     @Test
     public void getAllUsers() throws Exception {
-        when(userService.getAllUsers()).thenReturn(usersG);
+
+        //object initialisation
+        List<String> testPrivileges= Arrays.asList("username");
+        List<String> testPrivileges2 = Arrays.asList("username","admin");
+        List<ProjectListModel> testProject=null;
+        List<UserModel> usersList = Arrays.asList(
+                new UserModel("testUser1","testPass","test@email.com",testProject,testPrivileges),
+                new UserModel("testUser2","testPass2","test2@email.com",testProject,testPrivileges2));
+
+        when(userService.getAllUsers()).thenReturn(usersList);
         mockMvc.perform(get("/users"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].username").value("testUser"))
+                .andExpect(jsonPath("$[0].username").value("testUser1"))
                 .andExpect(jsonPath("$[1].username").value("testUser2"))
                 .andExpect(jsonPath("$[0].password").value("testPass"))
                 .andExpect(jsonPath("$[0].email").value("test@email.com"))
@@ -116,13 +115,37 @@ public class UserControllerTests {
 
         verify(userService, times(1)).getAllUsers();
         verifyNoMoreInteractions(userService);
+    }
+
+
+    @Test
+    public void getASpecificUser() throws Exception {
+
+        //object initialisation
+        List<String> testPrivileges = Arrays.asList("username","admin");
+        List<ProjectListModel> testProject=null;
+        UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
+
+        when(userService.getUserByUserName(testUser.getUsername())).thenReturn(testUser);
+        mockMvc.perform(get("/users/{username}", testUser.getUsername()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("testUserModel"));
+        verify(userService, times(1)).getUserByUserName(testUser.getUsername());
+        verifyNoMoreInteractions(userService);
 
     }
 
     @Test
     public void getListOfUserPriviledges() throws Exception {
+
+        //object initialisation
+        PrivilegeModel testPrivilege = new PrivilegeModel("username","standard user access", false);
+        PrivilegeModel testPrivilege2 = new PrivilegeModel("admin","admin access", true);
+        List<PrivilegeModel> testPrivilegeList = Arrays.asList(testPrivilege, testPrivilege2);
+
         when(userService.getAllPrivileges()).thenReturn(testPrivilegeList);
-        this.mockMvc.perform(get("/user_privileges"))
+        mockMvc.perform(get("/user_privileges"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -136,17 +159,60 @@ public class UserControllerTests {
 
     @Test
     public void createUser() throws Exception {
-        when(userService.userExists(testUser.getUsername())).thenReturn(false);
+
+        //object initialisation
+        List<String> testPrivileges = Arrays.asList("username","admin");
+        List<ProjectListModel> testProject=null;
+        UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
+
         when(userService.createUser(testUser)).thenReturn(testUser);
-        this.mockMvc.perform(post("/users/testUser?action=create")
+        mockMvc.perform(post("/users/testUser?action=create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
-                .andDo(print());
-                //.andExpect(status().isCreated())
-                //.andExpect(header().string("location", containsString("http://localhost/users/")));
-        verify(userService, times(1)).userExists(testUser.getUsername());
-        verify(userService, times(1)).createUser(testUser);
+                .andDo(print())
+                .andExpect(status().isCreated());
+                verify(userService, times(1)).createUser(testUser);
         verifyNoMoreInteractions(userService);
     }
+
+    @Test
+    public void updateUser() throws Exception {
+
+        //object initialisation
+        List<String> testPrivileges = Arrays.asList("username","admin");
+        List<ProjectListModel> testProject=null;
+        UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
+
+        when(userService.updateUser(testUser)).thenReturn(testUser);
+        mockMvc.perform(post("/users/{username}?action=update", testUser.getUsername())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testUser)))
+                .andDo(print())
+                .andExpect(status().isOk());
+        verify(userService, times(1)).updateUser(testUser);
+        verifyNoMoreInteractions(userService);
+
+
+    }
+
+    @Test
+    public void deleteUser() throws Exception {
+
+        //object initialisation
+        /*
+        List<String> testPrivileges= Arrays.asList("username");
+        List<String> testPrivileges2 = Arrays.asList("username","admin");
+        List<ProjectListModel> testProject=null;
+        List<UserModel> usersList = Arrays.asList(
+                new UserModel("testUser1","testPass","test@email.com",testProject,testPrivileges),
+                new UserModel("testUser2","testPass2","test2@email.com",testProject,testPrivileges2));
+        */
+        when(userService.deleteUser("testUser1")).thenReturn(null);
+        mockMvc.perform(post("/users/testUser1?action=delete"))
+                .andExpect(status().isOk());
+        verify(userService, times(1)).deleteUser("testUser1");
+        verifyNoMoreInteractions(userService);
+    }
+
 
 }
