@@ -63,8 +63,6 @@ Classes for intercepting method calls to other classes. Used to wrap error and s
 according to protocol
 #### aspects/
 Classes for monitoring method calls. Used for performance monitoring by timing method execution.
-#### config/
-Configuration classes for Spring, such as security endpoints and filters.
 #### controllers/
 REST Controller classes, which maps URLS to the corresponding service call, and extracts any data
 from the request body.
@@ -77,11 +75,11 @@ All exceptions extend base exception class, and contain the fields required by t
 Repositories provide an interface into the DB, and simplify requests.
 #### responsemodels/
 Classes for mapping entities to expected response models and the reverse.
+#### security/
+Package contains custom implemenation of Spring Security interfaces, implementing a simple JWT system.
 #### services/
 Services remove business logic from controllers, and provide the actual implementation and
-an interface for the controllers. 
-#### ClientTest/
-A basic front end client for testing the server.     
+an interface for the controllers.     
 #### resources/
 Contains properties and other static files such as database connection details.
 #### test/
