@@ -126,4 +126,5 @@ public class UserServiceImpl implements UserService {
                 .map(UserServiceImpl::privilegeToPrivilegeModel)
                 .collect(Collectors.toList());
     }
+
 }
