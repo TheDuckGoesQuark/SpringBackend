@@ -167,19 +167,12 @@ public class UserControllerTests {
         List<ProjectListModel> testProject=null;
         UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 
-        Privilege privilege = new Privilege("username","user rights", false);
-        List<Privilege> privileges = Arrays.asList(privilege);
-        List<UserProject> projects = null;
-        User user = new User("testUserModel","testPazz", "testModel@email.com",privileges,projects);
-
-        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(user);
         when(userService.createUser(testUser)).thenReturn(testUser);
         mockMvc.perform(post("/users/testUser?action=create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
                 .andDo(print());
                 //.andExpect(status().isCreated());
-        verify(userRepository, times(1)).findByUsername(testUser.getUsername());
         verify(userService, times(1)).createUser(testUser);
         verifyNoMoreInteractions(userService);
     }
