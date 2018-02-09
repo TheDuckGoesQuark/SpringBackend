@@ -21,11 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import BE.entities.UserProject;
-import BE.entities.project.Project;
-import BE.entities.user.Privilege;
-import BE.entities.user.User;
-import BE.repositories.UserRepository;
 import BE.responsemodels.user.PrivilegeModel;
 import BE.responsemodels.user.ProjectListModel;
 import BE.responsemodels.user.UserModel;
@@ -159,6 +154,7 @@ public class UserControllerTests {
         verifyNoMoreInteractions(userService);
     }
 
+
     @Test
     public void createUser() throws Exception {
 
@@ -167,22 +163,16 @@ public class UserControllerTests {
         List<ProjectListModel> testProject=null;
         UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 
-        Privilege privilege = new Privilege("username","user rights", false);
-        List<Privilege> privileges = Arrays.asList(privilege);
-        List<UserProject> projects = null;
-        User user = new User("testUserModel","testPazz", "testModel@email.com",privileges,projects);
-
-        //when(userRepository.findByUsername(testUser.getUsername())).thenReturn(user);
         when(userService.createUser(testUser)).thenReturn(testUser);
-        mockMvc.perform(post("/users/testUser?action=create")
+        mockMvc.perform(post("/users/{username}?action=create", testUser.getUsername())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
-                .andDo(print());
-                //.andExpect(status().isCreated());
-        //verify(userRepository, times(1)).findByUsername(testUser.getUsername());
+                .andDo(print())
+                .andExpect(status().isCreated());
         verify(userService, times(1)).createUser(testUser);
         verifyNoMoreInteractions(userService);
     }
+
 
     @Test
     public void updateUser() throws Exception {
@@ -200,22 +190,16 @@ public class UserControllerTests {
                 .andExpect(status().isOk());
         verify(userService, times(1)).updateUser(testUser);
         verifyNoMoreInteractions(userService);
+    }
 
-
+    @Test
+    public void getCurrentUser() throws Exception {
+        //TODO
     }
 
     @Test
     public void deleteUser() throws Exception {
 
-        //object initialisation
-        /*
-        List<String> testPrivileges= Arrays.asList("username");
-        List<String> testPrivileges2 = Arrays.asList("username","admin");
-        List<ProjectListModel> testProject=null;
-        List<UserModel> usersList = Arrays.asList(
-                new UserModel("testUser1","testPass","test@email.com",testProject,testPrivileges),
-                new UserModel("testUser2","testPass2","test2@email.com",testProject,testPrivileges2));
-        */
         when(userService.deleteUser("testUser1")).thenReturn(null);
         mockMvc.perform(post("/users/testUser1?action=delete"))
                 .andExpect(status().isOk());
