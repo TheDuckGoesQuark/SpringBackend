@@ -1,6 +1,7 @@
 package BE.entities.user;
 
 import BE.entities.UserProject;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,13 +11,14 @@ import java.util.List;
 public class User {
 
     @Id
+    @Column(name = "username")
     private String username;
 
     private String password;
 
     private String email;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch= FetchType.EAGER)
     @JoinTable(name = "has_privilege",
             joinColumns = @JoinColumn(name = "username", referencedColumnName = "username"),
             inverseJoinColumns = @JoinColumn(name = "privilege_name", referencedColumnName = "name"))
@@ -25,8 +27,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<UserProject> userProjects;
 
-    protected User() {
-    }
+    protected User() {}
 
     public User(String username, String password, String email, List<Privilege> privileges, List<UserProject> userProjects) {
         this.username = username;

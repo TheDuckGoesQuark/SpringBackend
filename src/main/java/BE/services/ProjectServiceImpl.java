@@ -24,18 +24,23 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
-    @Autowired
+    private final
     ProjectRepository projectRepository;
 
+
     @Autowired
-    FileRepository fileRepository;
+    public ProjectServiceImpl(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
 
     // Conversion Functions
     private static ProjectModel projectToProjectModel(Project project) {
         return new ProjectModel(project.getName(),
-                project.getUserProjects().stream().map(
+//TODO get user projects returns null and that causes the program to throw NullPointerException
+/*                project.getUserProjects().stream().map(
                         ProjectServiceImpl::userProjectToUserListModel
-                ).collect(Collectors.toList()));
+                ).collect(Collectors.toList())*/
+                null);
     }
 
     private static UserListModel userProjectToUserListModel(UserProject userProject) {
@@ -66,7 +71,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
         // TODO add creating user to project during creation logic
         // Create root directory
-        File file = new File("/", "root", FileTypes.DIR);
+        File file = new File("/" + project_name, project_name, FileTypes.DIR, "status", "file metadata");
         // Create project
         Project project = new Project(project_name, file);
         // Link project to root file
