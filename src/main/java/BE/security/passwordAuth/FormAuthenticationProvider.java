@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import BE.security.passwordHash.PasswordHash;
 
 @Component
 public class FormAuthenticationProvider implements AuthenticationProvider {
@@ -26,8 +27,11 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
         String username = (String) authentication.getPrincipal();
         String password = (String) authentication.getCredentials();
 
+        PasswordHash passwordHasher = new PasswordHash();
         UserDetails user = userService.loadUserByUsername(username);
-        if (user == null || !user.getPassword().equals(password)) {
+
+
+        if (user == null || !passwordHasher.checkPassword(password, user.getPassword())) {
             throw new AuthenticationException(
                     SecurityUtils.INVALID_CREDENTIALS_ERROR_MESSAGE,
                     AuthenticationFailureType.INVALID_GRANT

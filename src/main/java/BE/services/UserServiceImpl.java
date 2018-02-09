@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import BE.security.passwordHash.PasswordHash;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,9 +42,11 @@ public class UserServiceImpl implements UserService {
 
     // Conversion Functions
     private static UserModel userToUserModel(User user) {
+        PasswordHash passwordHasher = new PasswordHash();
+        String hashedPassword = passwordHasher.hashPassword(user.getPassword());
         return new UserModel(
                 user.getUsername(),
-                user.getPassword(),
+                hashedPassword,
                 user.getEmail(),
                 // convert user projects to project list
                 user.getUserProjects().stream().map(
