@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import BE.security.passwordHash.PasswordHash;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,9 +40,8 @@ public class UserServiceImpl implements UserService {
 
     // Conversion Functions
     private static UserModel userToUserModel(User user) {
-        Pbkdf2PasswordEncoder PBKDF2encoder = new Pbkdf2PasswordEncoder(); // Can change width of hash
-        String userPassword = user.getPassword();
-        String hashedPassword = PBKDF2encoder.encode(userPassword);
+        PasswordHash passwordHasher = new PasswordHash();
+        String hashedPassword = passwordHasher.hashPassword(user.getPassword());
         return new UserModel(
                 user.getUsername(),
                 hashedPassword,
