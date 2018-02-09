@@ -91,9 +91,10 @@ public class UserServiceImpl implements UserService {
         if (user != null) throw new UserAlreadyExistsException();
         // Construct user entity from information
         List<Privilege> privileges = privilegeRepository.findAllByNameIn(userModel.getPrivileges());
+        PasswordHash passwordHash = new PasswordHash();
         user = new User(
                 userModel.getUsername(),
-                userModel.getPassword(),
+                passwordHash.hashPassword(userModel.getPassword()),
                 userModel.getEmail(),
                 privileges,
                 null
@@ -110,9 +111,10 @@ public class UserServiceImpl implements UserService {
         // .save performs both update and creation
         // Construct user entity from information
         List<Privilege> privileges = privilegeRepository.findAllByNameIn(userModel.getPrivileges());
+        PasswordHash passwordHash = new PasswordHash();
         user = new User(
                 userModel.getUsername(),
-                userModel.getPassword(),
+                passwordHash.hashPassword(userModel.getPassword()),
                 userModel.getEmail(),
                 privileges,
                 null
