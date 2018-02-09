@@ -164,7 +164,7 @@ public class UserControllerTests {
         UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 
         when(userService.createUser(testUser)).thenReturn(testUser);
-        mockMvc.perform(post("/users/testUser?action=create")
+        mockMvc.perform(post("/users/{username}?action=create", testUser.getUsername())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
                 .andDo(print())

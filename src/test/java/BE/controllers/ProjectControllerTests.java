@@ -6,8 +6,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import BE.entities.project.File;
+import BE.entities.project.Supported_view;
+import BE.responsemodels.file.FileModel;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.UserListModel;
+import BE.services.FileService;
 import BE.services.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.filters.CorsFilter;
@@ -59,6 +63,9 @@ public class ProjectControllerTests {
     @InjectMocks
     private ProjectController projectController;
 
+    @Mock
+    private FileService fileService;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -109,32 +116,92 @@ public class ProjectControllerTests {
 
     @Test
     public void createProject() throws Exception {
-        //TODO
+        List<UserListModel> userList = Arrays.asList(
+                new UserListModel("testUserListModel1","testAccess1"),
+                new UserListModel("testUserListModel2", "testAccess2"));
+        ProjectModel testProject = new ProjectModel("testProjectModel1", userList);
+
+        when(projectService.createProject(testProject.getProject_name())).thenReturn(testProject);
+        mockMvc.perform(post("/project/{project_name}?action=create", testProject.getProject_name())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testProject)))
+                .andDo(print())
+                .andExpect(status().isCreated());
+        verify(projectService, times(1)).createProject(testProject.getProject_name());
+        verifyNoMoreInteractions(projectService);
     }
 
     @Test
     public void updateProject() throws Exception {
-        //TODO
+        List<UserListModel> userList = Arrays.asList(
+                new UserListModel("testUserListModel1","testAccess1"),
+                new UserListModel("testUserListModel2", "testAccess2"));
+        ProjectModel testProject = new ProjectModel("testProjectModel1", userList);
+
+        when(projectService.updateProject(testProject)).thenReturn(testProject);
+        mockMvc.perform(post("/project/{project_name}?action=update", testProject.getProject_name())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testProject)))
+                .andDo(print())
+                .andExpect(status().isOk());
+        verify(projectService, times(1)).updateProject(testProject);
+        verifyNoMoreInteractions(projectService);
+        //TODO extra testing on comparisons of update
     }
 
     @Test
     public void deleteProject() throws Exception {
-        //TODO
+        when(projectService.deleteProject("testProject")).thenReturn(null);
+        mockMvc.perform(post("/project/testProject?action=delete"))
+                .andExpect(status().isOk());
+        verify(projectService, times(1)).deleteProject("testProject");
+        verifyNoMoreInteractions(projectService);
+        //TODO testing if once a project is created that it is deleted
     }
 
     @Test
     public void updateGrant() throws Exception {
-        //TODO
+        List<UserListModel> userList = Arrays.asList(
+                new UserListModel("testUserListModel1","testAccess1"),
+                new UserListModel("testUserListModel2", "testAccess2"));
+        ProjectModel testProject = new ProjectModel("testProjectModel1", userList);
+        UserListModel userListModel = new UserListModel("testUserListModel3", "testAccess3");
+
+        when(projectService.updateGrant(testProject.getProject_name(), userListModel)).thenReturn(null);
+        //TODO after implemented
     }
 
     @Test
     public void getProjectRoles() throws Exception {
-        //TODO
+        // TODO when(projectService.getProjectRoles())
     }
+
+    /******************************************FILE TESTS***************************************************/
+
 
     @Test
     public void getAllFiles() throws Exception {
-        //TODO
+        File testFile = new File("/project/","testFile","testFileType","testStatus","testMetaData");
+        List<Supported_view> listSupportedViews = Arrays.asList(
+                new Supported_view(testFile, "testView")
+        );
+        FileModel fileModel = new FileModel("/project/", "testFileModel", 99
+                , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
+        List<FileModel> listFileModel = Arrays.asList(fileModel);
+        when (fileService.getAllFiles("project")).thenReturn(listFileModel);
+        mockMvc.perform(get("/projects/project/files"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].path").value("/project/"))
+                .andExpect(jsonPath("$[0].file_name").value("testFileModel"))
+                .andExpect(jsonPath("$[0].file_id").value(99))
+                .andExpect(jsonPath("$[0].views[0].view").value("testView"))
+                .andExpect(jsonPath("$[0].metadata").value("testMetaDataModel"))
+                .andExpect(jsonPath("$[0].type").value("testTypeModel"))
+                .andExpect(jsonPath("$[0].status").value("testStatusModel"));
+        verify(fileService, times(1)).getAllFiles("project");
+        verifyNoMoreInteractions(fileService);
     }
 
     @Test
