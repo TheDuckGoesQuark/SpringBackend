@@ -1,7 +1,9 @@
 package BE.services;
 
 import BE.entities.project.File;
+import BE.exceptions.FileAlreadyExistsException;
 import BE.exceptions.FileNotFoundException;
+import BE.exceptions.InvalidParentDirectoryException;
 import BE.exceptions.ProjectNotFoundException;
 import BE.repositories.Dir_containsRepository;
 import BE.repositories.FileRepository;
@@ -12,7 +14,6 @@ import BE.responsemodels.file.FileModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,27 +90,43 @@ public class FileServiceImpl implements FileService {
         throw new FileNotFoundException();
     }
     //TODO file metadata must be initial_metadata on creation by protocol ??
-    //TODO populate dir_contains with parent/child key pair. (this better be a after insert trigger in file table in the DB ???)
+    //TODO populate dir_contains with parent/child key pair. (this better be an after insert trigger in file table in the DB ???)
+    //TODO overwrite, offset, truncate, final according to 12.8 protocol
     @Override
     @Transactional
-    public FileModel createFile(String projectName, String filePath) {
-        //TODO check if file with same name already exists in directory
-//        if (this.getFile(projectName,filePath).getPath() != null) throw new UserAlreadyExistsException();
+    public FileModel createFile(FileModel fileModel, String action) {
         File file;
-        String file_name = filePath.substring(filePath.lastIndexOf("/"));
-        int i = file_name.lastIndexOf("/");
-        String dir_name = filePath.substring(0, i);
+        int i = fileModel.getFile_name().lastIndexOf("/");
+        String dir_name = fileModel.getFile_name().substring(0, i);
         java.io.File parent_dir = new java.io.File(dir_name);
+        java.io.File same_file_name = new java.io.File(fileModel.getPath());
         if(!parent_dir.exists())
-
+            throw new InvalidParentDirectoryException();
+        if(!same_file_name.exists())
+            throw new FileAlreadyExistsException();
         //TODO may want to change distinguishing between file and dir?
-        if(filePath.contains("."))
-            file = new File(filePath,file_name, "filetype...", "status", "file metadata...");
-        else
-            file = new File(filePath,file_name, "dir",  "status", "file metadata...");
-        //TODO create a file outside the DB before saving the metadata
-        FileRepository.save(file);
-        return this.fileToMetaModel(file);
+        if(action.equalsIgnoreCase("upload")){
+            file = new File(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata());
+            //TODO how to return only id:string , created:boolean object
+            //{
+            //   "id": string,
+            //   "created": boolean
+            //}
+            //TODO create a file outside the DB before saving the metadata
+            FileRepository.save(file);
+            return this.fileToMetaModel(file);
+        }
+
+        else if(action.equalsIgnoreCase("mkdir")){
+            file = new File(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata());
+            //TODO Figure out how to return only id:string JSON object
+            //{
+            //    "id": string
+            //}
+            //TODO create a file outside the DB before saving the metadata
+            FileRepository.save(file);
+            return this.fileToMetaModel(file);
+        }
     }
 
     @Override

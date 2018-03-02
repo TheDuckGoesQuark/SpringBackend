@@ -211,36 +211,36 @@ public class ProjectController {
     //TODO provide additional parameters support by protocol
     @RequestMapping(value = "/projects/{project_name}/**", params = {"action"}, method = RequestMethod.POST)
     public FileModel createFile(@PathVariable(value="project_name") String file_name,
-                                HttpServletRequest request) {
+                                HttpServletRequest request, @RequestParam("action") String action, @RequestBody FileModel file) {
         String path  = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return fileService.createFile(file_name, path);
+        return fileService.createFile(file, action);
     }
 
-    @RequestMapping(value = "/projects/{project_name}/upload/**", method = RequestMethod.POST)
-//    TODO make return a response which includes error messages & success message etc if needed
-    public void uploadFile(@PathVariable(value="project_name") String fileName,
-                           HttpServletRequest request) throws Exception {
-        if (!ServletFileUpload.isMultipartContent(request)) {
-            throw new Exception();
-        }
-
-        // Create a new file upload handler
-        ServletFileUpload file = new ServletFileUpload();
-
-        // Parse the request
-        FileItemIterator iterator = file.getItemIterator(request);
-        while (iterator.hasNext()) {
-            FileItemStream item = iterator.next();
-            InputStream stream = item.openStream();
-            if (!item.isFormField()) {
-//                String fileName = item.getName();
-                // Process the input stream
-                OutputStream out = new FileOutputStream(fileName);
-                IOUtils.copy(stream, out);
-                stream.close();
-                out.close();
-            }
-        }
-    }
+//    @RequestMapping(value = "/projects/{project_name}/upload/**", method = RequestMethod.POST)
+////    TODO make return a response which includes error messages & success message etc if needed
+//    public void uploadFile(@PathVariable(value="project_name") String fileName,
+//                           HttpServletRequest request) throws Exception {
+//        if (!ServletFileUpload.isMultipartContent(request)) {
+//            throw new Exception();
+//        }
+//
+//        // Create a new file upload handler
+//        ServletFileUpload file = new ServletFileUpload();
+//
+//        // Parse the request
+//        FileItemIterator iterator = file.getItemIterator(request);
+//        while (iterator.hasNext()) {
+//            FileItemStream item = iterator.next();
+//            InputStream stream = item.openStream();
+//            if (!item.isFormField()) {
+////                String fileName = item.getName();
+//                // Process the input stream
+//                OutputStream out = new FileOutputStream(fileName);
+//                IOUtils.copy(stream, out);
+//                stream.close();
+//                out.close();
+//            }
+//        }
+//    }
 }
