@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 //Other
@@ -216,11 +217,11 @@ public class ProjectController {
         return fileService.createFile(file_name, path);
     }
 
-    @RequestMapping(value = "/project/{project_name}/upload/**", method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}/upload/**", method = RequestMethod.POST)
 //    TODO make return a response which includes error messages & success message etc if needed
-    public void uploadFile(@PathVariable(value="project_name") String project_name,
-                       HttpServletRequest request) throws Exception {
-        if (ServletFileUpload.isMultipartContent(request)) {
+    public void uploadFile(@PathVariable(value="project_name") String fileName,
+                           HttpServletRequest request) throws Exception {
+        if (!ServletFileUpload.isMultipartContent(request)) {
             throw new Exception();
         }
 
@@ -233,9 +234,9 @@ public class ProjectController {
             FileItemStream item = iterator.next();
             InputStream stream = item.openStream();
             if (!item.isFormField()) {
-                    String filename = item.getName();
+//                String fileName = item.getName();
                 // Process the input stream
-                OutputStream out = new FileOutputStream(filename);
+                OutputStream out = new FileOutputStream(fileName);
                 IOUtils.copy(stream, out);
                 stream.close();
                 out.close();
