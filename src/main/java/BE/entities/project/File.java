@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+//import java.io.File;
 
 @Entity
 @Table(name = "file")
@@ -45,6 +46,12 @@ public class File {
         this.type = type;
         this.status = status;
         this.metadata = metadata;
+        // check if parent exists
+        // check if file_name exists already
+        int i = path.lastIndexOf("/");
+        String dir_name = path.substring(0, i);
+  //      java.io.File parent_dir = new java.io.File(dir_name);
+
     }
 
     public int getFileId() {

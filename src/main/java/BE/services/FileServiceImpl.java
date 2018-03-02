@@ -97,6 +97,11 @@ public class FileServiceImpl implements FileService {
 //        if (this.getFile(projectName,filePath).getPath() != null) throw new UserAlreadyExistsException();
         File file;
         String file_name = filePath.substring(filePath.lastIndexOf("/"));
+        int i = file_name.lastIndexOf("/");
+        String dir_name = filePath.substring(0, i);
+        java.io.File parent_dir = new java.io.File(dir_name);
+        if(!parent_dir.exists())
+
         //TODO may want to change distinguishing between file and dir?
         if(filePath.contains("."))
             file = new File(filePath,file_name, "filetype...", "status", "file metadata...");

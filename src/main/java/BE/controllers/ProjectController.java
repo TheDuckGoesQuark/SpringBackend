@@ -209,7 +209,7 @@ public class ProjectController {
      * @return
      */
     //TODO provide additional parameters support by protocol
-    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}/**", params = {"action"}, method = RequestMethod.POST)
     public FileModel createFile(@PathVariable(value="project_name") String file_name,
                                 HttpServletRequest request) {
         String path  = (String) request.getAttribute(
