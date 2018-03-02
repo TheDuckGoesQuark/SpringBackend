@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 //Other
@@ -216,37 +217,30 @@ public class ProjectController {
         return fileService.createFile(file_name, path);
     }
 
-    @RequestMapping(value = "/project/{project_name}/upload", method = RequestMethod.POST)
-    public void upload(HttpServletRequest request) throws Exception {
-        try {
-        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-        if (!isMultipart) {
-            // Inform user about invalid request
-            throw new Exception();//InvalidRequestException("Invalid file.");
+    @RequestMapping(value = "/projects/{project_name}/upload/**", method = RequestMethod.POST)
+//    TODO make return a response which includes error messages & success message etc if needed
+    public void uploadFile(@PathVariable(value="project_name") String fileName,
+                           HttpServletRequest request) throws Exception {
+        if (!ServletFileUpload.isMultipartContent(request)) {
+            throw new Exception();
         }
 
         // Create a new file upload handler
-        ServletFileUpload upload = new ServletFileUpload();
+        ServletFileUpload file = new ServletFileUpload();
 
         // Parse the request
-            FileItemIterator iterator = upload.getItemIterator(request);
-            while (iterator.hasNext()) {
-                FileItemStream item = iterator.next();
-//                String name = item.getFieldName();
-                InputStream stream = item.openStream();
-                if (!item.isFormField()) {
-//                    String filename = item.getName();
-                    // Process the input stream
-                    System.out.println("File detected");
-                    OutputStream out = new FileOutputStream("testFile.txt");
-                    IOUtils.copy(stream, out);
-                    stream.close();
-                    out.close();
-                }
+        FileItemIterator iterator = file.getItemIterator(request);
+        while (iterator.hasNext()) {
+            FileItemStream item = iterator.next();
+            InputStream stream = item.openStream();
+            if (!item.isFormField()) {
+//                String fileName = item.getName();
+                // Process the input stream
+                OutputStream out = new FileOutputStream(fileName);
+                IOUtils.copy(stream, out);
+                stream.close();
+                out.close();
             }
-        }catch (FileUploadException | IOException e){
-            e.printStackTrace();
         }
     }
-
 }

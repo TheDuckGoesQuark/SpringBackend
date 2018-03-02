@@ -8,9 +8,11 @@ import BE.repositories.FileRepository;
 import BE.repositories.ProjectRepository;
 import BE.repositories.Supported_ViewRepository;
 import BE.responsemodels.file.FileModel;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +128,16 @@ public class FileServiceImpl implements FileService {
     }
 
     //TODO 12.8 Uploading
+
+//    @Override
+//    @Transactional
+//    public FileModel uploadFile(String projectName, String filePath) {
+//        FileModel file = this.getFile(projectName, filePath);
+//        if (file == null) throw new FileNotFoundException();
+//        FileRepository.delete(file.getFile_id());
+//        return file;
+//    }
+
     //TODO 12.9 Changing metadata
     //TODO 12.10 Creating directories
     //TODO 12.11 Deleting
