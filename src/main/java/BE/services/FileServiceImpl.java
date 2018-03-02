@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService {
         throw new FileNotFoundException();
     }
     //TODO file metadata must be initial_metadata on creation by protocol ??
-    //TODO populate dir_contains with parent/child key pair. (this better be a before insert trigger in file table in the DB ???)
+    //TODO populate dir_contains with parent/child key pair. (this better be a after insert trigger in file table in the DB ???)
     @Override
     @Transactional
     public FileModel createFile(String projectName, String filePath) {
