@@ -27,8 +27,11 @@ public class ApplicationStartup
      */
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
-        String[] privileges = {"username"};
-        UserModel userModel = new UserModel("username1", "password1", "email", null, Arrays.asList(privileges));
+        String[] userPrivileges = {"user"};
+        String[] adminPrivileges = {"user", "admin"};
+        UserModel userModel = new UserModel("username1", "password1", "email", null, Arrays.asList(userPrivileges));
+        UserModel adminModel = new UserModel("admin1", "password1", "email", null, Arrays.asList(adminPrivileges));
         userService.createUser(userModel);
+        userService.createUser(adminModel);
     }
 }

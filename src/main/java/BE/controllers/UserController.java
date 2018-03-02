@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // Exceptions
+import BE.exceptions.InvalidRequestStructureException;
 import BE.exceptions.NotImplementedException;
 // Models
 import BE.entities.user.User;
@@ -55,12 +56,12 @@ public class UserController {
 
     @RequestMapping(value = "/current_user",params = {"action=update"}, method = RequestMethod.POST)
     public UserModel updateCurrentUser(@RequestBody UserModel user) {
-        //TODO this
-        throw new NotImplementedException();
+        return userService.updateUser(user);
     }
 
     @RequestMapping(value = "/users/{username}",params = {"action=create"}, method = RequestMethod.POST)
     public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+        user.setUsername(username);
         return userService.createUser(user);
     }
 

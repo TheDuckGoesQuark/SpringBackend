@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `privilege` (
 
 INSERT INTO privilege (name, description, internal) VALUES
   ("admin", "can do everything", true),
-  ("username", "can do some stuff", false);
+  ("user", "can do some stuff", false);
 
 CREATE TABLE IF NOT EXISTS `has_privilege` (
   `username` VARCHAR(100) NOT NULL,
