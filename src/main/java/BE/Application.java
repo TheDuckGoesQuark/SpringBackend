@@ -16,6 +16,10 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 @SpringBootApplication
@@ -24,10 +28,13 @@ import java.io.File;
 @EnableAutoConfiguration
 public class Application {
 
-    public static void main(String[] args) {
-//        File projects = setUpDirectory();
+    public static void main(String[] args) throws IOException {
+        File projects = setUpDirectory();
         SpringApplication.run(Application.class, args);
-//        removeDirectory(projects);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() { removeDirectory(projects); }
+        });
     }
 
     // Produces swagger documentation at http://localhost:8080/swagger-ui.html
@@ -49,13 +56,21 @@ public class Application {
                 .build();
     }
 
-//    private static File setUpDirectory() {
-//        new File("/projects").mkdirs();
-//        File projects = new File("/projects");
-//        return projects;
-//    }
-//
-//    private static void removeDirectory(File projects) {
-//        projects.delete();
-//    }
+    private static File setUpDirectory() throws IOException {
+        File projects = new File("/cs/home/td38/Documents/cs3099/projects");
+        if (projects.mkdir()) {
+            System.out.println("Directory created.");
+        } else {
+            System.out.println("Create directory failed.");
+        }
+        return projects;
+    }
+
+    private static void removeDirectory(File projects) {
+        if (projects.delete()) {
+            System.out.println("Directory deleted.");
+        } else {
+            System.out.println("Remove directory failed.");
+        }
+    }
 }

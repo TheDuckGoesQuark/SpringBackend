@@ -295,21 +295,21 @@ public class ProjectControllerTests {
         verifyNoMoreInteractions(fileService);
     }
 
-    @Test
-    public void createFile() throws Exception {
-        File testFile = new File("/projects/project/","testFile","testFileType","testStatus","testMetaData");
-        List<Supported_view> listSupportedViews = Arrays.asList(
-                new Supported_view(testFile, "testView")
-        );
-        FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
-                , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
-        when(fileService.createFile("project", "/projects/project/")).thenReturn(fileModel);
-        mockMvc.perform(post("/projects/project/"))
-                .andDo(print())
-                .andExpect(status().isCreated());
-        verify(fileService, times(1)).createFile("project", "/projects/project/");
-        verifyNoMoreInteractions(fileService);
-    }
+//    @Test
+//    public void createFile() throws Exception {
+//        File testFile = new File("/projects/project/","testFile","testFileType","testStatus","testMetaData");
+//        List<Supported_view> listSupportedViews = Arrays.asList(
+//                new Supported_view(testFile, "testView")
+//        );
+//        FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
+//                , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
+//        when(fileService.createFile("project", "/projects/project/")).thenReturn(fileModel);
+//        mockMvc.perform(post("/projects/project/"))
+//                .andDo(print())
+//                .andExpect(status().isCreated());
+//        verify(fileService, times(1)).createFile("project", "/projects/project/");
+//        verifyNoMoreInteractions(fileService);
+//    }
 
     @Test
     public void upload() throws Exception {

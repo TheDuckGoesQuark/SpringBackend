@@ -117,8 +117,8 @@ public class FileServiceImpl implements FileService {
             return this.fileToMetaModel(file);
         }
 
-        else if(action.equalsIgnoreCase("mkdir")){
-            file = new File(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata());
+        else//(action.equalsIgnoreCase("mkdir")){
+        { file = new File(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata());
             //TODO Figure out how to return only id:string JSON object
             //{
             //    "id": string
@@ -127,6 +127,7 @@ public class FileServiceImpl implements FileService {
             FileRepository.save(file);
             return this.fileToMetaModel(file);
         }
+
     }
 
     @Override
