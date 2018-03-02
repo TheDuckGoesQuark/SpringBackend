@@ -78,7 +78,7 @@ public class ProjectController {
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}", params = {"action=create"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=create"}, method = RequestMethod.POST)
     public ProjectModel createProject(@PathVariable(value="project_name") String project_name) {
         return projectService.createProject(project_name);
     }
@@ -88,7 +88,7 @@ public class ProjectController {
      * @param project
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}", params = {"action=update"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=update"}, method = RequestMethod.POST)
     public ProjectModel updateProject(@PathVariable(value="project_name") String project_name, @RequestBody ProjectModel project) {
         return projectService.updateProject(project);
     }
@@ -97,7 +97,7 @@ public class ProjectController {
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}", params = {"action=delete"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=delete"}, method = RequestMethod.POST)
     public void deleteProject(@PathVariable(value="project_name") String project_name) {
         projectService.deleteProject(project_name);
     }
@@ -106,7 +106,7 @@ public class ProjectController {
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}", params = {"action=update_grant"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=update_grant"}, method = RequestMethod.POST)
     public void updateGrant(@PathVariable(value="project_name") String project_name, @RequestBody UserListModel userListModel) {
         projectService.updateGrant(project_name, userListModel);
     }
@@ -162,7 +162,7 @@ public class ProjectController {
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/project/{project_name}/**", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.PATCH)
     public FileModel updateFile(@PathVariable(value="project_name") String project_name,
                                 HttpServletRequest request,
                                 @RequestBody File file) {
