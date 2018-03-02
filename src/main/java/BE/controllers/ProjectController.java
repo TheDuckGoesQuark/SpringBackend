@@ -1,9 +1,7 @@
 package BE.controllers;
 
 // JavaIO
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +19,11 @@ import BE.services.ProjectService;
 // Exceptions
 import BE.exceptions.NotImplementedException;
 //import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
-import java.io.IOException;
 
 // Apache
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.http.fileupload.FileItemIterator;
-import org.apache.tomcat.util.http.fileupload.FileItemStream;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.tomcat.util.http.fileupload.*;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 // Spring
@@ -42,7 +37,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 //Other
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
 @RestController
 public class ProjectController {
@@ -211,9 +209,22 @@ public class ProjectController {
     //TODO provide additional parameters support by protocol
     @RequestMapping(value = "/projects/{project_name}/**", params = {"action"}, method = RequestMethod.POST)
     public FileModel createFile(@PathVariable(value="project_name") String file_name,
-                                HttpServletRequest request, @RequestParam("action") String action, @RequestBody FileModel file) {
-        String path  = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                                HttpServletRequest request,
+                                HttpServletResponse response,
+                                @RequestParam("action") String action, @RequestBody FileModel file) throws IOException, ServletException {
+//        String path  = (String) request.getAttribute(
+//                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        //TODO MOVE file upload to the file service implementation
+        // should get the file from the form-data in the body
+        Part filePart = request.getPart("file");
+        InputStream fileData = filePart.getInputStream();
+        OutputStream out = new FileOutputStream(new java.io.File("/projects/" + file.getFile_id())); // nothing is written in the body ?? how to get ID ;?
+        byte[] bytes = new byte[1024];
+        int read = 0;
+        while ((read = fileData.read(bytes)) != -1) {
+            out.write(bytes, 0, read);
+        }
+
         return fileService.createFile(file, action);
     }
 

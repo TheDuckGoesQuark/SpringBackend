@@ -114,6 +114,7 @@ public class FileServiceImpl implements FileService {
             //}
             //TODO create a file outside the DB before saving the metadata
             FileRepository.save(file);
+//            java.io.File realFile = new java.io.File(fileModel.getPath());
             return this.fileToMetaModel(file);
         }
 

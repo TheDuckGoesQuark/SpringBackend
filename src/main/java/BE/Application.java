@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 @EnableAutoConfiguration
 public class Application {
 
-    private static final String PROJECTS_DIRECTORY = "/cs/home/td38/Documents/cs3099/project-code/projects";
+    private static final String PROJECTS_DIRECTORY = "/cs/home/nd33/project-code/projects";
 
     public static void main(String[] args) throws IOException {
         File projects = setUpDirectory();
