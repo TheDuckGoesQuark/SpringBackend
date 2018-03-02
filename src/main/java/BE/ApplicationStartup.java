@@ -1,6 +1,7 @@
 package BE;
 
 import BE.responsemodels.user.UserModel;
+import BE.security.enums.Privileges;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -27,8 +28,8 @@ public class ApplicationStartup
      */
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
-        String[] userPrivileges = {"user"};
-        String[] adminPrivileges = {"user", "admin"};
+        String[] userPrivileges = {Privileges.USER};
+        String[] adminPrivileges = {Privileges.USER, Privileges.ADMIN};
         UserModel userModel = new UserModel("username1", "password1", "email", null, Arrays.asList(userPrivileges));
         UserModel adminModel = new UserModel("admin1", "password1", "email", null, Arrays.asList(adminPrivileges));
         userService.createUser(userModel);

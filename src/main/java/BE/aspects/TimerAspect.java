@@ -1,6 +1,5 @@
 package BE.aspects;
 
-import BE.controllers.SystemController;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;

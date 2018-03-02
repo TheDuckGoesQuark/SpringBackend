@@ -7,6 +7,9 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+/**
+ * Final call before serialising response to JSON. Structures response in expected format.
+ */
 @RestControllerAdvice(value = "BE.controllers")
 public class JSONAdvisor implements ResponseBodyAdvice {
 
