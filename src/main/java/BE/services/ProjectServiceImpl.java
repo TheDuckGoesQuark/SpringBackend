@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
+    private final String PROJECTS_DIRECTORY = "/cs/home/td38/Documents/cs3099/project-code/projects/";
+
     private final
     ProjectRepository projectRepository;
 
@@ -72,6 +74,12 @@ public class ProjectServiceImpl implements ProjectService {
         // TODO add creating user to project during creation logic
         // Create root directory
         File file = new File("/" + project_name, project_name, FileTypes.DIR, "status", "file metadata");
+        java.io.File proj = new java.io.File(PROJECTS_DIRECTORY + project_name);
+        if (proj.mkdir()) {
+            System.out.println("Project directory created.");
+        } else {
+            System.out.println("Create project directory failed.");
+        }
         // Create project
         Project project = new Project(project_name, file);
         // Link project to root file

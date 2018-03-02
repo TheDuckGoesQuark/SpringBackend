@@ -28,12 +28,16 @@ import java.nio.file.Paths;
 @EnableAutoConfiguration
 public class Application {
 
+    private static final String PROJECTS_DIRECTORY = "/cs/home/td38/Documents/cs3099/project-code/projects";
+
     public static void main(String[] args) throws IOException {
         File projects = setUpDirectory();
         SpringApplication.run(Application.class, args);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() { removeDirectory(projects); }
+            public void run() {
+                removeDirectory(projects);
+            }
         });
     }
 
@@ -57,7 +61,7 @@ public class Application {
     }
 
     private static File setUpDirectory() throws IOException {
-        File projects = new File("/cs/home/td38/Documents/cs3099/projects");
+        File projects = new File(PROJECTS_DIRECTORY);
         if (projects.mkdir()) {
             System.out.println("Directory created.");
         } else {
@@ -67,7 +71,12 @@ public class Application {
     }
 
     private static void removeDirectory(File projects) {
-        if (projects.delete()) {
+        File[] allContents = projects.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) { removeDirectory(file);
+            }
+        }
+                if (projects.delete()) {
             System.out.println("Directory deleted.");
         } else {
             System.out.println("Remove directory failed.");
