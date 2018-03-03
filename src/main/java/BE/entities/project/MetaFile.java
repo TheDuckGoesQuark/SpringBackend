@@ -27,7 +27,11 @@ public class MetaFile {
 
     private long length;
 
-    @OneToMany(mappedBy = "metaFile")
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "supports_view",
+            joinColumns = @JoinColumn(name = "file_id", referencedColumnName = "file_id"),
+            inverseJoinColumns = @JoinColumn(name = "view", referencedColumnName = "view"))
     private List<SupportedView> supported_views;
 
 

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,17 +57,17 @@ public class ProjectServiceImpl implements ProjectService {
                 userProject.getAccess_level());
     }
 
-    private MetaFile createProjectRoot(Project project) {
-        SupportedView supportedViews = supportedViewRepository.findByView(SupportedView.META_VIEW)
-        MetaFile metaFile = new MetaFile(
+    private MetaFile createProjectRoot() {
+        List<SupportedView> supportedViews = new ArrayList<>();
+        supportedViews.add(supportedViewRepository.findByView(SupportedView.META_VIEW));
+        return new MetaFile(
                 "/",
                 "",
                 FileTypes.DIR,
                 FileStatus.READY,
                 new Timestamp(System.currentTimeMillis()),
                 0L,
-                Arrays.asList(supportedViews);
-
+                supportedViews
                 );
     }
 
@@ -89,15 +90,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public ProjectModel createProject(String project_name) {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
-        MetaFile projectRoot = createProjectRoot()
-
-
-        Project project = new Project()
-        // Create project
-        Project project = new Project(project_name, metaFile);
-        // Link project to root metaFile
-        metaFile.setProject(project);
-        project.setRoot_dir(metaFile);
+        MetaFile projectRoot = createProjectRoot();
+        Project project = new Project(project_name, projectRoot);
         // Save to database
         projectRepository.save(project);
         return projectToProjectModel(project);

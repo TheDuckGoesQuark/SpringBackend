@@ -14,7 +14,7 @@ public class FileModel {
 
     private List<SupportedView> views;
 
-    private String metadata;
+    private FileMetaDataModel metadata;
 
     private String type;
 
@@ -23,7 +23,7 @@ public class FileModel {
 //    private List<Dir_contains> contents;
 
     //file meta model
-    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, String metadata, String type, String status) {
+    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -87,11 +87,11 @@ public class FileModel {
         this.status = status;
     }
 
-    public String getMetadata() {
+    public FileMetaDataModel getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(String metadata) {
+    public void setMetadata(FileMetaDataModel metadata) {
         this.metadata = metadata;
     }
 

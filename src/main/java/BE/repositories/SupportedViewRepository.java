@@ -5,8 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface SupportedViewRepository extends CrudRepository<SupportedView, SupportedView> {
-    List<SupportedView> findByMetaFile_FileId(int file_Id);
-
+public interface SupportedViewRepository extends CrudRepository<SupportedView, String> {
     SupportedView findByView(String viewName);
 }

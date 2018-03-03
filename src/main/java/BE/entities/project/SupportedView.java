@@ -10,6 +10,7 @@ import java.io.Serializable;
 public class SupportedView {
 
     public static final String META_VIEW = "meta";
+    public static final String RAW_VIEW = "raw";
 
     @Id
     private String view;
