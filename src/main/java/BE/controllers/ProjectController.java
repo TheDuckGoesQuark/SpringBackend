@@ -25,6 +25,7 @@ import BE.exceptions.NotImplementedException;
 import org.apache.log4j.Logger;
 
 // Spring
+import org.springframework.hateoas.UriTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -119,21 +120,19 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
     public FileModel getFile(@PathVariable(value = "project_name") String project_name,
-                             HttpServletRequest request,
-                             @RequestParam(value = "view", required = false, defaultValue = "meta") String view) {
-        //TODO first iterate through views to see if supported otherwise throw UnsupportedFileViewException
+                             @RequestParam(value = "view", required = false, defaultValue = "meta") String view,
+                             HttpServletRequest request) {
         // Retrieves file path from request
-        String path = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        System.out.println(path);
+        String requestURI = request.getRequestURI();
+        String relativePath = requestURI.replaceFirst("/projects/"+project_name+"/files/", "");
+        System.out.println(relativePath);
 
-        path = path.replace("/files", "");
+        //path = path.replace("/files", "");
         /*if (view.equals("") || view.equals("meta"))
             return fileService.getFile(project_name, path);
         else
-            //TODO return other views
             return fileService.getFile(project_name, path);
-            */ return null;
+            */ return new FileModel(relativePath, "good", 0, null, null, "dir", "cool");
     }
 
     /**
@@ -198,7 +197,7 @@ public class ProjectController {
      * @return
      */
     //TODO provide additional parameters support by protocol
-    @RequestMapping(value = "/projects/{project_name}/**", params = {"action"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action"}, method = RequestMethod.POST)
     public FileModel createFile(@PathVariable(value = "project_name") String file_name,
                                 HttpServletRequest request,
                                 HttpServletResponse response,
