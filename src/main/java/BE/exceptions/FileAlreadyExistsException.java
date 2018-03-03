@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class FileAlreadyExistsException extends BaseException {
     public FileAlreadyExistsException() {
-        super(HttpStatus.BAD_REQUEST, "File already exists.", "file_already_exists");
+        super(HttpStatus.BAD_REQUEST, "MetaFile already exists.", "file_already_exists");
     }
 }

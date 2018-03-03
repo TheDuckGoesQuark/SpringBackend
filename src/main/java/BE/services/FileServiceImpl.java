@@ -1,6 +1,6 @@
 package BE.services;
 
-import BE.entities.project.File;
+import BE.entities.project.MetaFile;
 import BE.exceptions.FileAlreadyExistsException;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.InvalidParentDirectoryException;
@@ -8,7 +8,7 @@ import BE.exceptions.ProjectNotFoundException;
 import BE.repositories.Dir_containsRepository;
 import BE.repositories.FileRepository;
 import BE.repositories.ProjectRepository;
-import BE.repositories.Supported_ViewRepository;
+import BE.repositories.SupportedViewRepository;
 import BE.responsemodels.file.FileModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,24 +28,24 @@ public class FileServiceImpl implements FileService {
     FileRepository FileRepository;
 
     @Autowired
-    Supported_ViewRepository Supported_ViewRepository;
+    SupportedViewRepository Supported_ViewRepository;
 
     @Autowired
     Dir_containsRepository Dir_containsRepository;
 
     // Conversion Functions
-    private FileModel fileToMetaModel(File file) {
+    private FileModel fileToMetaModel(MetaFile metaFile) {
         return new FileModel(
-                file.getPath(),
-                file.getFile_name(),
-                file.getFileId(),
+                metaFile.getPath(),
+                metaFile.getFile_name(),
+                metaFile.getFileId(),
                 // get supported views from table
                 //TODO get key/value (view/additional_data_of_view) pairs by protocol
-                Supported_ViewRepository.findByFileFileId(file.getFileId()),
-                file.getMetadata(),
-                file.getType(),
-                file.getStatus()
-//                file.getContents()
+                Supported_ViewRepository.findByMetaFile_FileId(metaFile.getFileId()),
+                metaFile.getMetadata(),
+                metaFile.getType(),
+                metaFile.getStatus()
+//                metaFile.getContents()
         );
     }
 
@@ -54,7 +54,7 @@ public class FileServiceImpl implements FileService {
         if(ProjectRepository.findByName(projectName) == null)
             throw new ProjectNotFoundException();
         List<FileModel> files = new ArrayList<>();
-        File root_dir = FileRepository.findByProjectName(projectName);
+        MetaFile root_dir = FileRepository.findByProjectName(projectName);
         FileRepository.findAll().forEach( file->{if(file.getPath().startsWith(root_dir.getPath())) files.add(this.fileToMetaModel(file));});
         return files;
     }
@@ -64,9 +64,9 @@ public class FileServiceImpl implements FileService {
         List<FileModel> children = new ArrayList<>();
         FileModel dir = this.getFile(projectName, filePath);
 //        for(Dir_contains file : dir.getContents()){
-//            children.add(this.getFileByID(projectName,file.getFile().getFileId()));
+//            children.add(this.getFileByID(projectName,file.getMetaFile().getFileId()));
 //        }
-        Dir_containsRepository.findByDirId(dir.getFile_id()).forEach(dir_contains->{children.add(this.getFileByID(projectName,dir_contains.getFile().getFileId()));});
+        Dir_containsRepository.findByDirId(dir.getFile_id()).forEach(dir_contains->{children.add(this.getFileByID(projectName,dir_contains.getMetaFile().getFileId()));});
         return children;
     }
 
@@ -95,7 +95,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public FileModel createFile(FileModel fileModel, String action) {
-        File file;
+        MetaFile metaFile;
         int i = fileModel.getFile_name().lastIndexOf("/");
         String dir_name = fileModel.getFile_name().substring(0, i);
         java.io.File parent_dir = new java.io.File(dir_name);
@@ -104,41 +104,41 @@ public class FileServiceImpl implements FileService {
             throw new InvalidParentDirectoryException();
         if(!same_file_name.exists())
             throw new FileAlreadyExistsException();
-        //TODO may want to change distinguishing between file and dir?
+        //TODO may want to change distinguishing between metaFile and dir?
         if(action.equalsIgnoreCase("upload")){
-            file = new File(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata());
+            metaFile = new MetaFile(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata(), last_modified, length, supported_views);
             //TODO how to return only id:string , created:boolean object
             //{
             //   "id": string,
             //   "created": boolean
             //}
-            //TODO create a file outside the DB before saving the metadata
-            FileRepository.save(file);
-//            java.io.File realFile = new java.io.File(fileModel.getPath());
-            return this.fileToMetaModel(file);
+            //TODO create a metaFile outside the DB before saving the metadata
+            FileRepository.save(metaFile);
+//            java.io.MetaFile realFile = new java.io.MetaFile(fileModel.getPath());
+            return this.fileToMetaModel(metaFile);
         }
 
         else//(action.equalsIgnoreCase("mkdir")){
-        { file = new File(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata());
+        { metaFile = new MetaFile(fileModel.getPath(),fileModel.getFile_name(), fileModel.getType(), fileModel.getStatus(), fileModel.getMetadata(), last_modified, length, supported_views);
             //TODO Figure out how to return only id:string JSON object
             //{
             //    "id": string
             //}
-            //TODO create a file outside the DB before saving the metadata
-            FileRepository.save(file);
-            return this.fileToMetaModel(file);
+            //TODO create a metaFile outside the DB before saving the metadata
+            FileRepository.save(metaFile);
+            return this.fileToMetaModel(metaFile);
         }
 
     }
 
     @Override
     @Transactional
-    public FileModel updateFile(File file) {
+    public FileModel updateFile(MetaFile metaFile) {
         //TODO only root dir has project assigned need to change method
-        if (this.getFileByID(file.getProject().getName(), file.getFileId()) == null) throw new FileNotFoundException();
+        if (this.getFileByID(metaFile.getProject().getName(), metaFile.getFileId()) == null) throw new FileNotFoundException();
         // .save performs both update and creation
-        FileRepository.save(file);
-        return this.fileToMetaModel(file);
+        FileRepository.save(metaFile);
+        return this.fileToMetaModel(metaFile);
     }
 
 
@@ -156,7 +156,7 @@ public class FileServiceImpl implements FileService {
 //    @Override
 //    @Transactional
 //    public FileModel uploadFile(String projectName, String filePath) {
-//        FileModel file = this.getFile(projectName, filePath);
+//        FileModel file = this.getMetaFile(projectName, filePath);
 //        if (file == null) throw new FileNotFoundException();
 //        FileRepository.delete(file.getFile_id());
 //        return file;

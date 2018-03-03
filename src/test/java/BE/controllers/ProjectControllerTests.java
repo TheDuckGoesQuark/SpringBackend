@@ -6,8 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import BE.entities.project.File;
-import BE.entities.project.Supported_view;
+import BE.entities.project.MetaFile;
+import BE.entities.project.SupportedView;
 import BE.responsemodels.file.FileModel;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.UserListModel;
@@ -28,19 +28,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.junit.Assert.*;
 
 /**
  * Tests involving calls to UserController.
@@ -181,9 +176,9 @@ public class ProjectControllerTests {
 
     @Test
     public void getAllFiles() throws Exception {
-        File testFile = new File("/project/","testFile","testFileType","testStatus","testMetaData");
-        List<Supported_view> listSupportedViews = Arrays.asList(
-                new Supported_view(testFile, "testView")
+        MetaFile testMetaFile = new MetaFile("/project/","testMetaFile","testFileType","testStatus","testMetaData", last_modified, length, supported_views);
+        List<SupportedView> listSupportedViews = Arrays.asList(
+                new SupportedView(testMetaFile, "testView")
         );
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
@@ -206,9 +201,9 @@ public class ProjectControllerTests {
 
     @Test
     public void getFile() throws Exception {
-        File testFile = new File("/project/","testFile","testFileType","testStatus","testMetaData");
-        List<Supported_view> listSupportedViews = Arrays.asList(
-                new Supported_view(testFile, "testView")
+        MetaFile testMetaFile = new MetaFile("/project/","testMetaFile","testFileType","testStatus","testMetaData", last_modified, length, supported_views);
+        List<SupportedView> listSupportedViews = Arrays.asList(
+                new SupportedView(testMetaFile, "testView")
         );
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
@@ -219,9 +214,9 @@ public class ProjectControllerTests {
 
     @Test
     public void getFileById() throws Exception {
-        File testFile = new File("/project/","testFile","testFileType","testStatus","testMetaData");
-        List<Supported_view> listSupportedViews = Arrays.asList(
-                new Supported_view(testFile, "testView")
+        MetaFile testMetaFile = new MetaFile("/project/","testMetaFile","testFileType","testStatus","testMetaData", last_modified, length, supported_views);
+        List<SupportedView> listSupportedViews = Arrays.asList(
+                new SupportedView(testMetaFile, "testView")
         );
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
@@ -242,28 +237,28 @@ public class ProjectControllerTests {
 
     @Test
     public void updateFile() throws Exception {
-        File testFile = new File("/project/","testFile","testFileType","testStatus","testMetaData");
-        List<Supported_view> listSupportedViews = Arrays.asList(
-                new Supported_view(testFile, "testView")
+        MetaFile testMetaFile = new MetaFile("/project/","testMetaFile","testFileType","testStatus","testMetaData", last_modified, length, supported_views);
+        List<SupportedView> listSupportedViews = Arrays.asList(
+                new SupportedView(testMetaFile, "testView")
         );
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
 
-        when(fileService.updateFile(testFile)).thenReturn(fileModel);
-        mockMvc.perform(patch("/project/project/testFile"))
+        when(fileService.updateFile(testMetaFile)).thenReturn(fileModel);
+        mockMvc.perform(patch("/project/project/testMetaFile"))
                 //TODO the url is wrong, need fix
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.path").value("/project/"));
-        verify(fileService, times(1)).updateFile(testFile);
+        verify(fileService, times(1)).updateFile(testMetaFile);
         verifyNoMoreInteractions(fileService);
     }
 
     @Test
     public void deleteFile() throws Exception {
-        File testFile = new File("/projects/project/","testFile","testFileType","testStatus","testMetaData");
-        List<Supported_view> listSupportedViews = Arrays.asList(
-                new Supported_view(testFile, "testView")
+        MetaFile testMetaFile = new MetaFile("/projects/project/","testMetaFile","testFileType","testStatus","testMetaData", last_modified, length, supported_views);
+        List<SupportedView> listSupportedViews = Arrays.asList(
+                new SupportedView(testMetaFile, "testView")
         );
         FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
@@ -277,9 +272,9 @@ public class ProjectControllerTests {
 
     @Test
     public void getDirContents() throws Exception {
-        File testFile = new File("/projects/project/","testFile","testFileType","testStatus","testMetaData");
-        List<Supported_view> listSupportedViews = Arrays.asList(
-                new Supported_view(testFile, "testView")
+        MetaFile testMetaFile = new MetaFile("/projects/project/","testMetaFile","testFileType","testStatus","testMetaData", last_modified, length, supported_views);
+        List<SupportedView> listSupportedViews = Arrays.asList(
+                new SupportedView(testMetaFile, "testView")
         );
         FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
@@ -289,7 +284,7 @@ public class ProjectControllerTests {
         mockMvc.perform(get("/projects/project/?view?include_children"))
                 .andDo(print())
                 .andExpect(status().isOk());
-        //verify(fileService, times(1)).getFile("project", "/projects/project/");
+        //verify(fileService, times(1)).getMetaFile("project", "/projects/project/");
         //verify(fileService, times(1)).getChildren("project", "/projects/project/");
         //TODO doesnt seem to be calling appropriate methods, or testing incorrectly
         verifyNoMoreInteractions(fileService);
@@ -297,9 +292,9 @@ public class ProjectControllerTests {
 
 //    @Test
 //    public void createFile() throws Exception {
-//        File testFile = new File("/projects/project/","testFile","testFileType","testStatus","testMetaData");
-//        List<Supported_view> listSupportedViews = Arrays.asList(
-//                new Supported_view(testFile, "testView")
+//        MetaFile testFile = new MetaFile("/projects/project/","testFile","testFileType","testStatus","testMetaData");
+//        List<SupportedView> listSupportedViews = Arrays.asList(
+//                new SupportedView(testFile, "testView")
 //        );
 //        FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
 //                , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");

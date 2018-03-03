@@ -1,7 +1,5 @@
 package BE.entities.project;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -12,34 +10,34 @@ public class Dir_contains implements Serializable {
     @Id
     @JoinColumn(name = "dir_id")
     @ManyToOne(cascade = CascadeType.ALL)
-    private File dir;
+    private MetaFile dir;
 
     @Id
     @JoinColumn(name = "file_id")
     @ManyToOne(cascade = CascadeType.ALL)
-    private File file;
+    private MetaFile metaFile;
 
     public Dir_contains() {
     }
 
-    public Dir_contains(File dir, File file) {
+    public Dir_contains(MetaFile dir, MetaFile metaFile) {
         this.dir = dir;
-        this.file = file;
+        this.metaFile = metaFile;
     }
 
-    public File getDir() {
+    public MetaFile getDir() {
         return dir;
     }
 
-    public void setDir(File dir) {
+    public void setDir(MetaFile dir) {
         this.dir = dir;
     }
 
-    public File getFile() {
-        return file;
+    public MetaFile getMetaFile() {
+        return metaFile;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setMetaFile(MetaFile metaFile) {
+        this.metaFile = metaFile;
     }
 }

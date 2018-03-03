@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS `privilege`;
 DROP TABLE IF EXISTS `project`;
 DROP TABLE IF EXISTS `supported_view`;
 DROP TABLE IF EXISTS `dir_contains`;
-DROP TABLE IF EXISTS `file`;
+DROP TABLE IF EXISTS file;
 
 
 CREATE TABLE IF NOT EXISTS `user` (
@@ -43,13 +43,14 @@ CREATE TABLE IF NOT EXISTS `has_privilege` (
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
-CREATE TABLE IF NOT EXISTS `file` (
+CREATE TABLE IF NOT EXISTS file (
   `file_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `path` VARCHAR(200) NOT NULL,
   `file_name` VARCHAR(54) NOT NULL,
   `type` VARCHAR(45) NOT NULL,
-  `metadata` VARCHAR(45) NOT NULL,
   `status` VARCHAR(10) NOT NULL,
+  `last_modified` TIMESTAMP NOT NULL,
+  `length` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`file_id`));
 
 CREATE TABLE IF NOT EXISTS `project` (
@@ -59,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `project` (
   UNIQUE INDEX `root_dir_id_UNIQUE` (`root_dir_id` ASC),
   CONSTRAINT `root_dir_id`
   FOREIGN KEY (`root_dir_id`)
-  REFERENCES `file` (`file_id`)
+  REFERENCES file (`file_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
@@ -95,18 +96,9 @@ CREATE TABLE IF NOT EXISTS `oauth_access_token` (
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
-
-
-
 CREATE TABLE IF NOT EXISTS `supported_view` (
-  `file_id` INT UNSIGNED NOT NULL,
   `view` VARCHAR(10) NOT NULL,
-  PRIMARY KEY (`file_id`, `view`),
-  CONSTRAINT `file_id`
-  FOREIGN KEY (`file_id`)
-  REFERENCES `file` (`file_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE);
+  PRIMARY KEY (`view`));
 
 CREATE TABLE IF NOT EXISTS `dir_contains` (
   `dir_id` INT UNSIGNED NOT NULL,
@@ -115,12 +107,12 @@ CREATE TABLE IF NOT EXISTS `dir_contains` (
   INDEX `dir_contains.idx` (`dir_id` ASC),
   CONSTRAINT `dir_id`
   FOREIGN KEY (`dir_id`)
-  REFERENCES `file` (`file_id`)
+  REFERENCES file (`file_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `file`
+  CONSTRAINT `metaFile`
   FOREIGN KEY (`file_id`)
-  REFERENCES `file` (`file_id`)
+  REFERENCES file (`file_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
@@ -530,10 +522,10 @@ insert into has_privilege (username,privilege_name) values ('varnett4t', 'userna
 insert into has_privilege (username,privilege_name) values ('vmcreynold3w', 'username');
 insert into has_privilege (username,privilege_name) values ('whasely4b', 'username');
 
-insert into file (file_id, path, file_name, type, metadata, status) values ('12323', 'ohaa','ohaa', 'dir', 'file meta-data', 'status');
-insert into file (file_id, path, file_name, type, metadata, status) values ('12324', '/projects/Protege/root1','root1', 'dir', 'file meta-data', 'status');
-insert into file (file_id, path, file_name, type, metadata, status) values ('1231', '/projects/Protege/root1/oze','oze', 'dir', 'file meta-data', 'status');
-insert into file (file_id, path, file_name, type, metadata, status) values ('1232', '/projects/Protege/root1/oze/file1','file1', 'file', 'file meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('12323', 'ohaa','ohaa', 'dir', 'metaFile meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('12324', '/projects/Protege/root1','root1', 'dir', 'metaFile meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('1231', '/projects/Protege/root1/oze','oze', 'dir', 'metaFile meta-data', 'status');
+insert into file (file_id, path, file_name, type, metadata, status) values ('1232', '/projects/Protege/root1/oze/file1','file1', 'metaFile', 'metaFile meta-data', 'status');
 insert into project (name, root_dir_id) values ('Protege', '12324');
 insert into supported_view(file_id, view)  values ('12324', 'meta');
 insert into supported_view(file_id, view)  values ('1232', 'meta');

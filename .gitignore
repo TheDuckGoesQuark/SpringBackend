@@ -6,7 +6,7 @@ tasks.xml
 
 *.class
 
-# Log file
+# Log metaFile
 *.log
 
 # BlueJ files

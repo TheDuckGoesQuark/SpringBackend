@@ -3,13 +3,12 @@ package BE.entities.project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.sql.Timestamp;
 import java.util.List;
-//import java.io.File;
 
 @Entity
 @Table(name = "file")
-public class File {
+public class MetaFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +23,12 @@ public class File {
 
     private String status;
 
-    private String metadata;
+    private Timestamp last_modified;
 
+    private long length;
 
+    @OneToMany(mappedBy = "metaFile")
+    private List<SupportedView> supported_views;
 
 
     @OneToOne(mappedBy = "root_dir")
@@ -37,21 +39,17 @@ public class File {
 //    @JoinColumn(name = "dir_id")
 //    private List<Dir_contains> contents = new ArrayList<Dir_contains>();
 
-    protected File() {
+    protected MetaFile() {
     }
 
-    public File(String path, String file_name, String type, String status, String metadata) {
+    public MetaFile(String path, String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views) {
         this.path = path;
         this.file_name = file_name;
         this.type = type;
         this.status = status;
-        this.metadata = metadata;
-        // check if parent exists
-        // check if file_name exists already
-        int i = path.lastIndexOf("/");
-        String dir_name = path.substring(0, i);
-  //      java.io.File parent_dir = new java.io.File(dir_name);
-
+        this.last_modified = last_modified;
+        this.length = length;
+        this.supported_views = supported_views;
     }
 
     public int getFileId() {
@@ -102,15 +100,31 @@ public class File {
         this.status = status;
     }
 
-    public String getMetadata() {
-        return metadata;
+    public Timestamp getLast_modified() {
+        return last_modified;
     }
 
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
+    public void setLast_modified(Timestamp last_modified) {
+        this.last_modified = last_modified;
     }
 
-//    public List<Dir_contains> getContents() {
+    public long getLength() {
+        return length;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
+    }
+
+    public List<SupportedView> getSupported_views() {
+        return supported_views;
+    }
+
+    public void setSupported_views(List<SupportedView> supported_views) {
+        this.supported_views = supported_views;
+    }
+
+    //    public List<Dir_contains> getContents() {
 //        return contents;
 //    }
 //
