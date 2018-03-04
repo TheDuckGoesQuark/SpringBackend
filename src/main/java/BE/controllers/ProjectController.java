@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 // Models
-import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
 import BE.exceptions.FileRetrievalException;
 import BE.exceptions.UnsupportedFileViewException;
@@ -19,7 +18,7 @@ import BE.responsemodels.project.ProjectRoleModel;
 import BE.responsemodels.project.UserListModel;
 
 // Services
-import BE.services.MetaFileService;
+import BE.services.FileService;
 import BE.services.ProjectService;
 
 // Exceptions
@@ -28,7 +27,6 @@ import BE.exceptions.NotImplementedException;
 
 // Apache
 import BE.services.StorageService;
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.log4j.Logger;
 
 // Spring
@@ -56,18 +54,14 @@ public class ProjectController {
     ProjectService projectService;
 
     @Autowired
-    MetaFileService metaFileService;
-
-    @Autowired
-    StorageService storageService;
+    FileService fileService;
 
     private static String getRelativeFilePath(HttpServletRequest request, String project_name) {
         String requestURI = request.getRequestURI();
         return requestURI.replaceFirst("/projects/" + project_name + "/files/", "");
     }
 
-    private void sendFile(HttpServletResponse response, int file_id) {
-        InputStream inputStream = storageService.getFileStream(file_id);
+    private void sendFile(InputStream inputStream, HttpServletResponse response) {
 
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
@@ -85,7 +79,7 @@ public class ProjectController {
     }
 
     private static FileRequestOptions readOptions(Map<String, String> mapOptions) {
-        FileRequestOptions options  = new FileRequestOptions();
+        FileRequestOptions options = new FileRequestOptions();
         options.setFinal(mapOptions.containsKey(FileRequestOptions.FINAL));
         options.setOffset(Integer.parseInt(mapOptions.get(FileRequestOptions.OFFSET)));
         options.setOverwrite(mapOptions.containsKey(FileRequestOptions.OVERWRITE));
@@ -165,8 +159,8 @@ public class ProjectController {
         // Retrieves file path from request
         String relativePath = getRelativeFilePath(request, project_name);
 
-        FileModel fileModel = metaFileService.getMetaFile(project_name, relativePath);
-        sendFile(response, fileModel.getFile_id());
+        InputStream inputStream = fileService.getRawFile(project_name, relativePath);
+        sendFile(inputStream, response);
     }
 
     /**
@@ -184,7 +178,7 @@ public class ProjectController {
         // Return appropriate response
         switch (view) {
             case SupportedView.META_VIEW:
-                return metaFileService.getMetaFile(project_name, relativePath);
+                return fileService.getMetaFile(project_name, relativePath);
             case SupportedView.RAW_VIEW:
                 getRawFile(project_name, request, response);
                 return null;
@@ -206,9 +200,10 @@ public class ProjectController {
         // Return appropriate response
         switch (view) {
             case SupportedView.META_VIEW:
-                return metaFileService.getFileMetaByID(project_name, file_id);
+                return fileService.getFileMetaByID(file_id);
             case SupportedView.RAW_VIEW:
-                sendFile(response, file_id);
+                InputStream inputStream = fileService.getRawFileByID(file_id);
+                sendFile(inputStream, response);
             default:
                 throw new UnsupportedFileViewException();
         }
@@ -226,26 +221,20 @@ public class ProjectController {
             throws IOException, ServletException {
 
         String relativeFilePath = getRelativeFilePath(request, project_name);
-        FileModel fileModel = metaFileService.createMetaFile(project_name, relativeFilePath, action);
-
-        storageService.uploadFile(fileModel.getFile_id(), readOptions(otherOptions), bytes);
-
-        return fileModel;
+        FileRequestOptions options = readOptions(otherOptions);
+        return fileService.createFile(project_name, relativeFilePath, action, options, bytes);
     }
 
     /**
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.DELETE)
     public FileModel deleteFile(@PathVariable(value = "project_name") String project_name,
                                 HttpServletRequest request) {
-        String path = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
-        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
-        path = path.replace("/files", "");
-        return metaFileService.deleteMetaFile(project_name, path);
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+
+        return fileService.deleteFile(project_name, relativeFilePath);
     }
 
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view", "include_children"}, method = RequestMethod.GET)
@@ -258,11 +247,11 @@ public class ProjectController {
         path = path.replace("/files", "");
         List<FileModel> list = new ArrayList<>();
         //check if dir exists
-        FileModel dir = metaFileService.getMetaFile(project_name, path);
+        FileModel dir = fileService.getMetaFile(project_name, path);
         list.add(dir);
         //TODO transfer logic to file service
         if (dir.getType().equals("dir") && view.equals("meta")) {
-            return metaFileService.getChildrenMeta(project_name, path);
+            return fileService.getChildrenMeta(project_name, path);
         }
         return list;
     }

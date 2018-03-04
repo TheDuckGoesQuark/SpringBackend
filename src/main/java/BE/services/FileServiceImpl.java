@@ -11,30 +11,44 @@ import BE.repositories.SupportedViewRepository;
 import BE.responsemodels.file.FileMetaDataModel;
 import BE.responsemodels.file.FileModel;
 
+import BE.responsemodels.file.FileRequestOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class MetaFileServiceImpl implements MetaFileService {
+public class FileServiceImpl implements FileService {
+
+    private final
+    ProjectService projectService;
+
+    private final
+    StorageService storageService;
+
+    private final
+    FileRepository fileRepository;
+
+    private final
+    SupportedViewRepository supportedViewRepository;
+
+    private final
+    Dir_containsRepository dirContainsRepository;
 
     @Autowired
-    ProjectRepository ProjectRepository;
-
-    @Autowired
-    FileRepository FileRepository;
-
-    @Autowired
-    SupportedViewRepository Supported_ViewRepository;
-
-    @Autowired
-    Dir_containsRepository Dir_containsRepository;
+    public FileServiceImpl(ProjectService projectService, StorageService storageService, FileRepository fileRepository, SupportedViewRepository supportedViewRepository, Dir_containsRepository dirContainsRepository) {
+        this.projectService = projectService;
+        this.storageService = storageService;
+        this.fileRepository = fileRepository;
+        this.supportedViewRepository = supportedViewRepository;
+        this.dirContainsRepository = dirContainsRepository;
+    }
 
     // Conversion Functions
-    private FileModel fileToMetaModel(MetaFile metaFile) {
+    private FileModel metaFileToFileModel(MetaFile metaFile) {
         return new FileModel(
                 metaFile.getPath(),
                 metaFile.getFile_name(),
@@ -48,67 +62,73 @@ public class MetaFileServiceImpl implements MetaFileService {
 
     @Override
     public List<FileModel> getAllMetaFiles(String projectName) {
-        if (ProjectRepository.findByName(projectName) == null)
+        if (projectService.getProjectByName(projectName) == null)
             throw new ProjectNotFoundException();
         List<FileModel> files = new ArrayList<>();
-        MetaFile root_dir = FileRepository.findByProjectName(projectName);
-        FileRepository.findAll().forEach(file -> {
-            if (file.getPath().startsWith(root_dir.getPath())) files.add(this.fileToMetaModel(file));
+        MetaFile root_dir = fileRepository.findByProjectName(projectName);
+        fileRepository.findAll().forEach(file -> {
+            if (file.getPath().startsWith(root_dir.getPath())) files.add(this.metaFileToFileModel(file));
         });
         return files;
     }
 
     @Override
     public List<FileModel> getChildrenMeta(String projectName, String filePath) {
-        List<FileModel> children = new ArrayList<>();
+/*        List<FileModel> children = new ArrayList<>();
         FileModel dir = this.getMetaFile(projectName, filePath);
 //        for(Dir_contains file : dir.getContents()){
 //            children.add(this.getFileMetaByID(projectName,file.getFile().getFileId()));
 //        }
-        Dir_containsRepository.findByDirId(dir.getFile_id()).forEach(dir_contains -> {
+        dirContainsRepository.findByDirId(dir.getFile_id()).forEach(dir_contains -> {
             children.add(this.getFileMetaByID(projectName, dir_contains.getMetaFile().getFileId()));
-        });
-        return children;
+        });*/
+        throw new NotImplementedException();
     }
 
-    //TODO recursive function to search through closure table(dir_contains) and build up path to find a file
     @Override
     public FileModel getMetaFile(String projectName, String filePath) {
-        List<FileModel> files = this.getAllMetaFiles(projectName);
-        for (FileModel file : files)
-            if (file.getPath().equals(filePath))
-                return file;
-        throw new FileNotFoundException();
-    }
-
-    @Override
-    public FileModel createMetaFile(String project_name, String path, String action) {
         throw new NotImplementedException();
     }
 
     @Override
-    //TODO write function for this in FileRepository to be a single operation
-    public FileModel getFileMetaByID(String projectName, int file_id) {
-        List<FileModel> files = this.getAllMetaFiles(projectName);
-        for (FileModel file : files)
-            if (file.getFile_id() == file_id)
-                return file;
-        throw new FileNotFoundException();
+    public FileModel getFileMetaByID(int file_id) {
+        MetaFile metaFile = fileRepository.findByFileId(file_id);
+        if (metaFile != null) return metaFileToFileModel(metaFile);
+        else throw new FileNotFoundException();
     }
 
     @Override
-    public FileModel updateFileMeta(String project_name, String path, String action) {
-        throw new NotImplementedException();
+    public InputStream getRawFile(String projectName, String filePath) {
+        return null;
+    }
+
+    @Override
+    public InputStream getRawFileByID(int file_id) {
+        return null;
     }
 
     @Override
     @Transactional
-    public FileModel deleteMetaFile(String projectName, String filePath) {
+    public FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public FileModel deleteFile(String projectName, String filePath) {
         FileModel file = this.getMetaFile(projectName, filePath);
         if (file == null) throw new FileNotFoundException();
-        FileRepository.delete(file.getFile_id());
+        fileRepository.delete(file.getFile_id());
+
         return file;
     }
+
+    @Override
+    @Transactional
+    public FileModel updateFileMeta(String project_name, String path, String action) {
+        throw new NotImplementedException();
+    }
+
 
     //TODO 12.8 Uploading
 
@@ -117,7 +137,7 @@ public class MetaFileServiceImpl implements MetaFileService {
 //    public FileModel uploadFile(String projectName, String filePath) {
 //        FileModel file = this.getFile(projectName, filePath);
 //        if (file == null) throw new FileNotFoundException();
-//        FileRepository.delete(file.getFile_id());
+//        fileRepository.delete(file.getFile_id());
 //        return file;
 //    }
 

@@ -25,9 +25,15 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public void uploadFile(int file_id, FileRequestOptions options, byte[] bytes) {
+    public boolean uploadFile(int file_id, FileRequestOptions options, byte[] bytes) {
         File file = new File(Integer.toString(file_id));
+        return false;
+    }
 
-
+    @Override
+    public boolean deleteFile(int file_id) {
+        File file = new File(Integer.toString(file_id));
+        if (file.exists()) return file.delete();
+        else throw new FileNotFoundException();
     }
 }

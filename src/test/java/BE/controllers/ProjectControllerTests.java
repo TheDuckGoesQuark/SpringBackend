@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.UserListModel;
-import BE.services.MetaFileService;
+import BE.services.FileService;
 import BE.services.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.filters.CorsFilter;
@@ -55,7 +55,7 @@ public class ProjectControllerTests {
     private ProjectController projectController;
 
     @Mock
-    private MetaFileService metaFileService;
+    private FileService fileService;
 
     @Before
     public void init() {
@@ -180,7 +180,7 @@ public class ProjectControllerTests {
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
         List<FileModel> listFileModel = Arrays.asList(fileModel);
-        when (metaFileService.getAllMetaFiles("project")).thenReturn(listFileModel);
+        when (fileService.getAllMetaFiles("project")).thenReturn(listFileModel);
         mockMvc.perform(get("/projects/project/files"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -192,8 +192,8 @@ public class ProjectControllerTests {
                 .andExpect(jsonPath("$[0].metadata").value("testMetaDataModel"))
                 .andExpect(jsonPath("$[0].type").value("testTypeModel"))
                 .andExpect(jsonPath("$[0].status").value("testStatusModel"));
-        verify(metaFileService, times(1)).getAllMetaFiles("project");
-        verifyNoMoreInteractions(metaFileService);
+        verify(fileService, times(1)).getAllMetaFiles("project");
+        verifyNoMoreInteractions(fileService);
     }
 
     @Test
@@ -204,7 +204,7 @@ public class ProjectControllerTests {
         );
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
-        when(metaFileService.getFile("project", "/project/"));
+        when(fileService.getFile("project", "/project/"));
         mockMvc.perform(get("/projects/project/files/**"));
         //TODO currently confused about URL form, and method still needing to be further implemented
     }
@@ -217,7 +217,7 @@ public class ProjectControllerTests {
         );
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
-        when(metaFileService.getFileMetaByID("project", 99)).thenReturn(fileModel);
+        when(fileService.getFileMetaByID("project", 99)).thenReturn(fileModel);
         mockMvc.perform(get("/projects/project/files_by_id/99"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -228,8 +228,8 @@ public class ProjectControllerTests {
                 .andExpect(jsonPath("$.metadata").value("testMetaDataModel"))
                 .andExpect(jsonPath("$.type").value("testTypeModel"))
                 .andExpect(jsonPath("$.status").value("testStatusModel"));
-        verify(metaFileService, times(1)).getFileMetaByID("project",99);
-        verifyNoMoreInteractions(metaFileService);
+        verify(fileService, times(1)).getFileMetaByID("project",99);
+        verifyNoMoreInteractions(fileService);
     }
 
     @Test
@@ -241,14 +241,14 @@ public class ProjectControllerTests {
         FileModel fileModel = new FileModel("/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
 
-        when(metaFileService.updateFileMeta(testMetaFile)).thenReturn(fileModel);
+        when(fileService.updateFileMeta(testMetaFile)).thenReturn(fileModel);
         mockMvc.perform(patch("/project/project/testMetaFile"))
                 //TODO the url is wrong, need fix
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.path").value("/project/"));
-        verify(metaFileService, times(1)).updateFileMeta(testMetaFile);
-        verifyNoMoreInteractions(metaFileService);
+        verify(fileService, times(1)).updateFileMeta(testMetaFile);
+        verifyNoMoreInteractions(fileService);
     }
 
     @Test
@@ -259,12 +259,12 @@ public class ProjectControllerTests {
         );
         FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
-        when(metaFileService.deleteMetaFile("project", "/project/")).thenReturn(fileModel);
+        when(fileService.deleteMetaFile("project", "/project/")).thenReturn(fileModel);
         mockMvc.perform(delete("/projects/project/"))
                 //TODO where am I selecting the file?
                 .andExpect(status().isOk());
-        verify(metaFileService, times(1)).deleteMetaFile("project", "/projects/project/");
-        verifyNoMoreInteractions(metaFileService);
+        verify(fileService, times(1)).deleteMetaFile("project", "/projects/project/");
+        verifyNoMoreInteractions(fileService);
     }
 
     @Test
@@ -276,15 +276,15 @@ public class ProjectControllerTests {
         FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
         List<FileModel> fileModelList = Arrays.asList(fileModel);
-        when(metaFileService.getFile("project", "/projects/project/")).thenReturn(fileModel);
-        when(metaFileService.getChildrenMeta("project", "/projects/project/")).thenReturn(fileModelList);
+        when(fileService.getFile("project", "/projects/project/")).thenReturn(fileModel);
+        when(fileService.getChildrenMeta("project", "/projects/project/")).thenReturn(fileModelList);
         mockMvc.perform(get("/projects/project/?view?include_children"))
                 .andDo(print())
                 .andExpect(status().isOk());
-        //verify(metaFileService, times(1)).getFile("project", "/projects/project/");
-        //verify(metaFileService, times(1)).getChildrenMeta("project", "/projects/project/");
+        //verify(fileService, times(1)).getFile("project", "/projects/project/");
+        //verify(fileService, times(1)).getChildrenMeta("project", "/projects/project/");
         //TODO doesnt seem to be calling appropriate methods, or testing incorrectly
-        verifyNoMoreInteractions(metaFileService);
+        verifyNoMoreInteractions(fileService);
     }
 
 //    @Test
@@ -295,12 +295,12 @@ public class ProjectControllerTests {
 //        );
 //        FileModel fileModel = new FileModel("/projects/project/", "testFileModel", 99
 //                , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
-//        when(metaFileService.createMetaFile("project", "/projects/project/")).thenReturn(fileModel);
+//        when(fileService.createMetaFile("project", "/projects/project/")).thenReturn(fileModel);
 //        mockMvc.perform(post("/projects/project/"))
 //                .andDo(print())
 //                .andExpect(status().isCreated());
-//        verify(metaFileService, times(1)).createMetaFile("project", "/projects/project/");
-//        verifyNoMoreInteractions(metaFileService);
+//        verify(fileService, times(1)).createMetaFile("project", "/projects/project/");
+//        verifyNoMoreInteractions(fileService);
 //    }
 
     @Test

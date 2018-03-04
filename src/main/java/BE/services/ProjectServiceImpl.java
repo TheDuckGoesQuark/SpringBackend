@@ -27,15 +27,15 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectRepository projectRepository;
 
     private final
-    MetaFileService metaFileService;
+    FileService fileService;
 
     private final
     SupportedViewRepository supportedViewRepository;
 
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, MetaFileService metaFileService, SupportedViewRepository supportedViewRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, FileService fileService, SupportedViewRepository supportedViewRepository) {
         this.projectRepository = projectRepository;
-        this.metaFileService = metaFileService;
+        this.fileService = fileService;
         this.supportedViewRepository = supportedViewRepository;
     }
 
