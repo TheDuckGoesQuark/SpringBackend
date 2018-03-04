@@ -1,4 +1,4 @@
-package BE;
+package BE.config;
 
 import BE.responsemodels.user.UserModel;
 import BE.security.enums.Privileges;
