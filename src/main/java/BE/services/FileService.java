@@ -1,19 +1,29 @@
 package BE.services;
 
-import BE.entities.project.File;
 import BE.responsemodels.file.FileModel;
+import BE.responsemodels.file.FileRequestOptions;
 
+import java.io.InputStream;
 import java.util.List;
 
 public interface FileService {
-    public List<FileModel> getAllFiles(String projectName);
-    public FileModel getFile(String projectName, String filePath);
-    public FileModel createFile(FileModel file, String action);
-    public FileModel deleteFile(String projectName, String filePath);
-    public FileModel getFileByID(String projectName, int file_id);
-    public FileModel updateFile(File file);
-    public List<FileModel> getChildren(String projectName, String filePath);
-    //TODO methods for FileDataModel (probably NO just have a FileModel class with meta and data constructors)
+    List<FileModel> getAllMetaFiles(String projectName);
+
+    FileModel getMetaFile(String projectName, String filePath);
+
+    FileModel getFileMetaByID(int file_id);
+
+    InputStream getRawFile(String projectName, String filePath);
+
+    InputStream getRawFileByID(int file_id);
+
+    FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes);
+
+    FileModel deleteFile(String projectName, String filePath);
+
+    FileModel updateFileMeta(String project_name, String path, String action);
+
+    List<FileModel> getChildrenMeta(String projectName, String filePath);
 }
 
 

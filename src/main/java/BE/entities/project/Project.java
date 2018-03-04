@@ -2,7 +2,6 @@ package BE.entities.project;
 
 
 import BE.entities.UserProject;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,7 +15,7 @@ public class Project {
 
     @JoinColumn(name = "root_dir_id")
     @OneToOne(cascade = CascadeType.ALL)
-    private File root_dir;
+    private MetaFile root_dir;
 
     @OneToMany(mappedBy = "project")
     private List<UserProject> userProjects;
@@ -24,7 +23,7 @@ public class Project {
     protected Project() {
     }
 
-    public Project(String name, File root_dir) {
+    public Project(String name, MetaFile root_dir) {
         this.name = name;
         this.root_dir = root_dir;
     }
@@ -37,11 +36,11 @@ public class Project {
         this.name = name;
     }
 
-    public File getRoot_dir() {
+    public MetaFile getRoot_dir() {
         return root_dir;
     }
 
-    public void setRoot_dir(File root_dir) {
+    public void setRoot_dir(MetaFile root_dir) {
         this.root_dir = root_dir;
     }
 

@@ -3,6 +3,9 @@ package BE.advices;
 import BE.exceptions.BaseException;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Wraps any error response to expected model
+ */
 public class ErrorResponseWrapper {
 
     private String status;

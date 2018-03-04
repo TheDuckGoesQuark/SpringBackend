@@ -28,17 +28,8 @@ import java.nio.file.Paths;
 @EnableAutoConfiguration
 public class Application {
 
-    private static final String PROJECTS_DIRECTORY = "/cs/home/nd33/project-code/projects";
-
     public static void main(String[] args) throws IOException {
-        File projects = setUpDirectory();
         SpringApplication.run(Application.class, args);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                removeDirectory(projects);
-            }
-        });
     }
 
     // Produces swagger documentation at http://localhost:8080/swagger-ui.html

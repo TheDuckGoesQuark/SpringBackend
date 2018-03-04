@@ -79,7 +79,7 @@ public class UserControllerWDBTests {
 
     @Test
     public void createUser() throws Exception {
-        List<String> testPrivileges= Arrays.asList("username");
+        List<String> testPrivileges= Arrays.asList("user");
 
         List<ProjectListModel> testProject=null;
 

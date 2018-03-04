@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import static BE.security.SecurityUtils.validateRequestStructure;
 
@@ -39,11 +40,9 @@ public class FormAuthenticationFilter extends AbstractAuthenticationProcessingFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws org.springframework.security.core.AuthenticationException, IOException, ServletException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        // String refresh_token = request.getParameter("refresh_token");
-        String grant_type = request.getParameter("grant_type");
-
+        String username = request.getParameter(URLEncoder.encode("username",CHARACTER_ENCODING_UTF_8));
+        String password = request.getParameter(URLEncoder.encode("password", CHARACTER_ENCODING_UTF_8));
+        String grant_type = request.getParameter(URLEncoder.encode("grant_type",CHARACTER_ENCODING_UTF_8));
         // Validate structure
         validateRequestStructure(username, password, grant_type, null);
 

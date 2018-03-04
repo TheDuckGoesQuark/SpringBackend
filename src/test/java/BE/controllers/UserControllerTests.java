@@ -91,8 +91,8 @@ public class UserControllerTests {
     public void getAllUsers() throws Exception {
 
         //object initialisation
-        List<String> testPrivileges= Arrays.asList("username");
-        List<String> testPrivileges2 = Arrays.asList("username","admin");
+        List<String> testPrivileges= Arrays.asList("user");
+        List<String> testPrivileges2 = Arrays.asList("user","admin");
         List<ProjectListModel> testProject=null;
         List<UserModel> usersList = Arrays.asList(
                 new UserModel("testUser1","testPass","test@email.com",testProject,testPrivileges),
@@ -108,7 +108,7 @@ public class UserControllerTests {
                 .andExpect(jsonPath("$[0].password").value("testPass"))
                 .andExpect(jsonPath("$[0].email").value("test@email.com"))
                 //.andExpect(jsonPath("$[0].projects").value("null"))
-                .andExpect(jsonPath("$[0].privileges[0]").value("username"));
+                .andExpect(jsonPath("$[0].privileges[0]").value("user"));
 
         verify(userService, times(1)).getAllUsers();
         verifyNoMoreInteractions(userService);
@@ -119,7 +119,7 @@ public class UserControllerTests {
     public void getASpecificUser() throws Exception {
 
         //object initialisation
-        List<String> testPrivileges = Arrays.asList("username","admin");
+        List<String> testPrivileges = Arrays.asList("user","admin");
         List<ProjectListModel> testProject=null;
         UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 
@@ -137,7 +137,7 @@ public class UserControllerTests {
     public void getListOfUserPriviledges() throws Exception {
 
         //object initialisation
-        PrivilegeModel testPrivilege = new PrivilegeModel("username","standard user access", false);
+        PrivilegeModel testPrivilege = new PrivilegeModel("user","standard user access", false);
         PrivilegeModel testPrivilege2 = new PrivilegeModel("admin","admin access", true);
         List<PrivilegeModel> testPrivilegeList = Arrays.asList(testPrivilege, testPrivilege2);
 
@@ -146,7 +146,7 @@ public class UserControllerTests {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].privilege").value("username"))
+                .andExpect(jsonPath("$[0].privilege").value("user"))
                 .andExpect(jsonPath("$[1].privilege").value("admin"))
                 .andExpect(jsonPath("$[0].description").value("standard user access"))
                 .andExpect(jsonPath("$[0].internal").value(false));
@@ -159,7 +159,7 @@ public class UserControllerTests {
     public void createUser() throws Exception {
 
         //object initialisation
-        List<String> testPrivileges = Arrays.asList("username","admin");
+        List<String> testPrivileges = Arrays.asList("user","admin");
         List<ProjectListModel> testProject=null;
         UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 
@@ -178,7 +178,7 @@ public class UserControllerTests {
     public void updateUser() throws Exception {
 
         //object initialisation
-        List<String> testPrivileges = Arrays.asList("username","admin");
+        List<String> testPrivileges = Arrays.asList("user","admin");
         List<ProjectListModel> testProject=null;
         UserModel testUser = new UserModel("testUserModel","testPazz","testModel@email.com",testProject,testPrivileges);
 

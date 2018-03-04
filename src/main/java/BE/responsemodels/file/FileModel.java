@@ -1,7 +1,6 @@
 package BE.responsemodels.file;
 
-import BE.entities.project.Dir_contains;
-import BE.entities.project.Supported_view;
+import BE.entities.project.SupportedView;
 
 import java.util.List;
 //TODO this may actually have to be named FileModel containing two constructors one for file meta protocol and one for file data protocol.
@@ -13,9 +12,9 @@ public class FileModel {
 
     private int file_id;
 
-    private List<Supported_view> views;
+    private List<SupportedView> views;
 
-    private String metadata;
+    private FileMetaDataModel metadata;
 
     private String type;
 
@@ -24,7 +23,7 @@ public class FileModel {
 //    private List<Dir_contains> contents;
 
     //file meta model
-    public FileModel(String path, String file_name, int file_id, List<Supported_view> views, String metadata, String type, String status) {
+    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -72,11 +71,11 @@ public class FileModel {
         this.type = type;
     }
 
-    public List<Supported_view> getViews() {
+    public List<SupportedView> getViews() {
         return views;
     }
 
-    public void setViews(List<Supported_view> views) {
+    public void setViews(List<SupportedView> views) {
         this.views = views;
     }
 
@@ -88,11 +87,11 @@ public class FileModel {
         this.status = status;
     }
 
-    public String getMetadata() {
+    public FileMetaDataModel getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(String metadata) {
+    public void setMetadata(FileMetaDataModel metadata) {
         this.metadata = metadata;
     }
 
