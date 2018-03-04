@@ -50,11 +50,17 @@ public class ProjectController {
 
     private static final Logger logger = Logger.getLogger(ProjectController.class);
 
-    @Autowired
+    final
     ProjectService projectService;
 
-    @Autowired
+    final
     FileService fileService;
+
+    @Autowired
+    public ProjectController(ProjectService projectService, FileService fileService) {
+        this.projectService = projectService;
+        this.fileService = fileService;
+    }
 
     private static String getRelativeFilePath(HttpServletRequest request, String project_name) {
         String requestURI = request.getRequestURI();
