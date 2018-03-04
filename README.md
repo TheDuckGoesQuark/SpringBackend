@@ -1,6 +1,6 @@
 # Junior Honours Project
 
-A back end for the JH project_name, providing file storage, image processing, and username permissions and groups.
+A back end for the JH project_name, providing metaFile storage, image processing, and username permissions and groups.
 ## Getting Started
 
 These instructions will get you a copy of the project_name up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project_name on a live system.
@@ -26,7 +26,7 @@ git clone https://gitlab.cs.st-andrews.ac.uk/cs3099group-be-5/project-code.git
 
 >If using Intellij as your IDEA, you can use the import project option 
 >and select the pom.xml 
->file as build instructions.
+>metaFile as build instructions.
 
 Install the necessary packages and build the project:
 > Note: The test suite will be ran automatically after building to 

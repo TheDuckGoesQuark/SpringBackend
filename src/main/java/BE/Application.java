@@ -28,17 +28,8 @@ import java.nio.file.Paths;
 @EnableAutoConfiguration
 public class Application {
 
-    private static final String PROJECTS_DIRECTORY = "/cs/home/nd33/project-code/projects";
-
     public static void main(String[] args) throws IOException {
-        File projects = setUpDirectory();
         SpringApplication.run(Application.class, args);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                removeDirectory(projects);
-            }
-        });
     }
 
     // Produces swagger documentation at http://localhost:8080/swagger-ui.html
@@ -58,32 +49,5 @@ public class Application {
                 .title("JH BE")
                 .version("0.1")
                 .build();
-    }
-
-    // Creates the initial directory that stores the files that the database references.
-    // Exists for testing the project locally.
-    private static File setUpDirectory() throws IOException {
-        File projects = new File(PROJECTS_DIRECTORY);
-        if (projects.mkdir()) {
-            System.out.println("Directory created.");
-        } else {
-            System.out.println("Create directory failed.");
-        }
-        return projects;
-    }
-
-    // Deletes the initial directory and all of its contents.
-    // Exists for testing the project locally.
-    private static void removeDirectory(File projects) {
-        File[] allContents = projects.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) { removeDirectory(file);
-            }
-        }
-                if (projects.delete()) {
-            System.out.println("Directory deleted.");
-        } else {
-            System.out.println("Remove directory failed.");
-        }
     }
 }

@@ -1,13 +1,18 @@
 package BE.controllers;
 
 // JavaIO
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 // Models
-import BE.entities.project.File;
+import BE.entities.project.SupportedView;
+import BE.exceptions.FileRetrievalException;
+import BE.exceptions.UnsupportedFileViewException;
 import BE.responsemodels.file.FileModel;
+import BE.responsemodels.file.FileRequestOptions;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
 import BE.responsemodels.project.UserListModel;
@@ -21,40 +26,76 @@ import BE.exceptions.NotImplementedException;
 //import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
 
 // Apache
+import BE.services.StorageService;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.http.fileupload.*;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 // Spring
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 //Other
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 @RestController
 public class ProjectController {
 
     private static final Logger logger = Logger.getLogger(ProjectController.class);
 
-    @Autowired
+    final
     ProjectService projectService;
 
-    @Autowired
+    final
     FileService fileService;
+
+    @Autowired
+    public ProjectController(ProjectService projectService, FileService fileService) {
+        this.projectService = projectService;
+        this.fileService = fileService;
+    }
+
+    private static String getRelativeFilePath(HttpServletRequest request, String project_name) {
+        String requestURI = request.getRequestURI();
+        return requestURI.replaceFirst("/projects/" + project_name + "/files/", "");
+    }
+
+    private void sendFile(InputStream inputStream, HttpServletResponse response) {
+
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+        try {
+            IOUtils.copy(inputStream, response.getOutputStream());
+        } catch (IOException e) {
+            throw new FileRetrievalException();
+        } finally {
+            try {
+                response.flushBuffer();
+            } catch (IOException e) {
+                throw new FileRetrievalException();
+            }
+        }
+    }
+
+    private static FileRequestOptions readOptions(Map<String, String> mapOptions) {
+        FileRequestOptions options = new FileRequestOptions();
+        options.setFinal(mapOptions.containsKey(FileRequestOptions.FINAL));
+        options.setOffset(Integer.parseInt(mapOptions.get(FileRequestOptions.OFFSET)));
+        options.setOverwrite(mapOptions.containsKey(FileRequestOptions.OVERWRITE));
+        options.setTruncate(mapOptions.containsKey(FileRequestOptions.TRUNCATE));
+        return options;
+    }
 
     /**
      * Gets all projects
+     *
      * @return a list of all projects
      **/
     @RequestMapping(value = "/projects", method = RequestMethod.GET)
@@ -63,61 +104,52 @@ public class ProjectController {
     }
 
     /**
-     * Gets a specific project
      * @param project_name
-     * @return project
+     * @return
      * @throws NotImplementedException
      */
     @RequestMapping(value = "/projects/{project_name}", method = RequestMethod.GET)
-    public ProjectModel getProject(@PathVariable(value="project_name") String project_name) {
+    public ProjectModel getProject(@PathVariable(value = "project_name") String project_name) {
         return projectService.getProjectByName(project_name);
     }
 
     /**
-     * Creates a new project
      * @param project_name
-     * @return project
+     * @return
      */
-    @RequestMapping(value = "/projects/{project_name}", params = {"action=create"}, method = RequestMethod.POST)
-    public ProjectModel createProject(@PathVariable(value="project_name") String project_name) {
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.CREATE}, method = RequestMethod.POST)
+    public ProjectModel createProject(@PathVariable(value = "project_name") String project_name) {
         return projectService.createProject(project_name);
     }
 
     /**
-     * Updates a specific existing project
      * @param project_name
      * @param project
-     * @return project
+     * @return
      */
-    @RequestMapping(value = "/projects/{project_name}", params = {"action=update"}, method = RequestMethod.POST)
-    public ProjectModel updateProject(@PathVariable(value="project_name") String project_name, @RequestBody ProjectModel project) {
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.UPDATE}, method = RequestMethod.POST)
+    public ProjectModel updateProject(@PathVariable(value = "project_name") String project_name, @RequestBody ProjectModel project) {
         return projectService.updateProject(project);
     }
 
     /**
-     * Deletes a specific existing project
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/projects/{project_name}", params = {"action=delete"}, method = RequestMethod.POST)
-    public void deleteProject(@PathVariable(value="project_name") String project_name) {
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.DELETE}, method = RequestMethod.POST)
+    public void deleteProject(@PathVariable(value = "project_name") String project_name) {
         projectService.deleteProject(project_name);
     }
 
     /**
-     *
      * @param project_name
-     * @param userListModel
      * @return
      */
-    @RequestMapping(value = "/projects/{project_name}", params = {"action=update_grant"}, method = RequestMethod.POST)
-    public void updateGrant(@PathVariable(value="project_name") String project_name, @RequestBody UserListModel userListModel) {
+    @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.UPDATE_GRANT}, method = RequestMethod.POST)
+    public void updateGrant(@PathVariable(value = "project_name") String project_name, @RequestBody UserListModel userListModel) {
         projectService.updateGrant(project_name, userListModel);
     }
 
-    /**
-     *
-     */
     @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
     public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
@@ -125,162 +157,108 @@ public class ProjectController {
     }
 
     /**
-     * Gets all files in a specific project
      * @param project_name
-     * @return a list of files
-     **/
-    @RequestMapping(value = "/projects/{project_name}/files", method = RequestMethod.GET)
-    public List<FileModel> getAllFiles(@PathVariable(value="project_name") String project_name) {
-        return fileService.getAllFiles(project_name);
-    }
-
-    /**
-     * Gets a specific file in a specific project
-     * @param project_name
-     * @param request
-     * @param view
-     * @return file
+     * @return a particular file
      */
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = "view", method = RequestMethod.GET)
-    public FileModel getFile(@PathVariable(value="project_name") String project_name,
-                             HttpServletRequest request,
-                             @RequestParam("view") String view) {
-        //TODO first iterate through views to see if supported otherwise throw UnsupportedFileViewException
-        String path  = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
-        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
-        path = path.replace("/files", "");
-        if(view.equals("") || view.equals("meta"))
-            return fileService.getFile(project_name, path);
-        else
-            //TODO return other views
-            return fileService.getFile(project_name, path);
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view=" + SupportedView.RAW_VIEW}, method = RequestMethod.GET)
+    public void getRawFile(@PathVariable(value = "project_name") String project_name, HttpServletRequest request, HttpServletResponse response) {
+        // Retrieves file path from request
+        String relativePath = getRelativeFilePath(request, project_name);
+
+        InputStream inputStream = fileService.getRawFile(project_name, relativePath);
+        sendFile(inputStream, response);
     }
 
     /**
-     * Gets a specific file by file id in a specific project
+     * @param project_name
+     * @return a particular file
+     */
+    @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
+    public FileModel getFile(@PathVariable(value = "project_name") String project_name,
+                             @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
+                             HttpServletRequest request,
+                             HttpServletResponse response) {
+        // Retrieves file path from request
+        String relativePath = getRelativeFilePath(request, project_name);
+
+        // Return appropriate response
+        switch (view) {
+            case SupportedView.META_VIEW:
+                return fileService.getMetaFile(project_name, relativePath);
+            case SupportedView.RAW_VIEW:
+                getRawFile(project_name, request, response);
+                return null;
+            default:
+                throw new UnsupportedFileViewException();
+        }
+    }
+
+    /**
      * @param project_name
      * @param file_id
-     * @return file
+     * @return a particular file
      */
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
-    public FileModel getFileByID(@PathVariable(value="project_name") String project_name,
-                                 @PathVariable(value="file_id") int file_id) {
-        return fileService.getFileByID(project_name, file_id);
+    public FileModel getFileByID(@PathVariable(value = "project_name") String project_name,
+                                 @PathVariable(value = "file_id") int file_id,
+                                 @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
+                                 HttpServletResponse response) {
+        // Return appropriate response
+        switch (view) {
+            case SupportedView.META_VIEW:
+                return fileService.getFileMetaByID(file_id);
+            case SupportedView.RAW_VIEW:
+                InputStream inputStream = fileService.getRawFileByID(file_id);
+                sendFile(inputStream, response);
+            default:
+                throw new UnsupportedFileViewException();
+        }
     }
 
     /**
-     * Updates a specific file in a specific project
-     * @param project_name
-     * @param request
-     * @param file
-     * @return file
+     * @return
      */
-    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.PATCH)
-    public FileModel updateFile(@PathVariable(value="project_name") String project_name,
-                                HttpServletRequest request,
-                                @RequestBody File file) {
-        String path  = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return fileService.updateFile(file);
+    @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.POST)
+    public FileModel createOrUpdateFile(@PathVariable(value = "project_name") String project_name,
+                                        @RequestParam(value = "content") byte[] bytes,
+                                        @RequestParam Map<String, String> otherOptions,
+                                        HttpServletRequest request,
+                                        @RequestParam("action") String action)
+            throws IOException, ServletException {
+
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+        FileRequestOptions options = readOptions(otherOptions);
+        return fileService.createFile(project_name, relativeFilePath, action, options, bytes);
     }
 
     /**
-     * Deletes a specific file in a specific project
      * @param project_name
-     * @param request
-     * @return file
+     * @return
      */
-    @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.DELETE)
-    public FileModel deleteFile(@PathVariable(value="project_name") String project_name,
+    @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.DELETE)
+    public FileModel deleteFile(@PathVariable(value = "project_name") String project_name,
                                 HttpServletRequest request) {
-        String path  = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        //TODO REPLACE.this is error prone because /files can be contained somewhere in filepath.
-        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
-        path = path.replace("/files", "");
-        return fileService.deleteFile(project_name, path);
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+
+        return fileService.deleteFile(project_name, relativeFilePath);
     }
 
-    /**
-     * Gets all files in a specific directory in a specific project
-     * @param project_name
-     * @param request
-     * @param view
-     * @return a list of files
-     */
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view","include_children"}, method = RequestMethod.GET)
-    public List<FileModel> getDirContents(@PathVariable(value="project_name") String project_name,
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view", "include_children"}, method = RequestMethod.GET)
+    public List<FileModel> getDirContents(@PathVariable(value = "project_name") String project_name,
                                           HttpServletRequest request, @RequestParam("view") String view) {
-        String path  = (String) request.getAttribute(
+        String path = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         //TODO REPLACE this is error prone because /files can be contained somewhere in filepath.
         // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
         path = path.replace("/files", "");
         List<FileModel> list = new ArrayList<>();
         //check if dir exists
-        FileModel dir = fileService.getFile(project_name, path);
+        FileModel dir = fileService.getMetaFile(project_name, path);
         list.add(dir);
         //TODO transfer logic to file service
-        if(dir.getType().equals("dir") && view.equals("meta")){
-            return fileService.getChildren(project_name, path);
+        if (dir.getType().equals("dir") && view.equals("meta")) {
+            return fileService.getChildrenMeta(project_name, path);
         }
         return list;
     }
-
-    /**
-     * Creates a file in a specific project
-     * @param project_name
-     * @param request
-     * @param action
-     * @param file
-     * @return file
-     */
-    @RequestMapping(value = "/projects/{project_name}/**", params = {"action"}, method = RequestMethod.POST)
-    public FileModel createFile(@PathVariable(value="project_name") String file_name,
-                                HttpServletRequest request,
-                                HttpServletResponse response,
-                                @RequestParam("action") String action, @RequestBody FileModel file) throws IOException, ServletException {
-//        String path  = (String) request.getAttribute(
-//                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        //TODO MOVE file upload to the file service implementation
-        // should get the file from the form-data in the body
-        Part filePart = request.getPart("file");
-        InputStream fileData = filePart.getInputStream();
-        OutputStream out = new FileOutputStream(new java.io.File("/projects/" + file.getFile_id())); // nothing is written in the body ?? how to get ID ;?
-        byte[] bytes = new byte[1024];
-        int read = 0;
-        while ((read = fileData.read(bytes)) != -1) {
-            out.write(bytes, 0, read);
-        }
-
-        return fileService.createFile(file, action);
-    }
-
-//    @RequestMapping(value = "/projects/{project_name}/upload/**", method = RequestMethod.POST)
-//    public void uploadFile(@PathVariable(value="project_name") String fileName,
-//                           HttpServletRequest request) throws Exception {
-//        if (!ServletFileUpload.isMultipartContent(request)) {
-//            throw new Exception();
-//        }
-//
-//        // Create a new file upload handler
-//        ServletFileUpload file = new ServletFileUpload();
-//
-//        // Parse the request
-//        FileItemIterator iterator = file.getItemIterator(request);
-//        while (iterator.hasNext()) {
-//            FileItemStream item = iterator.next();
-//            InputStream stream = item.openStream();
-//            if (!item.isFormField()) {
-////                String fileName = item.getName();
-//                // Process the input stream
-//                OutputStream out = new FileOutputStream(fileName);
-//                IOUtils.copy(stream, out);
-//                stream.close();
-//                out.close();
-//            }
-//        }
-//    }
 }

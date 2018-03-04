@@ -1,38 +1,38 @@
 package BE.services;
 
 import BE.entities.UserProject;
-import BE.entities.project.File;
-import BE.entities.project.FileTypes;
-import BE.entities.project.Project;
+import BE.entities.project.*;
 import BE.entities.user.User;
 import BE.exceptions.NotImplementedException;
 import BE.exceptions.ProjectAlreadyExistsException;
 import BE.exceptions.ProjectNotFoundException;
-import BE.repositories.FileRepository;
 import BE.repositories.ProjectRepository;
+import BE.repositories.SupportedViewRepository;
 import BE.responsemodels.project.ProjectModel;
 import BE.responsemodels.project.ProjectRoleModel;
 import BE.responsemodels.project.UserListModel;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
-    private final String PROJECTS_DIRECTORY = "/cs/home/td38/Documents/cs3099/project-code/projects/";
-
     private final
     ProjectRepository projectRepository;
 
+    private final
+    SupportedViewRepository supportedViewRepository;
 
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SupportedViewRepository supportedViewRepository) {
         this.projectRepository = projectRepository;
+        this.supportedViewRepository = supportedViewRepository;
     }
 
     // Conversion Functions
@@ -50,6 +50,20 @@ public class ProjectServiceImpl implements ProjectService {
         return new UserListModel(
                 user.getUsername(),
                 userProject.getAccess_level());
+    }
+
+    private MetaFile createProjectRoot() {
+        List<SupportedView> supportedViews = new ArrayList<>();
+        supportedViews.add(supportedViewRepository.findByView(SupportedView.META_VIEW));
+        return new MetaFile(
+                "/",
+                "",
+                FileTypes.DIR,
+                FileStatus.READY,
+                new Timestamp(System.currentTimeMillis()),
+                0L,
+                supportedViews
+                );
     }
 
     @Override
@@ -71,20 +85,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public ProjectModel createProject(String project_name) {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
-        // TODO add creating user to project during creation logic
-        // Create root directory
-        File file = new File("/" + project_name, project_name, FileTypes.DIR, "status", "file metadata");
-        java.io.File proj = new java.io.File(PROJECTS_DIRECTORY + project_name);
-        if (proj.mkdir()) {
-            System.out.println("Project directory created.");
-        } else {
-            System.out.println("Create project directory failed.");
-        }
-        // Create project
-        Project project = new Project(project_name, file);
-        // Link project to root file
-        file.setProject(project);
-        project.setRoot_dir(file);
+        MetaFile projectRoot = createProjectRoot();
+        Project project = new Project(project_name, projectRoot);
         // Save to database
         projectRepository.save(project);
         return projectToProjectModel(project);
@@ -110,8 +112,8 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectModel deleteProject(String project_name) {
         if (projectRepository.findByName(project_name) == null) throw new ProjectNotFoundException();
         else {
-             projectRepository.deleteByName(project_name);
-             return null;
+            projectRepository.deleteByName(project_name);
+            return null;
         }
     }
 
