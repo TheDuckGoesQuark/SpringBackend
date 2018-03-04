@@ -63,8 +63,9 @@ public class ProjectController {
     }
 
     /**
+     * Gets a specific project
      * @param project_name
-     * @return
+     * @return project
      * @throws NotImplementedException
      */
     @RequestMapping(value = "/projects/{project_name}", method = RequestMethod.GET)
@@ -73,8 +74,9 @@ public class ProjectController {
     }
 
     /**
+     * Creates a new project
      * @param project_name
-     * @return
+     * @return project
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=create"}, method = RequestMethod.POST)
     public ProjectModel createProject(@PathVariable(value="project_name") String project_name) {
@@ -82,9 +84,10 @@ public class ProjectController {
     }
 
     /**
+     * Updates a specific existing project
      * @param project_name
      * @param project
-     * @return
+     * @return project
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=update"}, method = RequestMethod.POST)
     public ProjectModel updateProject(@PathVariable(value="project_name") String project_name, @RequestBody ProjectModel project) {
@@ -92,6 +95,7 @@ public class ProjectController {
     }
 
     /**
+     * Deletes a specific existing project
      * @param project_name
      * @return
      */
@@ -101,7 +105,9 @@ public class ProjectController {
     }
 
     /**
+     *
      * @param project_name
+     * @param userListModel
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=update_grant"}, method = RequestMethod.POST)
@@ -109,6 +115,9 @@ public class ProjectController {
         projectService.updateGrant(project_name, userListModel);
     }
 
+    /**
+     *
+     */
     @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
     public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
@@ -116,8 +125,9 @@ public class ProjectController {
     }
 
     /**
-     * Gets all files of a project
-     * @return a list of all projects
+     * Gets all files in a specific project
+     * @param project_name
+     * @return a list of files
      **/
     @RequestMapping(value = "/projects/{project_name}/files", method = RequestMethod.GET)
     public List<FileModel> getAllFiles(@PathVariable(value="project_name") String project_name) {
@@ -125,8 +135,11 @@ public class ProjectController {
     }
 
     /**
+     * Gets a specific file in a specific project
      * @param project_name
-     * @return a particular file
+     * @param request
+     * @param view
+     * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", params = "view", method = RequestMethod.GET)
     public FileModel getFile(@PathVariable(value="project_name") String project_name,
@@ -146,9 +159,10 @@ public class ProjectController {
     }
 
     /**
+     * Gets a specific file by file id in a specific project
      * @param project_name
      * @param file_id
-     * @return a particular file
+     * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
     public FileModel getFileByID(@PathVariable(value="project_name") String project_name,
@@ -157,8 +171,11 @@ public class ProjectController {
     }
 
     /**
+     * Updates a specific file in a specific project
      * @param project_name
-     * @return
+     * @param request
+     * @param file
+     * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.PATCH)
     public FileModel updateFile(@PathVariable(value="project_name") String project_name,
@@ -170,8 +187,10 @@ public class ProjectController {
     }
 
     /**
+     * Deletes a specific file in a specific project
      * @param project_name
-     * @return
+     * @param request
+     * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/**", method = RequestMethod.DELETE)
     public FileModel deleteFile(@PathVariable(value="project_name") String project_name,
@@ -184,6 +203,13 @@ public class ProjectController {
         return fileService.deleteFile(project_name, path);
     }
 
+    /**
+     * Gets all files in a specific directory in a specific project
+     * @param project_name
+     * @param request
+     * @param view
+     * @return a list of files
+     */
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view","include_children"}, method = RequestMethod.GET)
     public List<FileModel> getDirContents(@PathVariable(value="project_name") String project_name,
                                           HttpServletRequest request, @RequestParam("view") String view) {
@@ -204,9 +230,13 @@ public class ProjectController {
     }
 
     /**
-     * @return
+     * Creates a file in a specific project
+     * @param project_name
+     * @param request
+     * @param action
+     * @param file
+     * @return file
      */
-    //TODO provide additional parameters support by protocol
     @RequestMapping(value = "/projects/{project_name}/**", params = {"action"}, method = RequestMethod.POST)
     public FileModel createFile(@PathVariable(value="project_name") String file_name,
                                 HttpServletRequest request,
@@ -229,7 +259,6 @@ public class ProjectController {
     }
 
 //    @RequestMapping(value = "/projects/{project_name}/upload/**", method = RequestMethod.POST)
-////    TODO make return a response which includes error messages & success message etc if needed
 //    public void uploadFile(@PathVariable(value="project_name") String fileName,
 //                           HttpServletRequest request) throws Exception {
 //        if (!ServletFileUpload.isMultipartContent(request)) {

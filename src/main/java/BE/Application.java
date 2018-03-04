@@ -60,6 +60,8 @@ public class Application {
                 .build();
     }
 
+    // Creates the initial directory that stores the files that the database references.
+    // Exists for testing the project locally.
     private static File setUpDirectory() throws IOException {
         File projects = new File(PROJECTS_DIRECTORY);
         if (projects.mkdir()) {
@@ -70,6 +72,8 @@ public class Application {
         return projects;
     }
 
+    // Deletes the initial directory and all of its contents.
+    // Exists for testing the project locally.
     private static void removeDirectory(File projects) {
         File[] allContents = projects.listFiles();
         if (allContents != null) {
