@@ -20,6 +20,7 @@ public class JSONAdvisor implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        return new ResponseWrapper(body);
+        if (body == null) return null;
+        else return new ResponseWrapper(body);
     }
 }

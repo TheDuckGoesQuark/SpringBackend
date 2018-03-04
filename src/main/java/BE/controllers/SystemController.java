@@ -44,7 +44,7 @@ public class SystemController {
         throw new NotImplementedException();
     }
 
-    @RequestMapping(value = "/properties", params = {"action=update"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/properties", params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public PropertyModel updateProperties(@RequestBody PropertyModel propertyModel) {
         throw new NotImplementedException();
     }

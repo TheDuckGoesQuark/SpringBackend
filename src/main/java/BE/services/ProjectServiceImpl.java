@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,15 +27,15 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectRepository projectRepository;
 
     private final
-    FileService fileService;
+    MetaFileService metaFileService;
 
     private final
     SupportedViewRepository supportedViewRepository;
 
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, FileService fileService, SupportedViewRepository supportedViewRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, MetaFileService metaFileService, SupportedViewRepository supportedViewRepository) {
         this.projectRepository = projectRepository;
-        this.fileService = fileService;
+        this.metaFileService = metaFileService;
         this.supportedViewRepository = supportedViewRepository;
     }
 

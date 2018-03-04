@@ -54,23 +54,23 @@ public class UserController {
         return userService.getUserByUserName(principal.getName());
     }
 
-    @RequestMapping(value = "/current_user",params = {"action=update"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/current_user",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public UserModel updateCurrentUser(@RequestBody UserModel user) {
         return userService.updateUser(user);
     }
 
-    @RequestMapping(value = "/users/{username}",params = {"action=create"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/users/{username}",params = {"action="+Action.CREATE}, method = RequestMethod.POST)
     public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         user.setUsername(username);
         return userService.createUser(user);
     }
 
-    @RequestMapping(value = "/users/{username}",params = {"action=update"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/users/{username}",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         return userService.updateUser(user);
     }
 
-    @RequestMapping(value = "/users/{username}",params = {"action=delete"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/users/{username}",params = {"action="+Action.DELETE}, method = RequestMethod.POST)
     public UserModel deleteUser(@PathVariable(value="username") String username) {
         return userService.deleteUser(username);
     }
