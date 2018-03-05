@@ -60,6 +60,11 @@ public class FileServiceImpl implements FileService {
         );
     }
 
+    /**
+     * Gets all MetaFiles
+     * @param projectName
+     * @return list of files
+     */
     @Override
     public List<FileModel> getAllMetaFiles(String projectName) {
         if (projectService.getProjectByName(projectName) == null)
@@ -90,6 +95,11 @@ public class FileServiceImpl implements FileService {
         throw new NotImplementedException();
     }
 
+    /**
+     * Gets specific MetaFile by id
+     * @param file_id the id of the file to get
+     * @return file
+     */
     @Override
     public FileModel getFileMetaByID(int file_id) {
         MetaFile metaFile = fileRepository.findByFileId(file_id);
@@ -113,6 +123,12 @@ public class FileServiceImpl implements FileService {
         return null;
     }
 
+    /**
+     * Deletes specific file
+     * @param projectName the name of the project to delete
+     * @param filePath the path of the file to delete
+     * @return file
+     */
     @Override
     @Transactional
     public FileModel deleteFile(String projectName, String filePath) {

@@ -66,6 +66,10 @@ public class ProjectServiceImpl implements ProjectService {
                 );
     }
 
+    /**
+     * Gets all projects
+     * @return a list of projects
+     */
     @Override
     public List<ProjectModel> getAllProjects() {
         return ((List<Project>) projectRepository.findAll())
@@ -74,6 +78,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Gets a specific project by its name
+     * @param project_name name of project to get
+     * @return project
+     */
     @Override
     public ProjectModel getProjectByName(String project_name) {
         Project project = projectRepository.findByName(project_name);
@@ -81,6 +90,11 @@ public class ProjectServiceImpl implements ProjectService {
         else return projectToProjectModel(project);
     }
 
+    /**
+     * Creates a new project
+     * @param project_name name of project to create
+     * @return project
+     */
     @Override
     @Transactional
     public ProjectModel createProject(String project_name) {
@@ -92,6 +106,11 @@ public class ProjectServiceImpl implements ProjectService {
         return projectToProjectModel(project);
     }
 
+    /**
+     * Updates a specific existing project
+     * @param project the project to update
+     * @return project
+     */
     @Override
     @Transactional
     public ProjectModel updateProject(ProjectModel project) {
@@ -107,6 +126,11 @@ public class ProjectServiceImpl implements ProjectService {
         throw new NotImplementedException();
     }
 
+    /**
+     * Deletes a specific existing project
+     * @param project_name the name of the project to delete
+     * @return project
+     */
     @Override
     @Transactional
     public ProjectModel deleteProject(String project_name) {

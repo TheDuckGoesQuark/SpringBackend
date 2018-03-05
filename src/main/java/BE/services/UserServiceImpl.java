@@ -77,6 +77,13 @@ public class UserServiceImpl implements UserService {
         ).collect(Collectors.toList());
     }
 
+    /**
+     * Gets specific user by their username
+     * @param username username of the user to get
+     * @return user
+     * @throws UsernameNotFoundException
+     * @throws UserNotFoundException
+     */
     @Override
     public UserModel getUserByUserName(String username) throws UsernameNotFoundException, UserNotFoundException {
         User user = userRepository.findByUsername(username);
@@ -84,6 +91,11 @@ public class UserServiceImpl implements UserService {
         else return userToUserModel(user);
     }
 
+    /**
+     * Creates new user
+     * @param userModel the user to create
+     * @return user
+     */
     @Override
     @Transactional
     public UserModel createUser(UserModel userModel) {
@@ -103,6 +115,11 @@ public class UserServiceImpl implements UserService {
         return userModel;
     }
 
+    /**
+     * Updates a specific existing user
+     * @param userModel updated user
+     * @return user
+     */
     @Override
     @Transactional
     public UserModel updateUser(UserModel userModel) {
@@ -123,6 +140,11 @@ public class UserServiceImpl implements UserService {
         return userModel;
     }
 
+    /**
+     * Deletes a specific existing user
+     * @param username user to delete
+     * @return user
+     */
     @Override
     @Transactional
     public UserModel deleteUser(String username) {
@@ -133,6 +155,10 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    /**
+     * Gets all user privileges
+     * @return a list of privileges
+     */
     @Override
     public List<PrivilegeModel> getAllPrivileges() {
         return ((List<Privilege>) privilegeRepository.findAll())
@@ -141,7 +167,12 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    // Method used by spring security for providing user information
+    /**
+     * Method used by spring security for providing user information
+     * @param s username of user
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(s);

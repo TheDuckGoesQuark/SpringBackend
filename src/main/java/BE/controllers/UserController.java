@@ -36,7 +36,7 @@ public class UserController {
 
     /**
      * Gets a user based on username
-     * @param username username of user to retrieve
+     * @param username username of the user to retrieve
      * @return user with requested username
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
@@ -44,32 +44,63 @@ public class UserController {
         return userService.getUserByUserName(username);
     }
 
+    /**
+     * Gets all of the user privileges
+     * @return list of user privileges
+     */
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
     public List<PrivilegeModel> getListOfUserPrivileges() {
         return userService.getAllPrivileges();
     }
 
+    /**
+     * Gets the current user
+     * @param principal
+     * @return user
+     */
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)
     public UserModel getCurrentUser(Principal principal) {
         return userService.getUserByUserName(principal.getName());
     }
 
+    /**
+     * Updates the current user
+     * @param user the user to update
+     * @return current user
+     */
     @RequestMapping(value = "/current_user",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public UserModel updateCurrentUser(@RequestBody UserModel user) {
         return userService.updateUser(user);
     }
 
+    /**
+     * Creates a new user
+     * @param username the username of the user to create
+     * @param user the user to create
+     * @return user
+     */
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.CREATE}, method = RequestMethod.POST)
     public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         user.setUsername(username);
         return userService.createUser(user);
     }
 
+    /**
+     * Updates a specific user
+     * @param username the username of the user to update
+     * @param user the user to update
+     * @return user
+     */
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         return userService.updateUser(user);
     }
 
+    /**
+     * Deletes a specific user
+     * @param username the username of the user to delete
+     * @return user
+     */
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.DELETE}, method = RequestMethod.POST)
     public UserModel deleteUser(@PathVariable(value="username") String username) {
         return userService.deleteUser(username);

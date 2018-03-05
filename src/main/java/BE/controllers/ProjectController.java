@@ -103,7 +103,7 @@ public class ProjectController {
 
     /**
      * Gets a specific project
-     * @param project_name
+     * @param project_name the name of the project to get
      * @return project
      * @throws NotImplementedException
      */
@@ -114,7 +114,7 @@ public class ProjectController {
 
     /**
      * Creates a new project
-     * @param project_name
+     * @param project_name the name of the project to create
      * @return project
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.CREATE}, method = RequestMethod.POST)
@@ -124,8 +124,8 @@ public class ProjectController {
 
     /**
      * Updates a specific existing project
-     * @param project_name
-     * @param project
+     * @param project_name the name of the project to update
+     * @param project the project to update
      * @return project
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.UPDATE}, method = RequestMethod.POST)
@@ -135,7 +135,7 @@ public class ProjectController {
 
     /**
      * Deletes a specific existing project
-     * @param project_name
+     * @param project_name the name of the project to delete
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.DELETE}, method = RequestMethod.POST)
@@ -144,10 +144,10 @@ public class ProjectController {
     }
 
     /**
-     *
-     * @param project_name
-     * @param userListModel
-     * @return
+     * Updates the list of users that can update a specific project
+     * @param project_name the name of the project to update
+     * @param userListModel the list of users to update
+     * @return project
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.UPDATE_GRANT}, method = RequestMethod.POST)
     public void updateGrant(@PathVariable(value = "project_name") String project_name, @RequestBody UserListModel userListModel) {
@@ -164,11 +164,11 @@ public class ProjectController {
     }
 
     /**
-     * Gets a specific file in a specific project
-     * @param project_name
+     * Gets a specific raw file in a specific project
+     * @param project_name the name of the project that has the file
      * @param request
-     * @param view
-     * @return file
+     * @param response
+     * @return
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view=" + SupportedView.RAW_VIEW}, method = RequestMethod.GET)
     public void getRawFile(@PathVariable(value = "project_name") String project_name, HttpServletRequest request, HttpServletResponse response) {
@@ -180,8 +180,12 @@ public class ProjectController {
     }
 
     /**
-     * @param project_name
-     * @return a particular file
+     * Gets a specific file in a specific project
+     * @param project_name the name of the project that has the file
+     * @param view
+     * @param request
+     * @param response
+     * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
     public FileModel getFile(@PathVariable(value = "project_name") String project_name,
@@ -205,8 +209,8 @@ public class ProjectController {
 
     /**
      * Gets a specific file by file id in a specific project
-     * @param project_name
-     * @param file_id
+     * @param project_name the name of the project that has the file
+     * @param file_id the id of the file to get
      * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
@@ -227,10 +231,12 @@ public class ProjectController {
     }
 
     /**
-     * Updates a specific file in a specific project
-     * @param project_name
+     * Creates or updates a specific file in a specific project
+     * @param project_name the name of the project that has the file
+     * @param bytes
+     * @param otherOptions
      * @param request
-     * @param file
+     * @param action create or delete
      * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.POST)
@@ -248,7 +254,7 @@ public class ProjectController {
 
     /**
      * Deletes a specific file in a specific project
-     * @param project_name
+     * @param project_name the name of the project that has the file
      * @param request
      * @return file
      */
@@ -260,6 +266,13 @@ public class ProjectController {
         return fileService.deleteFile(project_name, relativeFilePath);
     }
 
+    /**
+     * Gets all files in a specific directory in a specific project
+     * @param project_name the name of the project that has the directory
+     * @param request
+     * @param view
+     * @return a list of files
+     */
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view", "include_children"}, method = RequestMethod.GET)
     public List<FileModel> getDirContents(@PathVariable(value = "project_name") String project_name,
                                           HttpServletRequest request, @RequestParam("view") String view) {
