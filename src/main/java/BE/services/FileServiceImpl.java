@@ -48,6 +48,12 @@ public class FileServiceImpl implements FileService {
     }
 
     // Conversion Functions
+
+    /**
+     * Converts a specific meta file to a file model
+     * @param metaFile the meta file to be converted
+     * @return file model
+     */
     private FileModel metaFileToFileModel(MetaFile metaFile) {
         return new FileModel(
                 metaFile.getPath(),
@@ -61,9 +67,9 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * Gets all MetaFiles
+     * Gets all meta files
      * @param projectName
-     * @return list of files
+     * @return a list of all meta files
      */
     @Override
     public List<FileModel> getAllMetaFiles(String projectName) {
@@ -96,7 +102,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * Gets specific MetaFile by id
+     * Gets a specific meta file by id
      * @param file_id the id of the file to get
      * @return file
      */
@@ -124,7 +130,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * Deletes specific file
+     * Deletes a specific file
      * @param projectName the name of the project to delete
      * @param filePath the path of the file to delete
      * @return file

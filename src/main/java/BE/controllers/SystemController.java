@@ -36,7 +36,7 @@ public class SystemController {
      * @param beforeData
      * @param afterDate
      * @param level
-     * @return a list of logs
+     * @return a list of all system logs
      */
     @RequestMapping(value = "/log", method = RequestMethod.GET)
     public List<LoggingModel> getLogs(@RequestParam(value = "before", required = false) String beforeData,
@@ -57,7 +57,7 @@ public class SystemController {
 
     /**
      * Gets all of the properties of the system
-     * @return a list of properties
+     * @return a list of all properties
      */
     @RequestMapping(value = "/properties", method = RequestMethod.GET)
     public List<PropertyModel> getProperties() {

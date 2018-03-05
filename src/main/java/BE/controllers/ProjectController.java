@@ -61,11 +61,22 @@ public class ProjectController {
         this.fileService = fileService;
     }
 
+    /**
+     * Gets the path of a specific file in a request
+     * @param request the request to get the file path from
+     * @param project_name name of the project the file is in
+     * @return file path
+     */
     private static String getRelativeFilePath(HttpServletRequest request, String project_name) {
         String requestURI = request.getRequestURI();
         return requestURI.replaceFirst("/projects/" + project_name + "/files/", "");
     }
 
+    /**
+     * Sends a file
+     * @param inputStream input stream of the file
+     * @param response
+     */
     private void sendFile(InputStream inputStream, HttpServletResponse response) {
 
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -83,6 +94,11 @@ public class ProjectController {
         }
     }
 
+    /**
+     * Reads options of a request
+     * @param mapOptions the options to read
+     * @return options
+     */
     private static FileRequestOptions readOptions(Map<String, String> mapOptions) {
         FileRequestOptions options = new FileRequestOptions();
         options.setFinal(mapOptions.containsKey(FileRequestOptions.FINAL));

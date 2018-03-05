@@ -41,6 +41,12 @@ public class UserServiceImpl implements UserService {
     }
 
     // Conversion Functions
+
+    /**
+     * Converts a specific user to a user model
+     * @param user the user to be converted
+     * @return user model
+     */
     private static UserModel userToUserModel(User user) {
         PasswordHash passwordHasher = new PasswordHash();
         String hashedPassword = passwordHasher.hashPassword(user.getPassword());
@@ -59,6 +65,11 @@ public class UserServiceImpl implements UserService {
         );
     }
 
+    /**
+     * Converts a specific user project to a project list model
+     * @param userProject the user project to be converted
+     * @return project list model
+     */
     private static ProjectListModel userProjectToProjectListModel(UserProject userProject) {
         Project project = userProject.getProject();
         return new ProjectListModel(
@@ -66,10 +77,19 @@ public class UserServiceImpl implements UserService {
                 userProject.getAccess_level());
     }
 
+    /**
+     * Converts a specific privilege to a privilege model
+     * @param privilege the privilege to be converted
+     * @return privilege model
+     */
     private static PrivilegeModel privilegeToPrivilegeModel(Privilege privilege) {
         return new PrivilegeModel(privilege.getName(), privilege.getDescription(), privilege.isInternal());
     }
 
+    /**
+     * Gets all users
+     * @return a list of all users
+     */
     @Override
     public List<UserModel> getAllUsers() {
         return ((List<User>) userRepository.findAll()).stream().map(
@@ -157,7 +177,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Gets all user privileges
-     * @return a list of privileges
+     * @return a list of all user privileges
      */
     @Override
     public List<PrivilegeModel> getAllPrivileges() {
@@ -170,7 +190,7 @@ public class UserServiceImpl implements UserService {
     /**
      * Method used by spring security for providing user information
      * @param s username of user
-     * @return
+     * @return user details
      * @throws UsernameNotFoundException
      */
     @Override

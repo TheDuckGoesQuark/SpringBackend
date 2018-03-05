@@ -36,6 +36,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     // Conversion Functions
+
+    /**
+     * Converts a specific project to a project model
+     * @param project the project to convert
+     * @return project model
+     */
     private static ProjectModel projectToProjectModel(Project project) {
         return new ProjectModel(project.getName(),
 //TODO get user projects returns null and that causes the program to throw NullPointerException
@@ -45,6 +51,11 @@ public class ProjectServiceImpl implements ProjectService {
                 null);
     }
 
+    /**
+     * Converts a specific userProject to a user list model
+     * @param userProject the userProject to convert
+     * @return user list model
+     */
     private static UserListModel userProjectToUserListModel(UserProject userProject) {
         User user = userProject.getUser();
         return new UserListModel(
@@ -52,6 +63,10 @@ public class ProjectServiceImpl implements ProjectService {
                 userProject.getAccess_level());
     }
 
+    /**
+     * Creates root directory for projects
+     * @return project root directory
+     */
     private MetaFile createProjectRoot() {
         List<SupportedView> supportedViews = new ArrayList<>();
         supportedViews.add(supportedViewRepository.findByView(SupportedView.META_VIEW));
@@ -68,7 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * Gets all projects
-     * @return a list of projects
+     * @return a list of all projects
      */
     @Override
     public List<ProjectModel> getAllProjects() {

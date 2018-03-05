@@ -35,12 +35,20 @@ public class TokenServiceImpl implements TokenService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Removes tokens that have expired
+     */
     @Transactional
     @Scheduled(fixedDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS, initialDelay = REMOVE_EXPIRED_TOKENS_DELAY_MILLISECONDS)
     public void removeExpiredTokens() {
         tokenRepository.removeExpiredTokens(TOKEN_LIFETIME_MILLISECONDS);
     }
 
+    /**
+     * Calculates the time since a token was created
+     * @param time_of_creation time of token creation
+     * @return time in seconds since creation
+     */
     private static int calcTimeSinceCreation(java.sql.Timestamp time_of_creation) {
         long milliseconds1 = time_of_creation.getTime();
         long milliseconds2 = System.currentTimeMillis();
@@ -48,11 +56,21 @@ public class TokenServiceImpl implements TokenService {
         return diff.intValue();
     }
 
+    /**
+     * Generates a token for a specific user
+     * @param user the user to generate token for
+     * @return token
+     */
     private Token generateToken(User user) {
         Token token = new Token(user, UUID.randomUUID().toString());
         return tokenRepository.save(token);
     }
 
+    /**
+     * Converts a specific token to a token model
+     * @param token the token to be converted
+     * @return token model
+     */
     private TokenModel tokenToTokenModel(Token token) {
         return new TokenModel(
                 token.getToken_id(),
@@ -61,12 +79,21 @@ public class TokenServiceImpl implements TokenService {
         );
     }
 
+    /**
+     * Deletes a specific token
+     * @param tokenId the id of the token to be deleted
+     */
     @Override
     @Transactional
     public void deleteToken(String tokenId) {
         tokenRepository.delete(tokenId);
     }
 
+    /**
+     * Gets a specific token by token id
+     * @param tokenId the id of the token to get
+     * @return token
+     */
     @Override
     public TokenModel getTokenById(String tokenId) {
         Token token = tokenRepository.findOne(tokenId);
@@ -74,6 +101,11 @@ public class TokenServiceImpl implements TokenService {
         return tokenToTokenModel(token);
     }
 
+    /**
+     * Allocates a token to a user
+     * @param username username of user to have token allocated to
+     * @return token
+     */
     @Override
     @Transactional
     public TokenModel allocateToken(String username) {
@@ -81,6 +113,11 @@ public class TokenServiceImpl implements TokenService {
         return tokenToTokenModel(token);
     }
 
+    /**
+     * Refreshes a specific token
+     * @param tokenId id of the token to be refreshed
+     * @return token
+     */
     @Transactional
     public TokenModel refreshToken(String tokenId) {
         Token token = tokenRepository.findByRefresh_token(tokenId);
@@ -90,6 +127,11 @@ public class TokenServiceImpl implements TokenService {
         return tokenToTokenModel(token);
     }
 
+    /**
+     * Gets the username of a user from the token id of a specific token
+     * @param tokenId id of the token to get user's username from
+     * @return username
+     */
     @Override
     public String getUsernameFromTokenId(String tokenId) {
         Token token = tokenRepository.findOne(tokenId);
