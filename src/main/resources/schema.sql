@@ -48,12 +48,12 @@ CREATE TABLE IF NOT EXISTS `has_privilege` (
 );
 
 CREATE TABLE IF NOT EXISTS `file` (
-  `file_id`       INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `path`          VARCHAR(200) NOT NULL,
-  `file_name`     VARCHAR(54)  NOT NULL,
-  `type`          VARCHAR(45)  NOT NULL,
-  `status`        VARCHAR(10)  NOT NULL,
-  `last_modified` TIMESTAMP    NOT NULL,
+  `file_id`       INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+  `path`          VARCHAR(200)    NOT NULL,
+  `file_name`     VARCHAR(54)     NOT NULL,
+  `type`          VARCHAR(45)     NOT NULL,
+  `status`        VARCHAR(10)     NOT NULL,
+  `last_modified` TIMESTAMP       NOT NULL,
   `length`        BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`file_id`)
 );
@@ -121,8 +121,8 @@ CREATE TABLE IF NOT EXISTS `supports_view` (
   CONSTRAINT `file_id`
   FOREIGN KEY (`file_id`)
   REFERENCES `file` (`file_id`)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `view`
   FOREIGN KEY (`view`)
   REFERENCES `supported_view` (`view`)
@@ -134,6 +134,7 @@ CREATE TABLE IF NOT EXISTS `supports_view` (
 CREATE TABLE IF NOT EXISTS `dir_contains` (
   `dir_id`  INT UNSIGNED NOT NULL,
   `file_id` INT UNSIGNED NOT NULL,
+  `length`  INT UNSIGNED NOT NULL,
   PRIMARY KEY (`dir_id`, `file_id`),
   INDEX `dir_contains.idx` (`dir_id` ASC),
   CONSTRAINT `dir_id`
@@ -156,4 +157,3 @@ CREATE TABLE IF NOT EXISTS `dir_contains` (
 # insert into supported_view(file_id, view)  values ('12324', 'meta');
 # insert into supported_view(file_id, view)  values ('1232', 'meta');
 # insert into supported_view(file_id, view)  values ('1232', 'raw');
-

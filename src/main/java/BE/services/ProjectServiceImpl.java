@@ -52,11 +52,14 @@ public class ProjectServiceImpl implements ProjectService {
                 userProject.getAccess_level());
     }
 
+
+    // NOTE: Root directory has name "" and path "".
+    // A file in this directory has name "something" and path "something"
     private MetaFile createProjectRoot() {
         List<SupportedView> supportedViews = new ArrayList<>();
         supportedViews.add(supportedViewRepository.findByView(SupportedView.META_VIEW));
         return new MetaFile(
-                "/",
+                "",
                 "",
                 FileTypes.DIR,
                 FileStatus.READY,

@@ -3,11 +3,7 @@ package BE.services;
 import BE.entities.project.MetaFile;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.NotImplementedException;
-import BE.exceptions.ProjectNotFoundException;
-import BE.repositories.Dir_containsRepository;
 import BE.repositories.FileRepository;
-import BE.repositories.ProjectRepository;
-import BE.repositories.SupportedViewRepository;
 import BE.responsemodels.file.FileMetaDataModel;
 import BE.responsemodels.file.FileModel;
 
@@ -16,39 +12,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class FileServiceImpl implements FileService {
 
     private final
-    ProjectService projectService;
-
-    private final
-    StorageService storageService;
-
-    private final
     FileRepository fileRepository;
 
-    private final
-    SupportedViewRepository supportedViewRepository;
-
-    private final
-    Dir_containsRepository dirContainsRepository;
-
     @Autowired
-    public FileServiceImpl(ProjectService projectService, StorageService storageService, FileRepository fileRepository, SupportedViewRepository supportedViewRepository, Dir_containsRepository dirContainsRepository) {
-        this.projectService = projectService;
-        this.storageService = storageService;
+    public FileServiceImpl(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
-        this.supportedViewRepository = supportedViewRepository;
-        this.dirContainsRepository = dirContainsRepository;
     }
 
     // Conversion Functions
-    private FileModel metaFileToFileModel(MetaFile metaFile) {
+    private static FileModel metaFileToFileModel(MetaFile metaFile) {
         return new FileModel(
                 metaFile.getPath(),
                 metaFile.getFile_name(),
@@ -60,16 +40,33 @@ public class FileServiceImpl implements FileService {
         );
     }
 
+    private static String getFilenameFromPath(String path) {
+        File file = new File(path);
+        return file.getName();
+    }
+
+    private static String getTypeFromFilename(String filename) {
+        String extension = "";
+
+        int i = filename.lastIndexOf('.');
+        if (i > 0) {
+            extension = filename.substring(i+1);
+        } else {
+            return "none";
+        }
+        return extension;
+    }
+
     @Override
     public List<FileModel> getAllMetaFiles(String projectName) {
-        if (projectService.getProjectByName(projectName) == null)
+        /*if (projectService.getProjectByName(projectName) == null)
             throw new ProjectNotFoundException();
         List<FileModel> files = new ArrayList<>();
         MetaFile root_dir = fileRepository.findByProjectName(projectName);
         fileRepository.findAll().forEach(file -> {
             if (file.getPath().startsWith(root_dir.getPath())) files.add(this.metaFileToFileModel(file));
-        });
-        return files;
+        });*/
+        return null;
     }
 
     @Override
@@ -110,6 +107,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
+        fileRepository.saveNew(path, getFilenameFromPath(path), getTypeFromFilename(getFilenameFromPath(path)), "ready", 0, project_name);
         return null;
     }
 
