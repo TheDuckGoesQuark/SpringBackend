@@ -36,6 +36,19 @@ import java.util.List;
                         @StoredProcedureParameter(
                                 name = "project_name",
                                 type = String.class,
+                                mode = ParameterMode.IN)}),
+        @NamedStoredProcedureQuery(
+                name = "getFileByPath",
+                procedureName = "getFileByPath",
+                resultClasses = {MetaFile.class},
+                parameters = {
+                        @StoredProcedureParameter(
+                                name = "file_path",
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                name = "project_name",
+                                type = String.class,
                                 mode = ParameterMode.IN)})
 })
 public class MetaFile {

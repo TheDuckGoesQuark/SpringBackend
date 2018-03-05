@@ -29,4 +29,8 @@ public interface FileRepository extends CrudRepository<MetaFile, Integer> {
                  String file_status,
                  long file_length,
                  String project_name );
+
+    @Procedure(name="getFileByPath")
+    MetaFile getFileByPath(String file_path,
+                           String project_name);
 }

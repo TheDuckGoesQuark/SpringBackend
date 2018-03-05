@@ -84,7 +84,9 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileModel getMetaFile(String projectName, String filePath) {
-        throw new NotImplementedException();
+        MetaFile metaFile = fileRepository.getFileByPath(filePath, projectName);
+        if (metaFile != null) return metaFileToFileModel(metaFile);
+        else throw new FileNotFoundException();
     }
 
     @Override
