@@ -31,12 +31,22 @@ public class FormAuthenticationFilter extends AbstractAuthenticationProcessingFi
 
     private TokenService tokenService;
 
+
     @Autowired
     public FormAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher, TokenService tokenService) {
         super(requiresAuthenticationRequestMatcher);
         this.tokenService = tokenService;
     }
 
+    /**
+     * Attempts to authenticate a user from a request
+     * @param request the request that contains the user information
+     * @param response
+     * @return token
+     * @throws org.springframework.security.core.AuthenticationException
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws org.springframework.security.core.AuthenticationException, IOException, ServletException {
@@ -51,6 +61,15 @@ public class FormAuthenticationFilter extends AbstractAuthenticationProcessingFi
         return this.getAuthenticationManager().authenticate(tokenModel);
     }
 
+    /**
+     * Successful authentication. Allocates user a token
+     * @param request the successful request
+     * @param response
+     * @param chain
+     * @param authentication
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authentication) throws IOException, ServletException {
@@ -64,6 +83,14 @@ public class FormAuthenticationFilter extends AbstractAuthenticationProcessingFi
         response.getWriter().write(mapper.writeValueAsString(tokenModel));
     }
 
+    /**
+     * Unsuccessful authentication. Responds to inform user of failure
+     * @param request the failed request
+     * @param response
+     * @param failed
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException failed)
             throws IOException, ServletException {

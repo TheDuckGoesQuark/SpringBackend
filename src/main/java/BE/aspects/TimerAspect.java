@@ -14,8 +14,8 @@ public class TimerAspect {
 
     /**
      * Performance tracking for controllers.
-     * @param pjp
-     * @return
+     * @param pjp proceeding join point
+     * @return performance details
      * @throws Throwable
      */
     @Around("within(BE.controllers.*)")

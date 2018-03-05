@@ -25,6 +25,15 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         super(requiresAuthenticationRequestMatcher);
     }
 
+    /**
+     * Attempts to authenticate token, fails if invalid
+     * @param request the request that includes the authentication token
+     * @param response
+     * @return authentication
+     * @throws org.springframework.security.core.AuthenticationException
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws org.springframework.security.core.AuthenticationException, IOException, ServletException {
 
@@ -38,6 +47,15 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         throw new AuthenticationException("Invalid token.", AuthenticationFailureType.INVALID_GRANT);
     }
 
+    /**
+     * Successful token authentication
+     * @param request the request that includes the authentication token
+     * @param response
+     * @param chain
+     * @param authResult the result of the authentication
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {

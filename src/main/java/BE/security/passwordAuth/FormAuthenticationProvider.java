@@ -27,6 +27,12 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
         this.userService = userService;
     }
 
+    /**
+     * Authenticates user details
+     * @param authentication
+     * @return token
+     * @throws org.springframework.security.core.AuthenticationException
+     */
     @Override
     public Authentication authenticate(Authentication authentication) throws org.springframework.security.core.AuthenticationException {
         String username = (String) authentication.getPrincipal();

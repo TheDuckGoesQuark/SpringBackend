@@ -26,6 +26,12 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         this.userService = userService;
     }
 
+    /**
+     * Authenticates a token
+     * @param authentication
+     * @return token
+     * @throws AuthenticationException
+     */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String access_token = (String) authentication.getCredentials();
