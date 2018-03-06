@@ -23,6 +23,8 @@ public interface ProjectService {
 
     public ProjectModel deleteProject(String project_name);
 
+    public int getProjectRootDirId(String project_name);
+
     public List<ProjectRoleModel> getAllRoles();
 
 }

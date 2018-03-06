@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.List;
 
 public interface FileService {
-    List<FileModel> getAllMetaFiles(String projectName);
 
     FileModel getMetaFile(String projectName, String filePath);
 
@@ -19,9 +18,13 @@ public interface FileService {
 
     FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes);
 
-    FileModel deleteFile(String projectName, String filePath);
+    void deleteFile(String projectName, String filePath);
+
+    void deleteFileById(int file_id);
 
     FileModel updateFileMeta(String project_name, String path, String action);
+
+    FileModel moveFile(String project_name, String path, String newPath);
 
     List<FileModel> getChildrenMeta(String projectName, String filePath);
 }
