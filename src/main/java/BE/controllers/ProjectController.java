@@ -238,11 +238,11 @@ public class ProjectController {
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.DELETE)
-    public FileModel deleteFile(@PathVariable(value = "project_name") String project_name,
+    public void deleteFile(@PathVariable(value = "project_name") String project_name,
                                 HttpServletRequest request) {
         String relativeFilePath = getRelativeFilePath(request, project_name);
 
-        return fileService.deleteFile(project_name, relativeFilePath);
+        fileService.deleteFile(project_name, relativeFilePath);
     }
 
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view", "include_children"}, method = RequestMethod.GET)
