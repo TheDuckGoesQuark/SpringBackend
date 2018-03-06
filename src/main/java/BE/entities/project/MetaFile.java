@@ -8,6 +8,49 @@ import java.util.List;
 
 @Entity
 @Table(name = "file")
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "insertFile",
+                procedureName = "insertFile",
+                parameters = {
+                        @StoredProcedureParameter(
+                                name = "file_path",
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                name = "name",
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                name = "file_type",
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                name = "file_status",
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                name = "file_length",
+                                type = Long.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                name = "project_name",
+                                type = String.class,
+                                mode = ParameterMode.IN)}),
+        @NamedStoredProcedureQuery(
+                name = "getFileByPath",
+                procedureName = "getFileByPath",
+                resultClasses = {MetaFile.class},
+                parameters = {
+                        @StoredProcedureParameter(
+                                name = "file_path",
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                name = "project_name",
+                                type = String.class,
+                                mode = ParameterMode.IN)})
+})
 public class MetaFile {
 
     @Id

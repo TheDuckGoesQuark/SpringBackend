@@ -17,12 +17,15 @@ public class Dir_contains implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private MetaFile metaFile;
 
+    private int length;
+
     public Dir_contains() {
     }
 
-    public Dir_contains(MetaFile dir, MetaFile metaFile) {
+    public Dir_contains(MetaFile dir, MetaFile metaFile, int length) {
         this.dir = dir;
         this.metaFile = metaFile;
+        this.length = length;
     }
 
     public MetaFile getDir() {
@@ -39,5 +42,13 @@ public class Dir_contains implements Serializable {
 
     public void setMetaFile(MetaFile metaFile) {
         this.metaFile = metaFile;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
     }
 }
