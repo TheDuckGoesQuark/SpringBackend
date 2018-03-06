@@ -86,9 +86,9 @@ public class ProjectController {
 
     private static FileRequestOptions readOptions(Map<String, String> mapOptions) {
         FileRequestOptions options = new FileRequestOptions();
-        // TODO catch issues here
         options.setFinal(mapOptions.containsKey(FileRequestOptions.FINAL));
-        options.setOffset(Integer.parseInt(mapOptions.get(FileRequestOptions.OFFSET)));
+        if (mapOptions.containsKey(FileRequestOptions.OFFSET)) options.setOffset(Integer.parseInt(mapOptions.get(FileRequestOptions.OFFSET)));
+        else options.setOffset(0);
         options.setOverwrite(mapOptions.containsKey(FileRequestOptions.OVERWRITE));
         options.setTruncate(mapOptions.containsKey(FileRequestOptions.TRUNCATE));
         return options;
