@@ -277,12 +277,12 @@ public class ProjectControllerTests {
                 , listSupportedViews, "testMetaDataModel", "testTypeModel", "testStatusModel");
         List<FileModel> fileModelList = Arrays.asList(fileModel);
         when(fileService.getFile("project", "/projects/project/")).thenReturn(fileModel);
-        when(fileService.getChildrenMeta("project", "/projects/project/")).thenReturn(fileModelList);
+        when(fileService.getFileMetaWithChildren("project", "/projects/project/")).thenReturn(fileModelList);
         mockMvc.perform(get("/projects/project/?view?include_children"))
                 .andDo(print())
                 .andExpect(status().isOk());
         //verify(fileService, times(1)).getFile("project", "/projects/project/");
-        //verify(fileService, times(1)).getChildrenMeta("project", "/projects/project/");
+        //verify(fileService, times(1)).getFileMetaWithChildren("project", "/projects/project/");
         //TODO doesnt seem to be calling appropriate methods, or testing incorrectly
         verifyNoMoreInteractions(fileService);
     }

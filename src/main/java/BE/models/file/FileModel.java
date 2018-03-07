@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 public class FileModel {
 
+    public static final String ROOT_FILE_NAME= "";
+
     private String path;
 
     private String file_name;
@@ -23,7 +25,7 @@ public class FileModel {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<FileModel> children;
 
-    //file meta model
+    // File meta model
     public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
@@ -34,6 +36,7 @@ public class FileModel {
         this.status = status;
     }
 
+    // Directory meta model
     public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
         this.path = path;
         this.file_name = file_name;

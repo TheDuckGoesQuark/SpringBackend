@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static BE.controllers.Action.COPY;
 import static BE.controllers.Action.MOVE;
 import static BE.controllers.Action.SET_METADATA;
 import static BE.models.file.FileRequestOptions.readOptions;
@@ -181,7 +182,8 @@ public class ProjectController {
         // Return appropriate response
         switch (view) {
             case SupportedView.META_VIEW:
-                return fileService.getMetaFile(project_name, relativePath);
+                if (includeChildren != null) return fileService.getFileMetaWithChildren(project_name, relativePath);
+                else return fileService.getMetaFile(project_name, relativePath);
             case SupportedView.RAW_VIEW:
                 getRawFile(project_name, request, response);
                 return null;
@@ -199,11 +201,13 @@ public class ProjectController {
     public FileModel getFileByID(@PathVariable(value = "project_name") String project_name,
                                  @PathVariable(value = "file_id") int file_id,
                                  @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
+                                 @RequestParam(value = "include_children", required = false) String includeChildren,
                                  HttpServletResponse response) {
         // Return appropriate response
         switch (view) {
             case SupportedView.META_VIEW:
-                return fileService.getFileMetaByID(file_id);
+                if (includeChildren != null) return fileService.getFileMetaWithChildrenById(file_id);
+                else return fileService.getFileMetaByID(file_id);
             case SupportedView.RAW_VIEW:
                 InputStream inputStream = fileService.getRawFileByID(file_id);
                 sendFile(inputStream, response);
@@ -252,6 +256,17 @@ public class ProjectController {
     }
 
     /**
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + COPY}, method = RequestMethod.POST)
+    public FileModel copyFile(@PathVariable(value = "project_name") String project_name,
+                              @RequestBody MoveFileRequestModel moveFileRequestModel,
+                              HttpServletRequest request) {
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+        return fileService.copyFile(project_name, relativeFilePath, moveFileRequestModel);
+    }
+
+    /**
      * @param project_name
      * @return
      */
@@ -262,4 +277,6 @@ public class ProjectController {
 
         fileService.deleteFile(project_name, relativeFilePath);
     }
+
+
 }

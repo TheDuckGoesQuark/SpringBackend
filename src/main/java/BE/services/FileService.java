@@ -13,6 +13,8 @@ public interface FileService {
 
     FileModel getFileMetaByID(int file_id);
 
+    FileModel getFileMetaWithChildrenById(int file_id);
+
     InputStream getRawFile(String projectName, String filePath);
 
     InputStream getRawFileByID(int file_id);
@@ -27,9 +29,11 @@ public interface FileService {
 
     FileModel moveFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel);
 
-    List<FileModel> getChildrenMeta(String projectName, String filePath);
+    FileModel getFileMetaWithChildren(String projectName, String filePath);
 
     FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options);
+
+    FileModel copyFile(String project_name, String relativeFilePath, MoveFileRequestModel moveFileRequestModel);
 }
 
 

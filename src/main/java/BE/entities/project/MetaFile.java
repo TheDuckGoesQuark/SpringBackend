@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import static BE.models.file.FileModel.ROOT_FILE_NAME;
 import static BE.services.FileServiceImpl.DIRECTORY_SUPPORTED_VIEWS;
 
 @Entity
@@ -62,7 +63,7 @@ public class MetaFile {
 
     public static MetaFile createRoot() {
         return new MetaFile(
-                "",
+                ROOT_FILE_NAME,
                 FileTypes.DIR,
                 FileStatus.READY,
                 new Timestamp(System.currentTimeMillis()),
@@ -98,7 +99,8 @@ public class MetaFile {
 
     public String getPath() {
         if (parent == null) return this.file_name;
-        return this.file_name + this.getParent().getPath();
+        String parentPath = this.getParent().getPath();
+        return parentPath.equals(ROOT_FILE_NAME) ? parentPath + this.file_name : parentPath + "/" + this.file_name;
     }
 
     public String getFile_name() {

@@ -5,10 +5,7 @@ import BE.entities.project.FileStatus;
 import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
-import BE.exceptions.FileAlreadyExistsException;
-import BE.exceptions.FileNotFoundException;
-import BE.exceptions.InvalidParentDirectoryException;
-import BE.exceptions.NotImplementedException;
+import BE.exceptions.*;
 import BE.exceptions.excludedFromBaseException.RootFileDeletionException;
 import BE.models.file.MoveFileRequestModel;
 import BE.repositories.FileRepository;
@@ -26,6 +23,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static BE.models.file.FileModel.ROOT_FILE_NAME;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -87,7 +86,7 @@ public class FileServiceImpl implements FileService {
 
         int i = filename.lastIndexOf('.');
         if (i > 0) {
-            extension = filename.substring(i+1);
+            extension = filename.substring(i + 1);
         } else {
             return "none";
         }
@@ -101,7 +100,7 @@ public class FileServiceImpl implements FileService {
 
         MetaFile parent = root;
         for (String entry : entries) {
-            if (parent != null && !entry.equals("")) {
+            if (parent != null && !entry.equals(ROOT_FILE_NAME)) {
                 parent = parent.getChildren().stream().filter(child -> child.getFile_name().equals(entry)).findAny().orElse(null);
             } else break;
         }
@@ -111,23 +110,22 @@ public class FileServiceImpl implements FileService {
     }
 
     private MetaFile getParentFromPath(String project_name, String path) {
-        String parentPath = "";
+        String parentPath = ROOT_FILE_NAME;
 
-        if(path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER) > 0)
+        if (path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER) > 0)
             parentPath = path.substring(0, path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER));
 
         return getMetaFileFromPath(project_name, parentPath);
     }
 
-    @Override
-    public List<FileModel> getChildrenMeta(String projectName, String filePath) {
-        MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
-        return root.getChildren().stream().map(FileServiceImpl::metaFileToFileModel).collect(Collectors.toList());
-    }
-
-    @Override
-    public FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options) {
-        throw new NotImplementedException();
+    private static FileModel getFileModelWithChildren(MetaFile root) {
+        if (!root.getType().equals(FileTypes.DIR)) throw new UnsupportedFileViewException();
+        FileModel fileModel = metaFileToFileModel(root);
+        fileModel.setChildren(
+                root.getChildren().stream()
+                        .map(FileServiceImpl::metaFileToFileModel)
+                        .collect(Collectors.toList()));
+        return fileModel;
     }
 
     @Override
@@ -140,6 +138,18 @@ public class FileServiceImpl implements FileService {
         MetaFile metaFile = fileRepository.findByFileId(file_id);
         if (metaFile != null) return metaFileToFileModel(metaFile);
         else throw new FileNotFoundException();
+    }
+
+    @Override
+    public FileModel getFileMetaWithChildren(String projectName, String filePath) {
+        MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
+        return getFileModelWithChildren(root);
+    }
+
+    @Override
+    public FileModel getFileMetaWithChildrenById(int file_id) {
+        MetaFile root = fileRepository.findByFileId(file_id);
+        return getFileModelWithChildren(root);
     }
 
     @Override
@@ -156,18 +166,27 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
-        if (path.equals("")) throw new FileAlreadyExistsException(); // root will already exist
+        if (path.equals(ROOT_FILE_NAME)) throw new FileAlreadyExistsException(); // root will already exist
 
         MetaFile parent = getParentFromPath(project_name, path);
         MetaFile metaFile;
+        final String fileName = getFilenameFromPath(path);
 
+        // Check file doesn't already exist in directory
+        if (parent.getChildren().stream().anyMatch(
+                child -> child.getFile_name().equals(fileName))
+                ) {
+            throw new FileAlreadyExistsException();
+        }
+
+        // Create file
         if (action.equals(Action.MAKE_DIRECTORY)) {
             metaFile = MetaFile.createDirectory(
-                    getFilenameFromPath(path),
+                    fileName,
                     parent);
         } else {
             metaFile = MetaFile.createFile(
-                    getFilenameFromPath(path),
+                    fileName,
                     getTypeFromFilename(path),
                     options.isFinal() ? FileStatus.READY : FileStatus.UPLOADING,
                     bytes.length,
@@ -228,7 +247,13 @@ public class FileServiceImpl implements FileService {
             new_path = dest.getPath();
         } else {
             new_path = moveFileRequestModel.getPath();
-            if (path.equals("")) throw new RootFileDeletionException();
+            if (path.equals(ROOT_FILE_NAME)) throw new RootFileDeletionException();
+        }
+
+        // if new path is the same, do nothing
+        MetaFile original = getMetaFileFromPath(project_name, path);
+        if (new_path.equals(path)) {
+            return metaFileToFileModel(original);
         }
 
         // delete file at that location if it exists
@@ -238,7 +263,6 @@ public class FileServiceImpl implements FileService {
         } catch (FileNotFoundException ignore) {}
 
         // change parent to new directory
-        MetaFile original = getMetaFileFromPath(project_name, path);
         MetaFile destParent = getParentFromPath(project_name, new_path);
         if (!destParent.getType().equals(FileTypes.DIR)) throw new InvalidParentDirectoryException();
         original.setParent(destParent);
@@ -249,6 +273,16 @@ public class FileServiceImpl implements FileService {
 
         original = fileRepository.save(original);
         return metaFileToFileModel(original);
+    }
+
+    @Override
+    public FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public FileModel copyFile(String project_name, String relativeFilePath, MoveFileRequestModel moveFileRequestModel) {
+        return null;
     }
 
 
