@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `has_privilege` (
     ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS `file` (
+CREATE TABLE IF NOT EXISTS file (
   `file_id`       INT UNSIGNED    NOT NULL AUTO_INCREMENT,
   `path`          VARCHAR(200)    NOT NULL,
   `file_name`     VARCHAR(54)     NOT NULL,
@@ -55,8 +55,7 @@ CREATE TABLE IF NOT EXISTS `file` (
   `status`        VARCHAR(10)     NOT NULL,
   `last_modified` TIMESTAMP       NOT NULL,
   `length`        BIGINT UNSIGNED NOT NULL,
-  `parent_file_id`        INT UNSIGNED,
-  PRIMARY KEY (`file_id`)
+  PRIMARY KEY (file_id)
 );
 
 CREATE TABLE IF NOT EXISTS `project` (
