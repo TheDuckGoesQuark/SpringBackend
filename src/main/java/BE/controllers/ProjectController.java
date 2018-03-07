@@ -45,6 +45,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static BE.controllers.Action.SET_METADATA;
+import static BE.responsemodels.file.FileRequestOptions.readOptions;
+
 @RestController
 public class ProjectController {
 
@@ -82,17 +85,6 @@ public class ProjectController {
                 throw new FileRetrievalException();
             }
         }
-    }
-
-    private static FileRequestOptions readOptions(Map<String, String> mapOptions) {
-        FileRequestOptions options = new FileRequestOptions();
-        options.setFinal(mapOptions.containsKey(FileRequestOptions.FINAL));
-        if (mapOptions.containsKey(FileRequestOptions.OFFSET))
-            options.setOffset(Integer.parseInt(mapOptions.get(FileRequestOptions.OFFSET)));
-        else options.setOffset(0);
-        options.setOverwrite(mapOptions.containsKey(FileRequestOptions.OVERWRITE));
-        options.setTruncate(mapOptions.containsKey(FileRequestOptions.TRUNCATE));
-        return options;
     }
 
     /**
@@ -158,6 +150,10 @@ public class ProjectController {
         throw new NotImplementedException();
     }
 
+    /* -----------------|-----------------------------------|---------------- */
+    /* -----------------|------PROJECT FILE OPERATIONS------|---------------- */
+    /* -----------------\/----------------------------------\/--------------- */
+
     /**
      * @param project_name
      * @return a particular file
@@ -178,6 +174,7 @@ public class ProjectController {
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
     public FileModel getFile(@PathVariable(value = "project_name") String project_name,
                              @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
+                             @RequestParam(value = "include_children", required = false) String includeChildren,
                              HttpServletRequest request,
                              HttpServletResponse response) {
         // Retrieves file path from request
@@ -221,46 +218,38 @@ public class ProjectController {
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.POST)
-    public FileModel createOrUpdateFile(@PathVariable(value = "project_name") String project_name,
-                                        @RequestParam Map<String, String> otherOptions,
-                                        @RequestParam("action") String action,
-                                        @RequestBody(required = false) byte[] bytes,
-                                        HttpServletRequest request) {
+    public FileModel createFile(@PathVariable(value = "project_name") String project_name,
+                                @RequestParam Map<String, String> otherOptions,
+                                @RequestParam("action") String action,
+                                @RequestBody(required = false) byte[] bytes,
+                                HttpServletRequest request) {
 
         String relativeFilePath = getRelativeFilePath(request, project_name);
         FileRequestOptions options = readOptions(otherOptions);
 
-        return fileService.createFile(project_name, relativeFilePath, action, options, bytes);
+        if ((options.isOverwrite() || options.isTruncate()) && !action.equals(Action.MAKE_DIRECTORY)) return fileService.updateFile(project_name, relativeFilePath, options);
+        else return fileService.createFile(project_name, relativeFilePath, action, options, bytes);
+    }
+
+    /**
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action="+SET_METADATA}, method = RequestMethod.POST)
+    public FileModel updateFileMetaData(@PathVariable(value = "project_name") String project_name,
+                                        HttpServletRequest request) {
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+        return fileService.updateFileMeta(project_name, relativeFilePath);
     }
 
     /**
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/projects/{project_name}/files/**",params = {"action="+Action.DELETE}, method = RequestMethod.POST)
     public void deleteFile(@PathVariable(value = "project_name") String project_name,
                                 HttpServletRequest request) {
         String relativeFilePath = getRelativeFilePath(request, project_name);
 
         fileService.deleteFile(project_name, relativeFilePath);
-    }
-
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view", "include_children"}, method = RequestMethod.GET)
-    public List<FileModel> getDirContents(@PathVariable(value = "project_name") String project_name,
-                                          HttpServletRequest request, @RequestParam("view") String view) {
-        String path = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        //TODO REPLACE this is error prone because /files can be contained somewhere in filepath.
-        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
-        path = path.replace("/files", "");
-        List<FileModel> list = new ArrayList<>();
-        //check if dir exists
-        FileModel dir = fileService.getMetaFile(project_name, path);
-        list.add(dir);
-        //TODO transfer logic to file service
-        if (dir.getType().equals("dir") && view.equals("meta")) {
-            return fileService.getChildrenMeta(project_name, path);
-        }
-        return list;
     }
 }

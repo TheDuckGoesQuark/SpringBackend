@@ -4,10 +4,12 @@ import BE.controllers.Action;
 import BE.entities.project.FileStatus;
 import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
+import BE.entities.project.SupportedView;
 import BE.exceptions.FileAlreadyExistsException;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.NotImplementedException;
 import BE.repositories.FileRepository;
+import BE.repositories.SupportedViewRepository;
 import BE.responsemodels.file.FileMetaDataModel;
 import BE.responsemodels.file.FileModel;
 
@@ -18,10 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static BE.entities.project.SupportedView.FILE_SUPPORTED_VIEWS;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -35,11 +36,29 @@ public class FileServiceImpl implements FileService {
     private final
     StorageService storageService;
 
+    private final
+    SupportedViewRepository supportedViewRepository;
+
+    public static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
+    public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
+
+    private void initialiseDefaults() {
+        SupportedView meta = supportedViewRepository.findByView(SupportedView.META_VIEW);
+        SupportedView raw = supportedViewRepository.findByView(SupportedView.RAW_VIEW);
+
+        DIRECTORY_SUPPORTED_VIEWS.add(meta);
+        FILE_SUPPORTED_VIEWS.add(meta);
+        FILE_SUPPORTED_VIEWS.add(raw);
+    }
+
     @Autowired
-    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService) {
+    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService, SupportedViewRepository supportedViewRepository) {
         this.fileRepository = fileRepository;
         this.projectService = projectService;
         this.storageService = storageService;
+        this.supportedViewRepository = supportedViewRepository;
+        this.initialiseDefaults();
+
     }
 
     // Conversion Functions
@@ -74,11 +93,12 @@ public class FileServiceImpl implements FileService {
 
     private MetaFile getMetaFileFromPath(String projectName, String filePath) {
         MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
+
         String[] entries = filePath.split(MetaFile.FILE_PATH_DELIMITER);
 
         MetaFile parent = root;
         for (String entry : entries) {
-            if (parent != null) {
+            if (parent != null && !entry.equals("")) {
                 parent = parent.getChildren().stream().filter(child -> child.getFile_name().equals(entry)).findAny().orElse(null);
             } else break;
         }
@@ -89,6 +109,7 @@ public class FileServiceImpl implements FileService {
 
     private MetaFile getParentFromPath(String project_name, String path) {
         String parentPath = "";
+
         if(path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER) > 0)
             parentPath = path.substring(0, path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER));
 
@@ -99,6 +120,11 @@ public class FileServiceImpl implements FileService {
     public List<FileModel> getChildrenMeta(String projectName, String filePath) {
         MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
         return root.getChildren().stream().map(FileServiceImpl::metaFileToFileModel).collect(Collectors.toList());
+    }
+
+    @Override
+    public FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options) {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -187,7 +213,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public FileModel updateFileMeta(String project_name, String path, String action) {
+    public FileModel updateFileMeta(String project_name, String path) {
         throw new NotImplementedException();
     }
 

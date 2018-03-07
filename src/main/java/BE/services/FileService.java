@@ -22,11 +22,13 @@ public interface FileService {
 
     void deleteFileById(int file_id);
 
-    FileModel updateFileMeta(String project_name, String path, String action);
+    FileModel updateFileMeta(String project_name, String path);
 
     FileModel moveFile(String project_name, String path, String newPath);
 
     List<FileModel> getChildrenMeta(String projectName, String filePath);
+
+    FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options);
 }
 
 

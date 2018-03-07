@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static BE.entities.project.SupportedView.DIRECTORY_SUPPORTED_VIEWS;
+import static BE.services.FileServiceImpl.DIRECTORY_SUPPORTED_VIEWS;
 
 @Entity
 @Table(name = "file")
@@ -40,10 +38,10 @@ public class MetaFile {
     @OneToMany(mappedBy = "parent")
     private List<MetaFile> children = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "supports_view",
-            joinColumns = @JoinColumn(name = "file_id", referencedColumnName = "file_id"),
-            inverseJoinColumns = @JoinColumn(name = "view", referencedColumnName = "view"))
+            joinColumns = @JoinColumn(name = "file_id", referencedColumnName = "file_id", insertable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "view", referencedColumnName = "view", insertable = false, updatable = false))
     private List<SupportedView> supported_views;
 
 
