@@ -82,21 +82,6 @@ public class FileServiceImpl implements FileService {
         );
     }
 
-    /**
-     * Gets all meta files
-     * @param projectName
-     * @return a list of all meta files
-     */
-    @Override
-    public List<FileModel> getAllMetaFiles(String projectName) {
-        if (projectService.getProjectByName(projectName) == null)
-            throw new ProjectNotFoundException();
-        List<FileModel> files = new ArrayList<>();
-        MetaFile root_dir = fileRepository.findByProjectName(projectName);
-        fileRepository.findAll().forEach(file -> {
-            if (file.getPath().startsWith(root_dir.getPath())) files.add(this.metaFileToFileModel(file));
-        });
-        return files;
     private static String getFilenameFromPath(String path) {
         File file = new File(path);
         return file.getName();
@@ -325,8 +310,9 @@ public class FileServiceImpl implements FileService {
     private boolean checkForCycles(MetaFile original) {
         // TODO TODO TODO
         if (original.getType().equals(FileTypes.DIR)) {
-            original.getChildren().stream().forEach(child->);
+            //original.getChildren().stream().forEach(child->);
         }
+        return false;
     }
 
     @Override
