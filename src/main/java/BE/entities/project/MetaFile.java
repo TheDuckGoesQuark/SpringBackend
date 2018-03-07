@@ -89,6 +89,20 @@ public class MetaFile {
         return createFile(file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
     }
 
+    public static MetaFile deepCopy(MetaFile original) {
+        MetaFile metaFile = new MetaFile(
+                original.file_name,
+                original.type,
+                original.status,
+                original.getLast_modified(),
+                original.getLength(),
+                original.supported_views,
+                original.parent
+        );
+        metaFile.setChildren(original.getChildren());
+        return metaFile;
+    }
+
     public int getFileId() {
         return fileId;
     }

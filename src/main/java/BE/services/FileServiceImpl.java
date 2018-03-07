@@ -182,6 +182,8 @@ public class FileServiceImpl implements FileService {
         MetaFile metaFile;
         final String fileName = getFilenameFromPath(path);
 
+        if (fileName.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
+
         // Check file doesn't already exist in directory
         if (parent.getChildren().stream().anyMatch(
                 child -> child.getFile_name().equals(fileName))
@@ -244,6 +246,9 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public FileModel updateFileMeta(String project_name, String path) {
+
+//        if (fileName.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
+
         throw new NotImplementedException();
     }
 
@@ -274,6 +279,7 @@ public class FileServiceImpl implements FileService {
 
         // check for name change
         String new_name = getFilenameFromPath(new_path);
+        if (new_name.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
         if (!new_name.equals(original.getFile_name())) original.setFile_name(new_name);
 
         // check for cycles
@@ -293,13 +299,22 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options) {
+        //if (new_name.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
+
         throw new NotImplementedException();
+    }
+
+    public void recursivelyCopyFiles(MetaFile parent) {
+
     }
 
     @Override
     public FileModel copyFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel) {
-        // TODO TODO TODO
-
+        // if (new_name.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
+        String new_path = getPathFromMoveFileRequest(moveFileRequestModel);
+        MetaFile newFile = MetaFile.deepCopy(getMetaFileFromPath(project_name, path));
+        // TODO
+        recursivelyCopyFiles(newFile);
         return null;
     }
 
