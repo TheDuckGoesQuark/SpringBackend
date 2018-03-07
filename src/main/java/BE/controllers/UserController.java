@@ -32,7 +32,8 @@ public class UserController {
      * @return a list of all users
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<UserModel> getAllUsers() {
+    public List<UserModel> getAllUsers(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
         return userService.getAllUsers();
     }
 
@@ -42,22 +43,26 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
-    public UserModel getUser(@PathVariable(value="username") String username)  {
+    public UserModel getUser(@PathVariable(value="username") String username, HttpServletResponse response)  {
+        response.setStatus(HttpServletResponse.SC_OK);
         return userService.getUserByUserName(username);
     }
 
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
-    public List<PrivilegeModel> getListOfUserPrivileges() {
+    public List<PrivilegeModel> getListOfUserPrivileges(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
         return userService.getAllPrivileges();
     }
 
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)
-    public UserModel getCurrentUser(Principal principal) {
+    public UserModel getCurrentUser(Principal principal, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
         return userService.getUserByUserName(principal.getName());
     }
 
     @RequestMapping(value = "/current_user",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
-    public UserModel updateCurrentUser(@RequestBody UserModel user) {
+    public UserModel updateCurrentUser(@RequestBody UserModel user, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
         return userService.updateUser(user);
     }
 
@@ -69,12 +74,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
-    public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+    public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
         return userService.updateUser(user);
     }
 
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.DELETE}, method = RequestMethod.POST)
-    public UserModel deleteUser(@PathVariable(value="username") String username) {
+    public UserModel deleteUser(@PathVariable(value="username") String username, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
         return userService.deleteUser(username);
     }
 
