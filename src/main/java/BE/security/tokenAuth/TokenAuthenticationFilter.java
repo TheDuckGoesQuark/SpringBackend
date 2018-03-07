@@ -1,6 +1,6 @@
 package BE.security.tokenAuth;
 
-import BE.responsemodels.security.TokenHeaderModel;
+import BE.models.security.TokenHeaderModel;
 import BE.exceptions.excludedFromBaseException.AuthenticationException;
 import BE.security.enums.AuthenticationFailureType;
 import BE.security.SecurityUtils;

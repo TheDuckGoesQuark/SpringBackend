@@ -1,6 +1,6 @@
 package BE.services;
 
-import BE.responsemodels.file.FileRequestOptions;
+import BE.models.file.FileRequestOptions;
 
 import java.io.InputStream;
 

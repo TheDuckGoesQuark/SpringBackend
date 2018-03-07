@@ -2,16 +2,12 @@ package BE.controllers;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // Exceptions
-import BE.exceptions.InvalidRequestStructureException;
-import BE.exceptions.NotImplementedException;
 // Models
-import BE.entities.user.User;
 // Spring
-import BE.responsemodels.user.PrivilegeModel;
-import BE.responsemodels.user.UserModel;
+import BE.models.user.PrivilegeModel;
+import BE.models.user.UserModel;
 import BE.services.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

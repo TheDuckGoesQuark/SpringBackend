@@ -1,7 +1,7 @@
 package BE.security.passwordAuth;
 
-import BE.responsemodels.security.TokenModel;
-import BE.responsemodels.security.TokenRequestModel;
+import BE.models.security.TokenModel;
+import BE.models.security.TokenRequestModel;
 import BE.exceptions.excludedFromBaseException.AuthenticationException;
 import BE.services.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;

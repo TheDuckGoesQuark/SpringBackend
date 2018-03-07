@@ -3,6 +3,7 @@ package BE.entities.project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,6 @@ public class MetaFile {
     private int fileId;
 
     private String path;
-
-    private String file_name;
 
     private String type;
 
@@ -52,9 +51,8 @@ public class MetaFile {
     protected MetaFile() {
     }
 
-    private MetaFile(String path, String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
+    private MetaFile(String path, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
         this.path = path;
-        this.file_name = file_name;
         this.type = type;
         this.status = status;
         this.last_modified = last_modified;
@@ -65,7 +63,6 @@ public class MetaFile {
 
     public static MetaFile createRoot() {
         return new MetaFile(
-                "",
                 "",
                 FileTypes.DIR,
                 FileStatus.READY,
@@ -78,7 +75,6 @@ public class MetaFile {
     public static MetaFile createFile(String path, String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
         MetaFile metaFile = new MetaFile(
                 path,
-                file_name,
                 type,
                 status,
                 new Timestamp(System.currentTimeMillis()),
@@ -110,7 +106,8 @@ public class MetaFile {
     }
 
     public String getFile_name() {
-        return file_name;
+        File file = new File(path);
+        return file.getName();
     }
 
     public void setFile_name(String file_name) {

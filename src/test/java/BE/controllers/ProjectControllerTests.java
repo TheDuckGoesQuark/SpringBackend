@@ -6,8 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import BE.responsemodels.project.ProjectModel;
-import BE.responsemodels.project.UserListModel;
+import BE.models.project.ProjectModel;
+import BE.models.project.UserListModel;
 import BE.services.FileService;
 import BE.services.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;

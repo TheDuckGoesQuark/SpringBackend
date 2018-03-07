@@ -1,8 +1,7 @@
 package BE.services;
 
-import BE.responsemodels.user.PrivilegeModel;
-import BE.responsemodels.user.UserModel;
-import org.springframework.security.core.userdetails.UserDetails;
+import BE.models.user.PrivilegeModel;
+import BE.models.user.UserModel;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;

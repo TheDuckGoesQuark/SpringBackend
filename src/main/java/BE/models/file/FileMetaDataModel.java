@@ -1,4 +1,4 @@
-package BE.responsemodels.file;
+package BE.models.file;
 
 import java.sql.Timestamp;
 

@@ -1,4 +1,4 @@
-package BE.responsemodels.project;
+package BE.models.project;
 
 import java.util.List;
 

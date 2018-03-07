@@ -1,4 +1,4 @@
-package BE.responsemodels.file;
+package BE.models.file;
 
 import BE.entities.project.SupportedView;
 import com.fasterxml.jackson.annotation.JsonInclude;

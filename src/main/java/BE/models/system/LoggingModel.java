@@ -1,4 +1,4 @@
-package BE.responsemodels.system;
+package BE.models.system;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

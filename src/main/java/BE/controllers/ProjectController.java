@@ -3,7 +3,6 @@ package BE.controllers;
 // JavaIO
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,11 +10,12 @@ import java.util.Map;
 import BE.entities.project.SupportedView;
 import BE.exceptions.FileRetrievalException;
 import BE.exceptions.UnsupportedFileViewException;
-import BE.responsemodels.file.FileModel;
-import BE.responsemodels.file.FileRequestOptions;
-import BE.responsemodels.project.ProjectModel;
-import BE.responsemodels.project.ProjectRoleModel;
-import BE.responsemodels.project.UserListModel;
+import BE.models.file.FileModel;
+import BE.models.file.FileRequestOptions;
+import BE.models.file.MoveFileRequestModel;
+import BE.models.project.ProjectModel;
+import BE.models.project.ProjectRoleModel;
+import BE.models.project.UserListModel;
 
 // Services
 import BE.services.FileService;
@@ -26,7 +26,6 @@ import BE.exceptions.NotImplementedException;
 //import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
 
 // Apache
-import BE.services.StorageService;
 import org.apache.log4j.Logger;
 
 // Spring
@@ -38,15 +37,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.HandlerMapping;
 
 //Other
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static BE.controllers.Action.MOVE;
 import static BE.controllers.Action.SET_METADATA;
-import static BE.responsemodels.file.FileRequestOptions.readOptions;
+import static BE.models.file.FileRequestOptions.readOptions;
 
 @RestController
 public class ProjectController {
@@ -218,23 +216,24 @@ public class ProjectController {
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.POST)
-    public FileModel createFile(@PathVariable(value = "project_name") String project_name,
-                                @RequestParam Map<String, String> otherOptions,
-                                @RequestParam("action") String action,
-                                @RequestBody(required = false) byte[] bytes,
-                                HttpServletRequest request) {
+    public FileModel createOrUpdateFile(@PathVariable(value = "project_name") String project_name,
+                                        @RequestParam Map<String, String> otherOptions,
+                                        @RequestParam("action") String action,
+                                        @RequestBody(required = false) byte[] bytes,
+                                        HttpServletRequest request) {
 
         String relativeFilePath = getRelativeFilePath(request, project_name);
         FileRequestOptions options = readOptions(otherOptions);
 
-        if ((options.isOverwrite() || options.isTruncate()) && !action.equals(Action.MAKE_DIRECTORY)) return fileService.updateFile(project_name, relativeFilePath, options);
+        if ((options.isOverwrite() || options.isTruncate()) && !action.equals(Action.MAKE_DIRECTORY))
+            return fileService.updateFile(project_name, relativeFilePath, options);
         else return fileService.createFile(project_name, relativeFilePath, action, options, bytes);
     }
 
     /**
      * @return
      */
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action="+SET_METADATA}, method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + SET_METADATA}, method = RequestMethod.POST)
     public FileModel updateFileMetaData(@PathVariable(value = "project_name") String project_name,
                                         HttpServletRequest request) {
         String relativeFilePath = getRelativeFilePath(request, project_name);
@@ -242,12 +241,23 @@ public class ProjectController {
     }
 
     /**
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + MOVE}, method = RequestMethod.POST)
+    public FileModel moveFile(@PathVariable(value = "project_name") String project_name,
+                              @RequestBody MoveFileRequestModel moveFileRequestModel,
+                              HttpServletRequest request) {
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+        return fileService.moveFile(project_name, relativeFilePath, moveFileRequestModel);
+    }
+
+    /**
      * @param project_name
      * @return
      */
-    @RequestMapping(value = "/projects/{project_name}/files/**",params = {"action="+Action.DELETE}, method = RequestMethod.POST)
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + Action.DELETE}, method = RequestMethod.POST)
     public void deleteFile(@PathVariable(value = "project_name") String project_name,
-                                HttpServletRequest request) {
+                           HttpServletRequest request) {
         String relativeFilePath = getRelativeFilePath(request, project_name);
 
         fileService.deleteFile(project_name, relativeFilePath);

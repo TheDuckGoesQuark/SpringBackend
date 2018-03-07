@@ -8,12 +8,13 @@ import BE.entities.project.SupportedView;
 import BE.exceptions.FileAlreadyExistsException;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.NotImplementedException;
+import BE.models.file.MoveFileRequestModel;
 import BE.repositories.FileRepository;
 import BE.repositories.SupportedViewRepository;
-import BE.responsemodels.file.FileMetaDataModel;
-import BE.responsemodels.file.FileModel;
+import BE.models.file.FileMetaDataModel;
+import BE.models.file.FileModel;
 
-import BE.responsemodels.file.FileRequestOptions;
+import BE.models.file.FileRequestOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,8 +76,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private static String getFilenameFromPath(String path) {
-        File file = new File(path);
-        return file.getName();
+
     }
 
     private static String getTypeFromFilename(String filename) {
@@ -219,8 +219,15 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public FileModel moveFile(String project_name, String path, String newPath) {
-        throw new NotImplementedException();
+    public FileModel moveFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel) {
+        String new_path;
+        if (moveFileRequestModel.getId() != null) {
+            MetaFile dest = fileRepository.findByFileId(moveFileRequestModel.getId());
+            new_path = dest.getPath();
+        } else {
+            new_path = moveFileRequestModel.getPath();
+            if (path.equals("")) throw new
+        }
     }
 
 

@@ -1,11 +1,8 @@
 package BE.services;
 
-import BE.entities.project.Project;
-import BE.entities.project.Role;
-import BE.entities.user.User;
-import BE.responsemodels.project.ProjectModel;
-import BE.responsemodels.project.ProjectRoleModel;
-import BE.responsemodels.project.UserListModel;
+import BE.models.project.ProjectModel;
+import BE.models.project.ProjectRoleModel;
+import BE.models.project.UserListModel;
 
 import java.util.List;
 
