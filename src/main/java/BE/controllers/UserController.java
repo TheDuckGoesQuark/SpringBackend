@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 public class UserController {
 
@@ -60,8 +62,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.CREATE}, method = RequestMethod.POST)
-    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user, HttpServletResponse response) {
         user.setUsername(username);
+        response.setStatus(HttpServletResponse.SC_CREATED);
         return userService.createUser(user);
     }
 

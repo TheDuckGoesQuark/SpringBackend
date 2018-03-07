@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import BE.exceptions.UserNotFoundException;
 import BE.responsemodels.user.PrivilegeModel;
 import BE.responsemodels.user.ProjectListModel;
 import BE.responsemodels.user.UserModel;
@@ -86,9 +87,12 @@ public class UserControllerTests {
 
     //Initialised test helpers
 
-
+    /**
+     * Tests to see if successfully getting all users results in the expected response
+     * @throws Exception
+     */
     @Test
-    public void getAllUsers() throws Exception {
+    public void getAllUsersSuccess() throws Exception {
 
         //object initialisation
         List<String> testPrivileges= Arrays.asList("user");
@@ -105,7 +109,6 @@ public class UserControllerTests {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].username").value("testUser1"))
                 .andExpect(jsonPath("$[1].username").value("testUser2"))
-                .andExpect(jsonPath("$[0].password").value("testPass"))
                 .andExpect(jsonPath("$[0].email").value("test@email.com"))
                 //.andExpect(jsonPath("$[0].projects").value("null"))
                 .andExpect(jsonPath("$[0].privileges[0]").value("user"));
@@ -114,7 +117,25 @@ public class UserControllerTests {
         verifyNoMoreInteractions(userService);
     }
 
+    /**
+     * Tests to see if failing to get all users results in the expected response
+     * @throws Exception
+     */
+    @Test
+    public void getAllUsersFail() throws Exception {
+        when(userService.getAllUsers()).thenReturn(null);
+        mockMvc.perform(get("/users"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
 
+        verify(userService, times(1)).getAllUsers();
+        verifyNoMoreInteractions(userService);
+    }
+
+    /**
+     * Tests to see if successfully getting a specific user results in the expected response
+     * @throws Exception
+     */
     @Test
     public void getASpecificUser() throws Exception {
 
@@ -133,8 +154,28 @@ public class UserControllerTests {
 
     }
 
+    /**
+     * Tests to see if failing to get a specific user results in the expected response
+     * @throws Exception
+     */
     @Test
-    public void getListOfUserPriviledges() throws Exception {
+    public void getASpecificUserFail() throws Exception {
+        String testUsername = "testUsername";
+
+        when(userService.getUserByUserName(testUsername)).thenReturn(null);
+        mockMvc.perform(get("/users/{username}", testUsername))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).getUserByUserName(testUsername);
+        verifyNoMoreInteractions(userService);
+    }
+
+    /**
+     * Tests to see if successfully getting a list of all user privileges results in the expected response
+     * @throws Exception
+     */
+    @Test
+    public void getListOfUserPrivileges() throws Exception {
 
         //object initialisation
         PrivilegeModel testPrivilege = new PrivilegeModel("user","standard user access", false);
@@ -154,7 +195,25 @@ public class UserControllerTests {
         verifyNoMoreInteractions(userService);
     }
 
+    /**
+     * Tests to see if failing to get a list of all user privileges results in a the expected response
+     * @throws Exception
+     */
+    @Test
+    public void getListOfUserPrivilegesFail() throws Exception {
 
+        when(userService.getAllPrivileges()).thenReturn(null);
+        mockMvc.perform(get("/user_privileges"))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).getAllPrivileges();
+        verifyNoMoreInteractions(userService);
+    }
+
+    /**
+     * Tests to see if successfully creating a new user results in the expected response
+     * @throws Exception
+     */
     @Test
     public void createUser() throws Exception {
 
@@ -173,7 +232,28 @@ public class UserControllerTests {
         verifyNoMoreInteractions(userService);
     }
 
+    /**
+     * Tests to see if attempting to create a user that already exists results in the expected response
+     * @throws Exception
+     */
+    @Test
+    public void createExistingUserFail() throws Exception {
+        List<String> testPrivileges = Arrays.asList("user","admin");
+        List<ProjectListModel> testProject=null;
+        UserModel testUser = new UserModel("existingUser","existing","existing@email.com",testProject,testPrivileges);
 
+        when(userService.createUser(testUser)).thenThrow(new UserNotFoundException());
+        mockMvc.perform(post("/users/{username}?action=create", testUser.getUsername()))
+                .andExpect(status().isConflict());
+
+        verify(userService, times(1)).createUser(testUser);
+        verifyNoMoreInteractions(userService);
+    }
+
+    /**
+     * Tests to see if successfully updating an existing user results in the expected response
+     * @throws Exception
+     */
     @Test
     public void updateUser() throws Exception {
 
@@ -192,11 +272,30 @@ public class UserControllerTests {
         verifyNoMoreInteractions(userService);
     }
 
+    /**
+     * Tests to see if attempting to update a user that does not exist results in the expected response
+     * @throws Exception
+     */
+    @Test
+    public void updateUserFail() throws Exception {
+
+        when(userService.updateUser(null)).thenThrow(new UserNotFoundException());
+        mockMvc.perform(post("/users/{username}?action=update", "null"))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).updateUser(null);
+        verifyNoMoreInteractions(userService);
+    }
+
     @Test
     public void getCurrentUser() throws Exception {
         //TODO
     }
 
+    /**
+     * Tests to see if successfully deleting a user results in the expected response
+     * @throws Exception
+     */
     @Test
     public void deleteUser() throws Exception {
 
@@ -207,5 +306,19 @@ public class UserControllerTests {
         verifyNoMoreInteractions(userService);
     }
 
+    /**
+     * Tests to see if attempting to delete a user that does not exist results in the expected response
+     * @throws Exception
+     */
+    @Test
+    public void deleteUserFail() throws Exception {
+
+        when(userService.deleteUser("null")).thenThrow(new UserNotFoundException());
+        mockMvc.perform(post("/users/null?action=delete"))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).deleteUser("null");
+        verifyNoMoreInteractions(userService);
+    }
 
 }

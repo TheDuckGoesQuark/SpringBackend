@@ -119,7 +119,8 @@ public class ProjectController {
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.CREATE}, method = RequestMethod.POST)
-    public ProjectModel createProject(@PathVariable(value = "project_name") String project_name) {
+    public ProjectModel createProject(@PathVariable(value = "project_name") String project_name, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_CREATED);
         return projectService.createProject(project_name);
     }
 
