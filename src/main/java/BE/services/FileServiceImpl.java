@@ -93,6 +93,16 @@ public class FileServiceImpl implements FileService {
         return extension;
     }
 
+    private static FileModel getFileModelWithChildren(MetaFile root) {
+        if (!root.getType().equals(FileTypes.DIR)) throw new UnsupportedFileViewException();
+        FileModel fileModel = metaFileToFileModel(root);
+        fileModel.setChildren(
+                root.getChildren().stream()
+                        .map(FileServiceImpl::metaFileToFileModel)
+                        .collect(Collectors.toList()));
+        return fileModel;
+    }
+
     private MetaFile getMetaFileFromPath(String projectName, String filePath) {
         MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
 
@@ -118,14 +128,14 @@ public class FileServiceImpl implements FileService {
         return getMetaFileFromPath(project_name, parentPath);
     }
 
-    private static FileModel getFileModelWithChildren(MetaFile root) {
-        if (!root.getType().equals(FileTypes.DIR)) throw new UnsupportedFileViewException();
-        FileModel fileModel = metaFileToFileModel(root);
-        fileModel.setChildren(
-                root.getChildren().stream()
-                        .map(FileServiceImpl::metaFileToFileModel)
-                        .collect(Collectors.toList()));
-        return fileModel;
+    private String getPathFromMoveFileRequest(MoveFileRequestModel moveFileRequestModel) {
+        // get path, either from id or given path
+        if (moveFileRequestModel.getId() != null) {
+            MetaFile dest = fileRepository.findByFileId(moveFileRequestModel.getId());
+            return dest.getPath();
+        } else {
+            return moveFileRequestModel.getPath();
+        }
     }
 
     @Override
@@ -240,15 +250,10 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public FileModel moveFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel) {
-        // get path, either from id or given path
-        String new_path;
-        if (moveFileRequestModel.getId() != null) {
-            MetaFile dest = fileRepository.findByFileId(moveFileRequestModel.getId());
-            new_path = dest.getPath();
-        } else {
-            new_path = moveFileRequestModel.getPath();
-            if (path.equals(ROOT_FILE_NAME)) throw new RootFileDeletionException();
-        }
+
+        if (path.equals(ROOT_FILE_NAME)) throw new RootFileDeletionException();
+
+        String new_path = getPathFromMoveFileRequest(moveFileRequestModel);
 
         // if new path is the same, do nothing
         MetaFile original = getMetaFileFromPath(project_name, path);
@@ -256,23 +261,34 @@ public class FileServiceImpl implements FileService {
             return metaFileToFileModel(original);
         }
 
+        // change parent to new directory
+        MetaFile destParent = getParentFromPath(project_name, new_path);
+        if (!destParent.getType().equals(FileTypes.DIR)) throw new InvalidParentDirectoryException();
+        original.setParent(destParent);
+
         // delete file at that location if it exists
         try {
             MetaFile dest = getMetaFileFromPath(project_name, new_path);
             if (dest != null) deleteRecursively(dest);
         } catch (FileNotFoundException ignore) {}
 
-        // change parent to new directory
-        MetaFile destParent = getParentFromPath(project_name, new_path);
-        if (!destParent.getType().equals(FileTypes.DIR)) throw new InvalidParentDirectoryException();
-        original.setParent(destParent);
-
         // check for name change
         String new_name = getFilenameFromPath(new_path);
         if (!new_name.equals(original.getFile_name())) original.setFile_name(new_name);
 
+        // check for cycles
+        if (checkForCycles(original)) throw new InvalidParentDirectoryException();
+
+        // persist
         original = fileRepository.save(original);
         return metaFileToFileModel(original);
+    }
+
+    private boolean checkForCycles(MetaFile original) {
+        // TODO TODO TODO
+        if (original.getType().equals(FileTypes.DIR)) {
+            original.getChildren().stream().forEach(child->);
+        }
     }
 
     @Override
@@ -281,7 +297,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileModel copyFile(String project_name, String relativeFilePath, MoveFileRequestModel moveFileRequestModel) {
+    public FileModel copyFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel) {
+        // TODO TODO TODO
+
         return null;
     }
 
