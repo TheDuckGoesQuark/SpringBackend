@@ -7,7 +7,9 @@ import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
 import BE.exceptions.FileAlreadyExistsException;
 import BE.exceptions.FileNotFoundException;
+import BE.exceptions.InvalidParentDirectoryException;
 import BE.exceptions.NotImplementedException;
+import BE.exceptions.excludedFromBaseException.RootFileDeletionException;
 import BE.models.file.MoveFileRequestModel;
 import BE.repositories.FileRepository;
 import BE.repositories.SupportedViewRepository;
@@ -76,7 +78,8 @@ public class FileServiceImpl implements FileService {
     }
 
     private static String getFilenameFromPath(String path) {
-
+        File file = new File(path);
+        return file.getName();
     }
 
     private static String getTypeFromFilename(String filename) {
@@ -160,12 +163,10 @@ public class FileServiceImpl implements FileService {
 
         if (action.equals(Action.MAKE_DIRECTORY)) {
             metaFile = MetaFile.createDirectory(
-                    path,
                     getFilenameFromPath(path),
                     parent);
         } else {
             metaFile = MetaFile.createFile(
-                    path,
                     getFilenameFromPath(path),
                     getTypeFromFilename(path),
                     options.isFinal() ? FileStatus.READY : FileStatus.UPLOADING,
@@ -220,21 +221,38 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public FileModel moveFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel) {
+        // get path, either from id or given path
         String new_path;
         if (moveFileRequestModel.getId() != null) {
             MetaFile dest = fileRepository.findByFileId(moveFileRequestModel.getId());
             new_path = dest.getPath();
         } else {
             new_path = moveFileRequestModel.getPath();
-            if (path.equals("")) throw new
+            if (path.equals("")) throw new RootFileDeletionException();
         }
+
+        // delete file at that location if it exists
+        try {
+            MetaFile dest = getMetaFileFromPath(project_name, new_path);
+            if (dest != null) deleteRecursively(dest);
+        } catch (FileNotFoundException ignore) {}
+
+        // change parent to new directory
+        MetaFile original = getMetaFileFromPath(project_name, path);
+        MetaFile destParent = getParentFromPath(project_name, new_path);
+        if (!destParent.getType().equals(FileTypes.DIR)) throw new InvalidParentDirectoryException();
+        original.setParent(destParent);
+
+        // check for name change
+        String new_name = getFilenameFromPath(new_path);
+        if (!new_name.equals(original.getFile_name())) original.setFile_name(new_name);
+
+        original = fileRepository.save(original);
+        return metaFileToFileModel(original);
     }
 
 
     //TODO 12.9 Changing metadata
-    //TODO 12.10 Creating directories
-    //TODO 12.11 Deleting
-    //TODO 12.12 Moving
     //TODO 12.13 Copying
     //TODO 12.14 Extra file types
     //TODO 12.13 Tabular files

@@ -3,7 +3,6 @@ package BE.entities.project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ public class MetaFile {
     @Column(name = "file_id")
     private int fileId;
 
-    private String path;
+    private String file_name;
 
     private String type;
 
@@ -51,8 +50,8 @@ public class MetaFile {
     protected MetaFile() {
     }
 
-    private MetaFile(String path, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
-        this.path = path;
+    private MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
+        this.file_name = file_name;
         this.type = type;
         this.status = status;
         this.last_modified = last_modified;
@@ -72,9 +71,9 @@ public class MetaFile {
                 null);
     }
 
-    public static MetaFile createFile(String path, String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
+    public static MetaFile createFile(String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
         MetaFile metaFile = new MetaFile(
-                path,
+                file_name,
                 type,
                 status,
                 new Timestamp(System.currentTimeMillis()),
@@ -85,8 +84,8 @@ public class MetaFile {
         return metaFile;
     }
 
-    public static MetaFile createDirectory(String path, String file_name, MetaFile parent) {
-        return createFile(path, file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
+    public static MetaFile createDirectory(String file_name, MetaFile parent) {
+        return createFile(file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
     }
 
     public int getFileId() {
@@ -98,16 +97,12 @@ public class MetaFile {
     }
 
     public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
+        if (parent == null) return this.file_name;
+        return this.file_name + this.getParent().getPath();
     }
 
     public String getFile_name() {
-        File file = new File(path);
-        return file.getName();
+        return file_name;
     }
 
     public void setFile_name(String file_name) {

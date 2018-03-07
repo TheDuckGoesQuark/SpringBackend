@@ -7,6 +7,10 @@ public class MoveFileRequestModel {
     private Integer id;
     private String path;
 
+    public MoveFileRequestModel() {
+
+    }
+
     public MoveFileRequestModel(int id, String path) {
         this.id = id;
         this.path = path;
