@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `file` (
   `status`        VARCHAR(10)     NOT NULL,
   `last_modified` TIMESTAMP       NOT NULL,
   `length`        BIGINT UNSIGNED NOT NULL,
+  `parent_file_id`        INT UNSIGNED,
   PRIMARY KEY (`file_id`)
 );
 
@@ -130,24 +131,6 @@ CREATE TABLE IF NOT EXISTS `supports_view` (
     ON UPDATE CASCADE
 );
 
-
-CREATE TABLE IF NOT EXISTS `dir_contains` (
-  `dir_id`  INT UNSIGNED NOT NULL,
-  `file_id` INT UNSIGNED NOT NULL,
-  `length`  INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`dir_id`, `file_id`),
-  INDEX `dir_contains.idx` (`dir_id` ASC),
-  CONSTRAINT `dir_id`
-  FOREIGN KEY (`dir_id`)
-  REFERENCES `file` (`file_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `file`
-  FOREIGN KEY (`file_id`)
-  REFERENCES `file` (`file_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
 
 # insert into file (file_id, path, file_name, type, metadata, status) values ('12323', 'ohaa','ohaa', 'dir', 'file meta-data', 'status');
 # insert into file (file_id, path, file_name, type, metadata, status) values ('12324', '/projects/Protege/root1','root1', 'dir', 'file meta-data', 'status');
