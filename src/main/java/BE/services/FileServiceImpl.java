@@ -88,7 +88,10 @@ public class FileServiceImpl implements FileService {
     }
 
     private MetaFile getParentFromPath(String project_name, String path) {
-        String parentPath = path.substring(0, path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER));
+        String parentPath = "";
+        if(path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER) > 0)
+            parentPath = path.substring(0, path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER));
+
         return getMetaFileFromPath(project_name, parentPath);
     }
 
