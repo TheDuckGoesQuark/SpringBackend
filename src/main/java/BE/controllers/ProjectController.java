@@ -102,7 +102,9 @@ public class ProjectController {
     private static FileRequestOptions readOptions(Map<String, String> mapOptions) {
         FileRequestOptions options = new FileRequestOptions();
         options.setFinal(mapOptions.containsKey(FileRequestOptions.FINAL));
-        options.setOffset(Integer.parseInt(mapOptions.get(FileRequestOptions.OFFSET)));
+        if (mapOptions.containsKey(FileRequestOptions.OFFSET))
+            options.setOffset(Integer.parseInt(mapOptions.get(FileRequestOptions.OFFSET)));
+        else options.setOffset(0);
         options.setOverwrite(mapOptions.containsKey(FileRequestOptions.OVERWRITE));
         options.setTruncate(mapOptions.containsKey(FileRequestOptions.TRUNCATE));
         return options;
@@ -257,14 +259,14 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.POST)
     public FileModel createOrUpdateFile(@PathVariable(value = "project_name") String project_name,
-                                        @RequestParam(value = "content") byte[] bytes,
                                         @RequestParam Map<String, String> otherOptions,
-                                        HttpServletRequest request,
-                                        @RequestParam("action") String action)
-            throws IOException, ServletException {
+                                        @RequestParam("action") String action,
+                                        @RequestBody(required = false) byte[] bytes,
+                                        HttpServletRequest request) {
 
         String relativeFilePath = getRelativeFilePath(request, project_name);
         FileRequestOptions options = readOptions(otherOptions);
+
         return fileService.createFile(project_name, relativeFilePath, action, options, bytes);
     }
 
@@ -275,11 +277,11 @@ public class ProjectController {
      * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.DELETE)
-    public FileModel deleteFile(@PathVariable(value = "project_name") String project_name,
+    public void deleteFile(@PathVariable(value = "project_name") String project_name,
                                 HttpServletRequest request) {
         String relativeFilePath = getRelativeFilePath(request, project_name);
 
-        return fileService.deleteFile(project_name, relativeFilePath);
+        fileService.deleteFile(project_name, relativeFilePath);
     }
 
     /**

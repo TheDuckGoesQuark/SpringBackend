@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,13 +24,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final
     ProjectRepository projectRepository;
 
-    private final
-    SupportedViewRepository supportedViewRepository;
-
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, SupportedViewRepository supportedViewRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
-        this.supportedViewRepository = supportedViewRepository;
     }
 
     // Conversion Functions
@@ -61,24 +55,6 @@ public class ProjectServiceImpl implements ProjectService {
         return new UserListModel(
                 user.getUsername(),
                 userProject.getAccess_level());
-    }
-
-    /**
-     * Creates root directory for projects
-     * @return project root directory
-     */
-    private MetaFile createProjectRoot() {
-        List<SupportedView> supportedViews = new ArrayList<>();
-        supportedViews.add(supportedViewRepository.findByView(SupportedView.META_VIEW));
-        return new MetaFile(
-                "/",
-                "",
-                FileTypes.DIR,
-                FileStatus.READY,
-                new Timestamp(System.currentTimeMillis()),
-                0L,
-                supportedViews
-                );
     }
 
     /**
@@ -114,7 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public ProjectModel createProject(String project_name) {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
-        MetaFile projectRoot = createProjectRoot();
+        MetaFile projectRoot = MetaFile.createRoot();
         Project project = new Project(project_name, projectRoot);
         // Save to database
         projectRepository.save(project);
@@ -154,6 +130,13 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.deleteByName(project_name);
             return null;
         }
+    }
+
+    @Override
+    public int getProjectRootDirId(String project_name) {
+        Project project = projectRepository.findByName(project_name);
+        if (project == null) throw new ProjectNotFoundException();
+        else return project.getRoot_dir().getFileId();
     }
 
     @Override

@@ -1,13 +1,13 @@
 package BE.services;
 
+import BE.controllers.Action;
+import BE.entities.project.FileStatus;
+import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
+import BE.exceptions.FileAlreadyExistsException;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.NotImplementedException;
-import BE.exceptions.ProjectNotFoundException;
-import BE.repositories.Dir_containsRepository;
 import BE.repositories.FileRepository;
-import BE.repositories.ProjectRepository;
-import BE.repositories.SupportedViewRepository;
 import BE.responsemodels.file.FileMetaDataModel;
 import BE.responsemodels.file.FileModel;
 
@@ -16,12 +16,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static BE.entities.project.SupportedView.FILE_SUPPORTED_VIEWS;
 
 @Service
 public class FileServiceImpl implements FileService {
+
+    private final
+    FileRepository fileRepository;
 
     private final
     ProjectService projectService;
@@ -29,22 +35,11 @@ public class FileServiceImpl implements FileService {
     private final
     StorageService storageService;
 
-    private final
-    FileRepository fileRepository;
-
-    private final
-    SupportedViewRepository supportedViewRepository;
-
-    private final
-    Dir_containsRepository dirContainsRepository;
-
     @Autowired
-    public FileServiceImpl(ProjectService projectService, StorageService storageService, FileRepository fileRepository, SupportedViewRepository supportedViewRepository, Dir_containsRepository dirContainsRepository) {
+    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService) {
+        this.fileRepository = fileRepository;
         this.projectService = projectService;
         this.storageService = storageService;
-        this.fileRepository = fileRepository;
-        this.supportedViewRepository = supportedViewRepository;
-        this.dirContainsRepository = dirContainsRepository;
     }
 
     // Conversion Functions
@@ -54,7 +49,7 @@ public class FileServiceImpl implements FileService {
      * @param metaFile the meta file to be converted
      * @return file model
      */
-    private FileModel metaFileToFileModel(MetaFile metaFile) {
+    private static FileModel metaFileToFileModel(MetaFile metaFile) {
         return new FileModel(
                 metaFile.getPath(),
                 metaFile.getFile_name(),
@@ -81,24 +76,52 @@ public class FileServiceImpl implements FileService {
             if (file.getPath().startsWith(root_dir.getPath())) files.add(this.metaFileToFileModel(file));
         });
         return files;
+    private static String getFilenameFromPath(String path) {
+        File file = new File(path);
+        return file.getName();
+    }
+
+    private static String getTypeFromFilename(String filename) {
+        String extension = "";
+
+        int i = filename.lastIndexOf('.');
+        if (i > 0) {
+            extension = filename.substring(i+1);
+        } else {
+            return "none";
+        }
+        return extension;
+    }
+
+    private MetaFile getMetaFileFromPath(String projectName, String filePath) {
+        MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
+        String[] entries = filePath.split(MetaFile.FILE_PATH_DELIMITER);
+
+        MetaFile parent = root;
+        for (String entry : entries) {
+            if (parent != null) {
+                parent = parent.getChildren().stream().filter(child -> child.getFile_name().equals(entry)).findAny().orElse(null);
+            } else break;
+        }
+
+        if (parent != null) return parent;
+        else throw new FileNotFoundException();
+    }
+
+    private MetaFile getParentFromPath(String project_name, String path) {
+        String parentPath = path.substring(0, path.lastIndexOf(MetaFile.FILE_PATH_DELIMITER));
+        return getMetaFileFromPath(project_name, parentPath);
     }
 
     @Override
     public List<FileModel> getChildrenMeta(String projectName, String filePath) {
-/*        List<FileModel> children = new ArrayList<>();
-        FileModel dir = this.getMetaFile(projectName, filePath);
-//        for(Dir_contains file : dir.getContents()){
-//            children.add(this.getFileMetaByID(projectName,file.getFile().getFileId()));
-//        }
-        dirContainsRepository.findByDirId(dir.getFile_id()).forEach(dir_contains -> {
-            children.add(this.getFileMetaByID(projectName, dir_contains.getMetaFile().getFileId()));
-        });*/
-        throw new NotImplementedException();
+        MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
+        return root.getChildren().stream().map(FileServiceImpl::metaFileToFileModel).collect(Collectors.toList());
     }
 
     @Override
     public FileModel getMetaFile(String projectName, String filePath) {
-        throw new NotImplementedException();
+        return metaFileToFileModel(getMetaFileFromPath(projectName, filePath));
     }
 
     /**
@@ -115,7 +138,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public InputStream getRawFile(String projectName, String filePath) {
-        return null;
+        int id = getMetaFile(projectName, filePath).getFile_id();
+        return storageService.getFileStream(id);
     }
 
     @Override
@@ -126,7 +150,46 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
-        return null;
+        if (path.equals("")) throw new FileAlreadyExistsException(); // root will already exist
+
+        MetaFile parent = getParentFromPath(project_name, path);
+        MetaFile metaFile;
+
+        if (action.equals(Action.MAKE_DIRECTORY)) {
+            metaFile = MetaFile.createDirectory(
+                    path,
+                    getFilenameFromPath(path),
+                    parent);
+        } else {
+            metaFile = MetaFile.createFile(
+                    path,
+                    getFilenameFromPath(path),
+                    getTypeFromFilename(path),
+                    options.isFinal() ? FileStatus.READY : FileStatus.UPLOADING,
+                    bytes.length,
+                    FILE_SUPPORTED_VIEWS,
+                    parent);
+        }
+
+        MetaFile created = fileRepository.save(metaFile);
+
+        // Add physical file to storage
+        if (!action.equals(Action.MAKE_DIRECTORY)) {
+            storageService.uploadFile(created.getFileId(), options, bytes);
+        }
+
+        return metaFileToFileModel(created);
+    }
+
+    private void deleteRecursively(MetaFile parent) {
+        // Delete children
+        if (parent.getType().equals(FileTypes.DIR)) {
+            parent.getChildren().forEach(this::deleteRecursively);
+        }
+
+        // Delete this
+        fileRepository.delete(parent.getFileId());
+        if (!parent.getType().equals(FileTypes.DIR)) storageService.deleteFile(parent.getFileId());
     }
 
     /**
@@ -137,12 +200,18 @@ public class FileServiceImpl implements FileService {
      */
     @Override
     @Transactional
-    public FileModel deleteFile(String projectName, String filePath) {
-        FileModel file = this.getMetaFile(projectName, filePath);
-        if (file == null) throw new FileNotFoundException();
-        fileRepository.delete(file.getFile_id());
+    public void deleteFile(String projectName, String filePath) {
+        MetaFile deletionRoot = this.getMetaFileFromPath(projectName, filePath);
 
-        return file;
+        deleteRecursively(deletionRoot);
+    }
+
+    @Override
+    @Transactional
+    public void deleteFileById(int file_id) {
+        MetaFile metaFile = fileRepository.findByFileId(file_id);
+
+        deleteRecursively(metaFile);
     }
 
     @Override
@@ -151,17 +220,12 @@ public class FileServiceImpl implements FileService {
         throw new NotImplementedException();
     }
 
+    @Override
+    @Transactional
+    public FileModel moveFile(String project_name, String path, String newPath) {
+        throw new NotImplementedException();
+    }
 
-    //TODO 12.8 Uploading
-
-//    @Override
-//    @Transactional
-//    public FileModel uploadFile(String projectName, String filePath) {
-//        FileModel file = this.getFile(projectName, filePath);
-//        if (file == null) throw new FileNotFoundException();
-//        fileRepository.delete(file.getFile_id());
-//        return file;
-//    }
 
     //TODO 12.9 Changing metadata
     //TODO 12.10 Creating directories

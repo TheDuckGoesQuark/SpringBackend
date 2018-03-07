@@ -4,11 +4,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static BE.entities.project.SupportedView.DIRECTORY_SUPPORTED_VIEWS;
 
 @Entity
 @Table(name = "file")
 public class MetaFile {
+
+    public static String FILE_PATH_DELIMITER = "/";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +34,11 @@ public class MetaFile {
 
     private long length;
 
+    @ManyToOne
+    private MetaFile parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<MetaFile> children = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "supports_view",
@@ -39,14 +51,10 @@ public class MetaFile {
     @JsonIgnore
     private Project project;
 
-//    @OneToMany
-//    @JoinColumn(name = "dir_id")
-//    private List<Dir_contains> contents = new ArrayList<Dir_contains>();
-
     protected MetaFile() {
     }
 
-    public MetaFile(String path, String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views) {
+    private MetaFile(String path, String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
         this.path = path;
         this.file_name = file_name;
         this.type = type;
@@ -54,6 +62,37 @@ public class MetaFile {
         this.last_modified = last_modified;
         this.length = length;
         this.supported_views = supported_views;
+        this.parent = parent;
+    }
+
+    public static MetaFile createRoot() {
+        return new MetaFile(
+                "",
+                "",
+                FileTypes.DIR,
+                FileStatus.READY,
+                new Timestamp(System.currentTimeMillis()),
+                0,
+                DIRECTORY_SUPPORTED_VIEWS,
+                null);
+    }
+
+    public static MetaFile createFile(String path, String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
+        MetaFile metaFile = new MetaFile(
+                path,
+                file_name,
+                type,
+                status,
+                new Timestamp(System.currentTimeMillis()),
+                length,
+                supportedViews,
+                parent);
+        parent.children.add(metaFile);
+        return metaFile;
+    }
+
+    public static MetaFile createDirectory(String path, String file_name, MetaFile parent) {
+        return createFile(path, file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
     }
 
     public int getFileId() {
@@ -128,11 +167,19 @@ public class MetaFile {
         this.supported_views = supported_views;
     }
 
-    //    public List<Dir_contains> getContents() {
-//        return contents;
-//    }
-//
-//    public void setContents(List<Dir_contains> contents) {
-//        this.contents = contents;
-//    }
+    public MetaFile getParent() {
+        return parent;
+    }
+
+    public void setParent(MetaFile parent) {
+        this.parent = parent;
+    }
+
+    public List<MetaFile> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<MetaFile> children) {
+        this.children = children;
+    }
 }
