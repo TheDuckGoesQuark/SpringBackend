@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS file (
   `status`        VARCHAR(10)     NOT NULL,
   `last_modified` TIMESTAMP       NOT NULL,
   `length`        BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY (file_id)
-);
+  `parent_file_id` INT UNSIGNED,
+  PRIMARY KEY (file_id));
 
 CREATE TABLE IF NOT EXISTS `project` (
   `name`        VARCHAR(100) NOT NULL,

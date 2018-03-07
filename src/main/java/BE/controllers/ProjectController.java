@@ -308,31 +308,4 @@ public class ProjectController {
 
         fileService.deleteFile(project_name, relativeFilePath);
     }
-
-    /**
-     * Gets all files in a specific directory in a specific project
-     * @param project_name the name of the project that has the directory
-     * @param request
-     * @param view
-     * @return a list of files
-     */
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view", "include_children"}, method = RequestMethod.GET)
-    public List<FileModel> getDirContents(@PathVariable(value = "project_name") String project_name,
-                                          HttpServletRequest request, @RequestParam("view") String view) {
-        String path = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        //TODO REPLACE this is error prone because /files can be contained somewhere in filepath.
-        // Can work with string methods to adjust path to replace just first /files, which is needed by protocols.
-        path = path.replace("/files", "");
-        List<FileModel> list = new ArrayList<>();
-        //check if dir exists
-        FileModel dir = fileService.getMetaFile(project_name, path);
-        list.add(dir);
-        //TODO transfer logic to file service
-        if (dir.getType().equals("dir") && view.equals("meta")) {
-            return fileService.getChildrenMeta(project_name, path);
-        }
-        return list;
-    }
-
 }
