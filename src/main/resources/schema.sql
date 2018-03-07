@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS `has_privilege` (
 
 CREATE TABLE IF NOT EXISTS file (
   `file_id`       INT UNSIGNED    NOT NULL AUTO_INCREMENT,
-  `path`          VARCHAR(200)    NOT NULL,
   `file_name`     VARCHAR(54)     NOT NULL,
   `type`          VARCHAR(45)     NOT NULL,
   `status`        VARCHAR(10)     NOT NULL,

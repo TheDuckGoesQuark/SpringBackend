@@ -1,10 +1,12 @@
-package BE.responsemodels.file;
+package BE.models.file;
 
 import BE.entities.project.SupportedView;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
-//TODO this may actually have to be named FileModel containing two constructors one for file meta protocol and one for file data protocol.
 public class FileModel {
+
+    public static final String ROOT_FILE_NAME= "";
 
     private String path;
 
@@ -20,9 +22,10 @@ public class FileModel {
 
     private String status;
 
-//    private List<Dir_contains> contents;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<FileModel> children;
 
-    //file meta model
+    // File meta model
     public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
@@ -31,13 +34,19 @@ public class FileModel {
         this.metadata = metadata;
         this.type = type;
         this.status = status;
-//        this.contents = contents;
     }
 
-    //dir meta model
-//    public FileModel(List<Dir_contains> contents) {
-//        this.contents = contents;
-//    }
+    // Directory meta model
+    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
+        this.path = path;
+        this.file_name = file_name;
+        this.file_id = file_id;
+        this.views = views;
+        this.metadata = metadata;
+        this.type = type;
+        this.status = status;
+        this.children = children;
+    }
 
     public int getFile_id() {
         return file_id;
@@ -95,11 +104,11 @@ public class FileModel {
         this.metadata = metadata;
     }
 
-//    public List<Dir_contains> getContents() {
-//        return contents;
-//    }
-//
-//    public void setContents(List<Dir_contains> contents) {
-//        this.contents = contents;
-//    }
+    public List<FileModel> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<FileModel> children) {
+        this.children = children;
+    }
 }

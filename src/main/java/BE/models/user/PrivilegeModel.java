@@ -1,4 +1,4 @@
-package BE.responsemodels.user;
+package BE.models.user;
 
 public class PrivilegeModel {
 

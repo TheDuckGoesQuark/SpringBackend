@@ -1,4 +1,4 @@
-package BE.responsemodels.user;
+package BE.models.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

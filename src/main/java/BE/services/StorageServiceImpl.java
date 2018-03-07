@@ -2,7 +2,7 @@ package BE.services;
 
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.FileRetrievalException;
-import BE.responsemodels.file.FileRequestOptions;
+import BE.models.file.FileRequestOptions;
 import org.springframework.stereotype.Service;
 
 import java.io.File;

@@ -1,6 +1,6 @@
 package BE.security.tokenAuth;
 
-import BE.responsemodels.security.TokenHeaderModel;
+import BE.models.security.TokenHeaderModel;
 import BE.services.TokenService;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

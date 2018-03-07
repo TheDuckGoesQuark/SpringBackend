@@ -1,6 +1,6 @@
 package BE.config;
 
-import BE.responsemodels.user.UserModel;
+import BE.models.user.UserModel;
 import BE.security.enums.Privileges;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,9 @@
 package BE.controllers;
 
 import BE.exceptions.NotImplementedException;
-import BE.responsemodels.system.LoggingModel;
-import BE.responsemodels.system.PropertyModel;
-import BE.responsemodels.system.SupportedProtocolListModel;
+import BE.models.system.LoggingModel;
+import BE.models.system.PropertyModel;
+import BE.models.system.SupportedProtocolListModel;
 import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.*;
 

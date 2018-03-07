@@ -4,15 +4,13 @@ import BE.entities.UserProject;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
 import BE.repositories.UserRepository;
-import BE.responsemodels.user.UserModel;
+import BE.models.user.UserModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 

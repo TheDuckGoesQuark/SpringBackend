@@ -5,11 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static BE.entities.project.SupportedView.DIRECTORY_SUPPORTED_VIEWS;
+import static BE.models.file.FileModel.ROOT_FILE_NAME;
+import static BE.services.FileServiceImpl.DIRECTORY_SUPPORTED_VIEWS;
 
 @Entity
 @Table(name = "file")
@@ -21,8 +20,6 @@ public class MetaFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "file_id")
     private int fileId;
-
-    private String path;
 
     private String file_name;
 
@@ -40,10 +37,10 @@ public class MetaFile {
     @OneToMany(mappedBy = "parent")
     private List<MetaFile> children = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "supports_view",
-            joinColumns = @JoinColumn(name = "file_id", referencedColumnName = "file_id"),
-            inverseJoinColumns = @JoinColumn(name = "view", referencedColumnName = "view"))
+            joinColumns = @JoinColumn(name = "file_id", referencedColumnName = "file_id", insertable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "view", referencedColumnName = "view", insertable = false, updatable = false))
     private List<SupportedView> supported_views;
 
 
@@ -54,8 +51,7 @@ public class MetaFile {
     protected MetaFile() {
     }
 
-    private MetaFile(String path, String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
-        this.path = path;
+    private MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
         this.file_name = file_name;
         this.type = type;
         this.status = status;
@@ -67,8 +63,7 @@ public class MetaFile {
 
     public static MetaFile createRoot() {
         return new MetaFile(
-                "",
-                "",
+                ROOT_FILE_NAME,
                 FileTypes.DIR,
                 FileStatus.READY,
                 new Timestamp(System.currentTimeMillis()),
@@ -77,9 +72,8 @@ public class MetaFile {
                 null);
     }
 
-    public static MetaFile createFile(String path, String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
+    public static MetaFile createFile(String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
         MetaFile metaFile = new MetaFile(
-                path,
                 file_name,
                 type,
                 status,
@@ -91,8 +85,22 @@ public class MetaFile {
         return metaFile;
     }
 
-    public static MetaFile createDirectory(String path, String file_name, MetaFile parent) {
-        return createFile(path, file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
+    public static MetaFile createDirectory(String file_name, MetaFile parent) {
+        return createFile(file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
+    }
+
+    public static MetaFile deepCopy(MetaFile original) {
+        MetaFile metaFile = new MetaFile(
+                original.file_name,
+                original.type,
+                original.status,
+                original.getLast_modified(),
+                original.getLength(),
+                original.supported_views,
+                original.parent
+        );
+        metaFile.setChildren(original.getChildren());
+        return metaFile;
     }
 
     public int getFileId() {
@@ -104,11 +112,9 @@ public class MetaFile {
     }
 
     public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
+        if (parent == null) return this.file_name;
+        String parentPath = this.getParent().getPath();
+        return parentPath.equals(ROOT_FILE_NAME) ? parentPath + this.file_name : parentPath + "/" + this.file_name;
     }
 
     public String getFile_name() {

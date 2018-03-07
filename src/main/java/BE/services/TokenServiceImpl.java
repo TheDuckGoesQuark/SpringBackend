@@ -7,14 +7,12 @@ import BE.exceptions.TokenNotFoundException;
 import BE.exceptions.UserNotFoundException;
 import BE.repositories.TokenRepository;
 import BE.repositories.UserRepository;
-import BE.responsemodels.security.TokenModel;
-import BE.responsemodels.user.UserModel;
+import BE.models.security.TokenModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @Service
