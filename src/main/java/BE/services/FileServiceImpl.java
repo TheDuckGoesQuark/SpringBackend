@@ -288,6 +288,9 @@ public class FileServiceImpl implements FileService {
         if (!destParent.getType().equals(FileTypes.DIR)) throw new InvalidParentDirectoryException();
         original.setParent(destParent);
 
+        // check for cycles
+        if (checkForCycles(original)) throw new InvalidParentDirectoryException();
+
         // delete file at that location if it exists
         try {
             MetaFile dest = getMetaFileFromPath(project_name, new_path);
@@ -299,8 +302,6 @@ public class FileServiceImpl implements FileService {
         if (new_name.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
         if (!new_name.equals(original.getFile_name())) original.setFile_name(new_name);
 
-        // check for cycles
-        if (checkForCycles(original)) throw new InvalidParentDirectoryException();
 
         // persist
         original = fileRepository.save(original);
@@ -308,9 +309,14 @@ public class FileServiceImpl implements FileService {
     }
 
     private boolean checkForCycles(MetaFile original) {
-        // TODO TODO TODO
+        int original_id = original.getFileId();
         if (original.getType().equals(FileTypes.DIR)) {
-            //original.getChildren().stream().forEach(child->);
+            // iterate up from original, detecting duplicate
+            MetaFile parent = original.getParent();
+            while (parent.getParent() != null) {
+                if (parent.getFileId() == original_id) return true;
+                else parent = parent.getParent();
+            }
         }
         return false;
     }
