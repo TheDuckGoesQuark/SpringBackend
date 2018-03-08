@@ -10,4 +10,6 @@ public interface StorageService {
     boolean uploadFile(int file_id, FileRequestOptions options, byte[] bytes);
 
     boolean deleteFile(int file_id);
+
+    boolean copyFile(int src_id, int dest_id);
 }

@@ -21,7 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
@@ -67,6 +70,7 @@ public class FileServiceImpl implements FileService {
 
     /**
      * Converts a specific meta file to a file model
+     *
      * @param metaFile the meta file to be converted
      * @return file model
      */
@@ -151,6 +155,7 @@ public class FileServiceImpl implements FileService {
 
     /**
      * Gets a specific meta file by id
+     *
      * @param file_id the id of the file to get
      * @return file
      */
@@ -240,8 +245,9 @@ public class FileServiceImpl implements FileService {
 
     /**
      * Deletes a specific file
+     *
      * @param projectName the name of the project to delete
-     * @param filePath the path of the file to delete
+     * @param filePath    the path of the file to delete
      * @return file
      */
     @Override
@@ -286,7 +292,7 @@ public class FileServiceImpl implements FileService {
         // change parent to new directory
         MetaFile destParent = getParentFromPath(project_name, new_path);
         if (!destParent.getType().equals(FileTypes.DIR)) throw new InvalidParentDirectoryException();
-        original.setParent(destParent);
+        else original.setParent(destParent);
 
         // check for cycles
         if (checkForCycles(original)) throw new InvalidParentDirectoryException();
@@ -295,7 +301,8 @@ public class FileServiceImpl implements FileService {
         try {
             MetaFile dest = getMetaFileFromPath(project_name, new_path);
             if (dest != null) deleteRecursively(dest);
-        } catch (FileNotFoundException ignore) {}
+        } catch (FileNotFoundException ignore) {
+        }
 
         // check for name change
         String new_name = getFilenameFromPath(new_path);
@@ -328,23 +335,71 @@ public class FileServiceImpl implements FileService {
         throw new NotImplementedException();
     }
 
-    public void recursivelyCopyFiles(MetaFile parent) {
+    private MetaFile deepCopy(MetaFile original, MetaFile newParent, String newName) {
+        final MetaFile metaFile;
 
+        if (original.getType().equals(FileTypes.DIR)) {
+
+            metaFile = fileRepository.save(
+                    MetaFile.createDirectory(
+                            newName,
+                            newParent
+                    ));
+
+            // Deep copy children
+            List<MetaFile> children = original.getChildren()
+                    .stream()
+                    .map(child -> deepCopy(child, metaFile, child.getFile_name()))
+                    .collect(Collectors.toList());
+            metaFile.setChildren(children);
+
+        } else {
+            metaFile = fileRepository.save(
+                    MetaFile.createFile(
+                            newName,
+                            original.getType(),
+                            original.getStatus(),
+                            original.getLength(),
+                            original.getSupported_views(),
+                            newParent
+                    ));
+            // Copy physical file
+            storageService.copyFile(original.getFileId(), metaFile.getFileId());
+        }
+
+        return metaFile;
     }
 
     @Override
     public FileModel copyFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel) {
-        // if (new_name.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
         String new_path = getPathFromMoveFileRequest(moveFileRequestModel);
-        MetaFile newFile = MetaFile.deepCopy(getMetaFileFromPath(project_name, path));
-        // TODO
-        recursivelyCopyFiles(newFile);
-        return null;
+
+        // Check new name is valid
+        String new_name = getFilenameFromPath(new_path);
+        if (new_name.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
+
+        // delete file at that location if it exists
+        try {
+            MetaFile dest = getMetaFileFromPath(project_name, new_path);
+            if (dest != null) deleteRecursively(dest);
+        } catch (FileNotFoundException ignore) {
+        }
+
+        MetaFile original = getMetaFileFromPath(project_name, path);
+
+
+        // Check new parent exists
+        MetaFile destParent = getParentFromPath(project_name, new_path);
+        if (!destParent.getType().equals(FileTypes.DIR)) throw new InvalidParentDirectoryException();
+
+        // deep copy meta file and its children
+        MetaFile newFile = deepCopy(original, destParent, new_name);
+
+        return metaFileToFileModel(newFile);
     }
 
 
     //TODO 12.9 Changing metadata
-    //TODO 12.13 Copying
     //TODO 12.14 Extra file types
     //TODO 12.13 Tabular files
     //TODO 13.1 The tabular view
