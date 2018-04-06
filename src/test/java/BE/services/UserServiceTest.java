@@ -4,6 +4,7 @@ import BE.MockData;
 import BE.entities.UserProject;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
+import BE.exceptions.UserNotFoundException;
 import BE.repositories.PrivilegeRepository;
 import BE.repositories.UserRepository;
 import BE.models.user.UserModel;
@@ -51,7 +52,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getAllUsersWhenEmpty() throws Exception {
+    public void getAllUsersWhenEmpty() {
         // Given
         List<User> users = Collections.emptyList();
         when(userRepository.findAll()).thenReturn(users);
@@ -65,7 +66,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getAllUsersWhenUsersExist() throws Exception {
+    public void getAllUsersWhenUsersExist() {
         // Given
         List<User> users = Arrays.asList(MockData.USERS);
         when(userRepository.findAll()).thenReturn(users);
@@ -77,11 +78,41 @@ public class UserServiceTest {
         for (User user : users) {
             assertTrue(userModels.stream().anyMatch(
                     userModel -> userModel.getUsername().equals(user.getUsername())
-                    && userModel.getPassword().equals(user.getPassword())
-                    && userModel.getEmail().equals(user.getEmail())
+                            && userModel.getPassword().equals(user.getPassword())
+                            && userModel.getEmail().equals(user.getEmail())
             ));
         }
 
         verify(userRepository).findAll();
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void getUserThatDoesntExist() {
+        // Given
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(null);
+        // When
+        UserModel userModel = userService.getUserByUserName("Jackson5");
+        // Then
+        // Expect exception
+    }
+
+    @Test
+    public void getUserThatDoesExist() {
+        // Given
+        List<User> users = Arrays.asList(MockData.USERS);
+        User user = users.get(0);
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+
+        // When
+        UserModel userModel = userService.getUserByUserName(user.getUsername());
+
+        // Then
+        assertTrue(userModel != null);
+        assertTrue(userModel.getUsername().equals(user.getUsername())
+                        && userModel.getPassword().equals(user.getPassword())
+                        && userModel.getEmail().equals(user.getEmail())
+        );
+
+        verify(userRepository).findByUsername(user.getUsername());
     }
 }
