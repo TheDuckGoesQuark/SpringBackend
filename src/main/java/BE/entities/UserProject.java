@@ -32,6 +32,15 @@ public class UserProject {
     @Column(name = "access_level")
     private String access_level;
 
+    public UserProject(User user, Project project, String role, String access_level) {
+        this.user = user;
+        this.project = project;
+        this.role = role;
+        this.access_level = access_level;
+    }
+
+    protected UserProject() {}
+
     public User getUser() {
         return user;
     }

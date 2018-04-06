@@ -1,5 +1,6 @@
 package BE.services;
 
+import BE.MockData;
 import BE.entities.UserProject;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
@@ -66,13 +67,20 @@ public class UserServiceTest {
     @Test
     public void getAllUsersWhenUsersExist() throws Exception {
         // Given
-        List<User> users = Arrays.asList(MockData.USER_LIST);
+        List<User> users = Arrays.asList(MockData.USERS);
         when(userRepository.findAll()).thenReturn(users);
         // When
         List<UserModel> userModels = userService.getAllUsers();
         // Then
         assertTrue(userModels != null);
-        assertTrue(userModels.size() == 0);
+        assertTrue(userModels.size() == users.size());
+        for (User user : users) {
+            assertTrue(userModels.stream().anyMatch(
+                    userModel -> userModel.getUsername().equals(user.getUsername())
+                    && userModel.getPassword().equals(user.getPassword())
+                    && userModel.getEmail().equals(user.getEmail())
+            ));
+        }
 
         verify(userRepository).findAll();
     }

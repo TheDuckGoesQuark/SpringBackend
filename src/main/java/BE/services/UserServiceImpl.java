@@ -46,11 +46,9 @@ public class UserServiceImpl implements UserService {
      * @return user model
      */
     private static UserModel userToUserModel(User user) {
-        PasswordHash passwordHasher = new PasswordHash();
-        String hashedPassword = passwordHasher.hashPassword(user.getPassword());
         return new UserModel(
                 user.getUsername(),
-                hashedPassword,
+                user.getPassword(),
                 user.getEmail(),
                 // convert user projects to project list
                 user.getUserProjects().stream().map(
@@ -129,8 +127,8 @@ public class UserServiceImpl implements UserService {
                 privileges,
                 null
         );
-        userRepository.save(user);
-        return userModel;
+        user = userRepository.save(user);
+        return userToUserModel(user);
     }
 
     /**
@@ -154,8 +152,8 @@ public class UserServiceImpl implements UserService {
                 privileges,
                 null
         );
-        userRepository.save(user);
-        return userModel;
+        user = userRepository.save(user);
+        return userToUserModel(user);
     }
 
     /**
