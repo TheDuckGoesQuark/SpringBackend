@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import BE.exceptions.NotImplementedException;
 import BE.exceptions.UserAlreadyExistsException;
 import BE.exceptions.UserNotFoundException;
 import BE.models.user.PrivilegeModel;
@@ -292,7 +293,7 @@ public class UserControllerTests {
 
     @Test
     public void getCurrentUser() throws Exception {
-        //TODO
+        throw new NotImplementedException();
     }
 
     /**

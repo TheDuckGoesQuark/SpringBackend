@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.*;
  * Tests involving calls to UserController.
  */
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ProjectControllerTests {
@@ -76,6 +77,7 @@ public class ProjectControllerTests {
                 new ProjectModel("testProject2", userList)
         );
         when(projectService.getAllProjects()).thenReturn(projectList);
+
         mockMvc.perform(get("/projects"))
                 .andDo(print())
                 .andExpect(status().isOk())

@@ -25,6 +25,22 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         super(requiresAuthenticationRequestMatcher);
     }
 
+
+    /**
+     * Attempts to read either Authorisation or Authorization header.
+     * Authorisation value will be used if both are present.
+     * @param request
+     * @return value of authori(s|z)ation header.
+     */
+    private static String extractAuthToken(HttpServletRequest request) {
+        String auth_token;
+
+        auth_token = request.getHeader(SecurityUtils.AUTHORISATION_HEADER);
+        if (auth_token == null) auth_token = request.getHeader(SecurityUtils.OAUTH_AUTHORISATION_HEADER);
+
+        return auth_token;
+    }
+
     /**
      * Attempts to authenticate token, fails if invalid
      * @param request the request that includes the authentication token
@@ -37,7 +53,8 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws org.springframework.security.core.AuthenticationException, IOException, ServletException {
 
-        String auth_token = request.getHeader(SecurityUtils.AUTHORISATION_HEADER);
+        String auth_token = extractAuthToken(request);
+
         String access_token = null;
 
         if (auth_token != null) access_token = auth_token.replace(SecurityUtils.TOKEN_BEARER_STRING_FOR_APPENDING, "");

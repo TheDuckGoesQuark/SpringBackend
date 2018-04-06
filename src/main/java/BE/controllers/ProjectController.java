@@ -51,10 +51,10 @@ public class ProjectController {
 
     private static final Logger logger = Logger.getLogger(ProjectController.class);
 
-    final
+    private final
     ProjectService projectService;
 
-    final
+    private final
     FileService fileService;
 
     @Autowired

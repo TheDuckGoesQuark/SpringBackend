@@ -6,12 +6,13 @@ import BE.security.enums.GrantTypes;
 
 public class SecurityUtils {
 
-    static final String NO_GRANT_TYPE_ERROR_MESSAGE = "No grant_type given.";
-    static final String NO_USERNAME_OR_PASSWORD_ERROR_MESSAGE = "No username or password given.";
-    static final String NO_REFRESH_TOKEN_ERROR_MESSAGE = "No refresh_token supplied.";
+    private static final String NO_GRANT_TYPE_ERROR_MESSAGE = "No grant_type given.";
+    private static final String NO_USERNAME_OR_PASSWORD_ERROR_MESSAGE = "No username or password given.";
+    private static final String NO_REFRESH_TOKEN_ERROR_MESSAGE = "No refresh_token supplied.";
     public static final String INVALID_CREDENTIALS_ERROR_MESSAGE = "Invalid credentials - username or password incorrect.";
 
     public static final String AUTHORISATION_HEADER = "Authorisation";
+    public static final String OAUTH_AUTHORISATION_HEADER = "Authorization";
     public static final String TOKEN_BEARER_STRING_FOR_APPENDING = "Bearer ";
 
     public static void validateRequestStructure(String username, String password, String grant_type, String refresh_token) {
