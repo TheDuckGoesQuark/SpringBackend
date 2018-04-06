@@ -167,8 +167,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserModel deleteUser(String username) {
         if (userRepository.findByUsername(username) == null) throw new UserNotFoundException();
-        Logger logger = Logger.getAnonymousLogger();
-        logger.info(username);
         userRepository.deleteByUsername(username);
         return null;
     }
