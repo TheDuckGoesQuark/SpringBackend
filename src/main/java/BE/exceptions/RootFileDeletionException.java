@@ -1,6 +1,5 @@
-package BE.exceptions.excludedFromBaseException;
+package BE.exceptions;
 
-import BE.exceptions.BaseException;
 import org.springframework.http.HttpStatus;
 
 public class RootFileDeletionException extends BaseException {
