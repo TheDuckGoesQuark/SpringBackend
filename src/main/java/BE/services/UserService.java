@@ -19,4 +19,6 @@ public interface UserService extends UserDetailsService {
 
     public List<PrivilegeModel> getAllPrivileges();
 
+    public boolean usernameExists(String username);
+
 }

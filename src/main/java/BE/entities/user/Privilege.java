@@ -1,6 +1,5 @@
 package BE.entities.user;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;

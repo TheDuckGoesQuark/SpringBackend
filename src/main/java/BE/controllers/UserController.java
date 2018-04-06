@@ -6,6 +6,7 @@ import java.util.List;
 // Exceptions
 // Models
 // Spring
+import BE.models.user.AvailabilityModel;
 import BE.models.user.PrivilegeModel;
 import BE.models.user.UserModel;
 import BE.services.UserService;
@@ -13,8 +14,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class UserController {
@@ -29,8 +28,7 @@ public class UserController {
      * @return a list of all users
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<UserModel> getAllUsers(HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public List<UserModel> getAllUsers() {
         return userService.getAllUsers();
     }
 
@@ -40,9 +38,17 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
-    public UserModel getUser(@PathVariable(value="username") String username, HttpServletResponse response)  {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public UserModel getUser(@PathVariable(value="username") String username)  {
         return userService.getUserByUserName(username);
+    }
+
+    /**
+     * Checks if username is available
+     * @return true if username is already in use
+     */
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.GET)
+    public AvailabilityModel checkUsernameAvailability(@PathVariable(value="username") String username) {
+        return new AvailabilityModel(userService.usernameExists(username));
     }
 
     /**
@@ -50,8 +56,7 @@ public class UserController {
      * @return list of user privileges
      */
     @RequestMapping(value = "/user_privileges", method = RequestMethod.GET)
-    public List<PrivilegeModel> getListOfUserPrivileges(HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public List<PrivilegeModel> getListOfUserPrivileges() {
         return userService.getAllPrivileges();
     }
 
@@ -61,8 +66,7 @@ public class UserController {
      * @return user
      */
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)
-    public UserModel getCurrentUser(Principal principal, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public UserModel getCurrentUser(Principal principal) {
         return userService.getUserByUserName(principal.getName());
     }
 
@@ -72,8 +76,7 @@ public class UserController {
      * @return current user
      */
     @RequestMapping(value = "/current_user",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
-    public UserModel updateCurrentUser(@RequestBody UserModel user, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public UserModel updateCurrentUser(@RequestBody UserModel user) {
         return userService.updateUser(user);
     }
 
@@ -84,9 +87,9 @@ public class UserController {
      * @return user
      */
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.CREATE}, method = RequestMethod.POST)
-    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         user.setUsername(username);
-        response.setStatus(HttpServletResponse.SC_CREATED);
         return userService.createUser(user);
     }
 
@@ -97,8 +100,7 @@ public class UserController {
      * @return user
      */
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
-    public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
         return userService.updateUser(user);
     }
 
@@ -108,8 +110,7 @@ public class UserController {
      * @return user
      */
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.DELETE}, method = RequestMethod.POST)
-    public UserModel deleteUser(@PathVariable(value="username") String username, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public UserModel deleteUser(@PathVariable(value="username") String username) {
         return userService.deleteUser(username);
     }
 

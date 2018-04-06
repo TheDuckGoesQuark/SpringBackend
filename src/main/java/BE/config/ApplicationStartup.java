@@ -30,6 +30,7 @@ public class ApplicationStartup
     public void onApplicationEvent(final ApplicationReadyEvent event) {
         String[] userPrivileges = {Privileges.USER};
         String[] adminPrivileges = {Privileges.USER, Privileges.ADMIN};
+        // TODO GET RID OF THESE MAJOR SECURITY HOLES
         UserModel userModel = new UserModel("username1", "password1", "email", null, Arrays.asList(userPrivileges));
         UserModel adminModel = new UserModel("admin1", "password1", "email", null, Arrays.asList(adminPrivileges));
         userService.createUser(userModel);

@@ -197,4 +197,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) throw new UserNotFoundException();
         else return new UserAdapter(user);
     }
+
+    @Override
+    public boolean usernameExists(String username) {
+        return userRepository.exists(username);
+    }
 }
