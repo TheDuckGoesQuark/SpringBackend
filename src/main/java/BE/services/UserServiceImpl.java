@@ -15,6 +15,8 @@ import BE.responsemodels.user.ProjectListModel;
 import BE.responsemodels.user.UserModel;
 import BE.security.UserAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -78,7 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel getUserByUserName(String username) throws UsernameNotFoundException, UserNotFoundException {
+    public UserModel getUserByUserName(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) throw new UserNotFoundException();
         else return userToUserModel(user);
@@ -105,22 +107,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserModel updateUser(UserModel userModel) {
-        User user = userRepository.findByUsername(userModel.getUsername());
+    public UserModel updateUser(String username, UserModel userModel) {
+        User user = userRepository.findByUsername(username);
         if (user == null) throw new UserNotFoundException();
         // .save performs both update and creation
         // Construct user entity from information
-        List<Privilege> privileges = privilegeRepository.findAllByNameIn(userModel.getPrivileges());
         PasswordHash passwordHash = new PasswordHash();
-        user = new User(
-                userModel.getUsername(),
-                passwordHash.hashPassword(userModel.getPassword()),
-                userModel.getEmail(),
+        String pass = userModel.getPassword();
+        String password;
+        String email = userModel.getEmail();
+        List<String> privs = userModel.getPrivileges();
+        List<Privilege> privileges;
+        if (pass == null) {
+            password = user.getPassword();
+        } else {
+            password = passwordHash.hashPassword(pass);
+        }
+        if (email == null) {
+            email = user.getEmail();
+        }
+        if (privs == null) {
+            privileges = user.getPrivileges();
+        } else {
+            privileges = privilegeRepository.findAllByNameIn(privs);
+        }
+        User newUser = new User(
+                username,
+                password,
+                email,
                 privileges,
-                null
+                user.getUserProjects()
         );
-        userRepository.save(user);
-        return userModel;
+        userRepository.save(newUser);
+        return userToUserModel(newUser);
     }
 
     @Override

@@ -10,11 +10,13 @@ import BE.exceptions.NotImplementedException;
 // Models
 import BE.entities.user.User;
 // Spring
+import BE.exceptions.UserNotFoundException;
 import BE.responsemodels.user.PrivilegeModel;
 import BE.responsemodels.user.UserModel;
 import BE.services.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +45,7 @@ public class UserController {
      * @return user with requested username
      */
     @RequestMapping(value = "/users/{username}", method= RequestMethod.GET)
-    public UserModel getUser(@PathVariable(value="username") String username, HttpServletResponse response)  {
+    public UserModel getUser(@PathVariable(value="username") String username, HttpServletResponse response) throws UserNotFoundException {
         response.setStatus(HttpServletResponse.SC_OK);
         return userService.getUserByUserName(username);
     }
@@ -63,7 +65,7 @@ public class UserController {
     @RequestMapping(value = "/current_user",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public UserModel updateCurrentUser(@RequestBody UserModel user, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
-        return userService.updateUser(user);
+        return userService.updateUser(user.getUsername(), user);
     }
 
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.CREATE}, method = RequestMethod.POST)
@@ -76,7 +78,7 @@ public class UserController {
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
-        return userService.updateUser(user);
+        return userService.updateUser(username, user);
     }
 
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.DELETE}, method = RequestMethod.POST)
