@@ -4,6 +4,7 @@ import BE.MockData;
 import BE.entities.UserProject;
 import BE.entities.user.Privilege;
 import BE.entities.user.User;
+import BE.exceptions.UserAlreadyExistsException;
 import BE.exceptions.UserNotFoundException;
 import BE.repositories.PrivilegeRepository;
 import BE.repositories.UserRepository;
@@ -114,5 +115,50 @@ public class UserServiceTest {
         );
 
         verify(userRepository).findByUsername(user.getUsername());
+    }
+
+    @Test
+    public void createUser() {
+        // Given
+        List<User> users = Arrays.asList(MockData.USERS);
+        User user = users.get(0);
+        user.setPrivileges(null);
+        user.setUserProjects(null);
+        when(userRepository.save((User) Mockito.any())).thenReturn(
+                new User(user.getUsername(),
+                        user.getPassword(),
+                        user.getEmail(),
+                        user.getPrivileges(),
+                        user.getUserProjects())
+        );
+
+        // When
+        UserModel userModel = new UserModel(user.getUsername(), user.getPassword(), user.getEmail(), null, null);
+        userModel = userService.createUser(userModel);
+
+        // Then
+        assertTrue(userModel != null);
+        assertTrue(userModel.getUsername().equals(user.getUsername())
+                && userModel.getEmail().equals(user.getEmail())
+        );
+
+        verify(userRepository).save((User) Mockito.any());
+    }
+
+    @Test(expected = UserAlreadyExistsException.class)
+    public void createExistingUser() {
+        // Given
+        List<User> users = Arrays.asList(MockData.USERS);
+        User user = users.get(0);
+        user.setPrivileges(null);
+        user.setUserProjects(null);
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+
+        // When
+        UserModel userModel = new UserModel(user.getUsername(), user.getPassword(), user.getEmail(), null, null);
+        userModel = userService.createUser(userModel);
+
+        // Then
+        // Expect exception
     }
 }

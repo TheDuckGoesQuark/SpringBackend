@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import BE.security.passwordHash.PasswordHash;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -46,18 +47,28 @@ public class UserServiceImpl implements UserService {
      * @return user model
      */
     private static UserModel userToUserModel(User user) {
+
+        List<ProjectListModel> projectListModels;
+        List<String> privileges;
+
+        // convert user projects to project list
+        if (user.getUserProjects() == null) projectListModels = new ArrayList<>();
+        else projectListModels = user.getUserProjects().stream().map(
+                UserServiceImpl::userProjectToProjectListModel
+        ).collect(Collectors.toList());
+
+        // convert privileges to list of names as string
+        if (user.getPrivileges() == null) privileges = new ArrayList<>();
+        else privileges = user.getPrivileges().stream().map(
+                Privilege::getName
+        ).collect(Collectors.toList());
+
         return new UserModel(
                 user.getUsername(),
                 user.getPassword(),
                 user.getEmail(),
-                // convert user projects to project list
-                user.getUserProjects().stream().map(
-                        UserServiceImpl::userProjectToProjectListModel
-                ).collect(Collectors.toList()),
-                // convert privileges to list of names as string
-                user.getPrivileges().stream().map(
-                        Privilege::getName
-                ).collect(Collectors.toList())
+                projectListModels,
+                privileges
         );
     }
 
