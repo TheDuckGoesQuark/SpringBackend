@@ -166,22 +166,6 @@ public class ProjectController {
     /* -----------------\/----------------------------------\/--------------- */
 
     /**
-     * Gets a specific raw file in a specific project
-     * @param project_name the name of the project that has the file
-     * @param request
-     * @param response
-     * @return
-     */
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"view=" + SupportedView.RAW_VIEW}, method = RequestMethod.GET)
-    public void getRawFile(@PathVariable(value = "project_name") String project_name, HttpServletRequest request, HttpServletResponse response) {
-        // Retrieves file path from request
-        String relativePath = getRelativeFilePath(request, project_name);
-
-        InputStream inputStream = fileService.getRawFile(project_name, relativePath);
-        sendFile(inputStream, response);
-    }
-
-    /**
      * Gets a specific file in a specific project
      * @param project_name the name of the project that has the file
      * @param view which type of file type to be returned i.e. 'raw' for a bytestream or 'meta' for just file meta data.
@@ -204,7 +188,8 @@ public class ProjectController {
                 if (includeChildren != null) return fileService.getFileMetaWithChildren(project_name, relativePath);
                 else return fileService.getMetaFile(project_name, relativePath);
             case SupportedView.RAW_VIEW:
-                getRawFile(project_name, request, response);
+                InputStream inputStream = fileService.getRawFile(project_name, relativePath);
+                sendFile(inputStream, response);
                 return null;
             default:
                 throw new UnsupportedFileViewException();
