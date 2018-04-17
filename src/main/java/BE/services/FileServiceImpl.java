@@ -183,7 +183,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public InputStream getRawFileByID(int file_id) {
-        return null;
+        return storageService.getFileStream(file_id);
     }
 
     @Override
