@@ -231,6 +231,7 @@ public class ProjectController {
             case SupportedView.RAW_VIEW:
                 InputStream inputStream = fileService.getRawFileByID(file_id);
                 sendFile(inputStream, response);
+                return null;
             default:
                 throw new UnsupportedFileViewException();
         }
