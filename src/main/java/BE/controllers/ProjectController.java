@@ -109,7 +109,6 @@ public class ProjectController {
      * Gets a specific project
      * @param project_name the name of the project to get
      * @return project
-     * @throws NotImplementedException
      */
     @RequestMapping(value = "/projects/{project_name}", method = RequestMethod.GET)
     public ProjectModel getProject(@PathVariable(value = "project_name") String project_name) {
@@ -185,9 +184,9 @@ public class ProjectController {
     /**
      * Gets a specific file in a specific project
      * @param project_name the name of the project that has the file
-     * @param view
-     * @param request
-     * @param response
+     * @param view which type of file type to be returned i.e. 'raw' for a bytestream or 'meta' for just file meta data.
+     * @param request object containing information about the request
+     * @param response object to return the bytestream if chosen.
      * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)

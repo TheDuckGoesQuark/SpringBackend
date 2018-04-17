@@ -235,7 +235,7 @@ public class FileServiceImpl implements FileService {
             parent.getChildren().forEach(this::deleteRecursively);
         }
 
-        // Delete this
+        // Delete parent
         fileRepository.delete(parent.getFileId());
         if (!parent.getType().equals(FileTypes.DIR)) storageService.deleteFile(parent.getFileId());
     }

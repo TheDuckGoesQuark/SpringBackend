@@ -46,7 +46,7 @@ public class UserController {
      * Checks if username is available
      * @return true if username is already in use
      */
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{username}", params = {"action="+Action.CHECK_AVAILABLE}, method = RequestMethod.GET)
     public AvailabilityModel checkUsernameAvailability(@PathVariable(value="username") String username) {
         return new AvailabilityModel(userService.usernameExists(username));
     }

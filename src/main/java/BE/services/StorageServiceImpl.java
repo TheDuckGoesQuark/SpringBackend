@@ -1,15 +1,13 @@
 package BE.services;
 
+import BE.exceptions.FileAlreadyExistsException;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.FileOperationException;
 import BE.exceptions.FileRetrievalException;
 import BE.models.file.FileRequestOptions;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 
 @Service
@@ -42,7 +40,13 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public boolean uploadFile(int file_id, FileRequestOptions options, byte[] bytes) {
         File file = new File(Integer.toString(file_id));
-        return false;
+        if (file.exists()) throw new FileAlreadyExistsException();
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(bytes);
+        } catch (Exception e) {
+            throw new FileOperationException(e);
+        }
+        return true;
     }
 
     /**
