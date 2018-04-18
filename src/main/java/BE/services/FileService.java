@@ -3,9 +3,9 @@ package BE.services;
 import BE.models.file.FileModel;
 import BE.models.file.FileRequestOptions;
 import BE.models.file.MoveFileRequestModel;
+import com.opencsv.CSVReader;
 
 import java.io.InputStream;
-import java.util.List;
 
 public interface FileService {
 
@@ -18,6 +18,10 @@ public interface FileService {
     InputStream getRawFile(String projectName, String filePath);
 
     InputStream getRawFileByID(int file_id);
+
+    InputStream getTabularFile(String projectName, String filePath, FileRequestOptions fileRequestOptions);
+
+    InputStream getTabularFileById(int file_id, FileRequestOptions fileRequestOptions);
 
     FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes);
 

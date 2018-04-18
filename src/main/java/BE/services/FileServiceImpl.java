@@ -6,6 +6,7 @@ import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
 import BE.exceptions.*;
+import BE.exceptions.FileNotFoundException;
 import BE.exceptions.RootFileDeletionException;
 import BE.models.file.MoveFileRequestModel;
 import BE.repositories.FileRepository;
@@ -14,17 +15,21 @@ import BE.models.file.FileMetaDataModel;
 import BE.models.file.FileModel;
 
 import BE.models.file.FileRequestOptions;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import jdk.internal.util.xml.impl.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
+import static BE.util.TabularParser.applyTabularSettings;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -41,16 +46,24 @@ public class FileServiceImpl implements FileService {
     private final
     SupportedViewRepository supportedViewRepository;
 
-    public static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
+    private static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
+    private static final List<SupportedView> TABULAR_SUPPORTED_VIEWS = new ArrayList<>();
 
     private void initialiseDefaults() {
+        // Init database with supported view types
         SupportedView meta = supportedViewRepository.findByView(SupportedView.META_VIEW);
+        if (meta == null) meta = supportedViewRepository.save(new SupportedView(SupportedView.META_VIEW));
         SupportedView raw = supportedViewRepository.findByView(SupportedView.RAW_VIEW);
-
+        if (raw == null) raw = supportedViewRepository.save(new SupportedView(SupportedView.RAW_VIEW));
+        SupportedView tabular = supportedViewRepository.findByView(SupportedView.TABULAR_VIEW);
+        if (tabular == null) tabular = supportedViewRepository.save(new SupportedView(SupportedView.TABULAR_VIEW));
+        // Init local constants for easy file creation
         DIRECTORY_SUPPORTED_VIEWS.add(meta);
-        FILE_SUPPORTED_VIEWS.add(meta);
+        FILE_SUPPORTED_VIEWS.addAll(DIRECTORY_SUPPORTED_VIEWS);
         FILE_SUPPORTED_VIEWS.add(raw);
+        TABULAR_SUPPORTED_VIEWS.addAll(FILE_SUPPORTED_VIEWS);
+        TABULAR_SUPPORTED_VIEWS.add(tabular);
     }
 
     @Autowired
@@ -187,6 +200,16 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public InputStream getTabularFile(String projectName, String filePath, FileRequestOptions fileRequestOptions) {
+        return applyTabularSettings(getRawFile(projectName, filePath), fileRequestOptions);
+    }
+
+    @Override
+    public InputStream getTabularFileById(int file_id, FileRequestOptions fileRequestOptions) {
+        return applyTabularSettings(getRawFileByID(file_id), fileRequestOptions);
+    }
+
+    @Override
     @Transactional
     public FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
         if (path.equals(ROOT_FILE_NAME)) throw new FileAlreadyExistsException(); // root will already exist
@@ -199,7 +222,7 @@ public class FileServiceImpl implements FileService {
 
         // Check file doesn't already exist in directory
         if (parent.getChildren().stream().anyMatch(
-                child -> child.getFile_name().equals(fileName))
+                child -> child.getFile_name().equals(fileName)) && !options.isOverwrite()
                 ) {
             throw new FileAlreadyExistsException();
         }
@@ -210,9 +233,11 @@ public class FileServiceImpl implements FileService {
                     fileName,
                     parent);
         } else {
+            String type = getTypeFromFilename(path);
+            if (FileTypes.isTabular(type)) type = FileTypes.TABULAR;
             metaFile = MetaFile.createFile(
                     fileName,
-                    getTypeFromFilename(path),
+                    type,
                     options.isFinal() ? FileStatus.READY : FileStatus.UPLOADING,
                     bytes.length,
                     FILE_SUPPORTED_VIEWS,

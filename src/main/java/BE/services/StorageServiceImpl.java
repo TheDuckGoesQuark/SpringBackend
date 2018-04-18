@@ -47,7 +47,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public boolean uploadFile(int file_id, FileRequestOptions options, byte[] bytes) {
         File file = new File(root_directory + Integer.toString(file_id));
-        if (file.exists()) throw new FileAlreadyExistsException();
+        if (file.exists() && options.isOverwrite()) throw new FileAlreadyExistsException();
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(bytes);
         } catch (Exception e) {

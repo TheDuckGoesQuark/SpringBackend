@@ -205,17 +205,23 @@ public class ProjectController {
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
     public FileModel getFileByID(@PathVariable(value = "project_name") String project_name,
                                  @PathVariable(value = "file_id") int file_id,
+                                 @RequestParam Map<String, String> otherOptions,
                                  @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
                                  @RequestParam(value = "include_children", required = false) String includeChildren,
                                  HttpServletResponse response) {
+
+        FileRequestOptions options = readOptions(otherOptions);
+
         // Return appropriate response
         switch (view) {
             case SupportedView.META_VIEW:
                 if (includeChildren != null) return fileService.getFileMetaWithChildrenById(file_id);
                 else return fileService.getFileMetaByID(file_id);
             case SupportedView.RAW_VIEW:
-                InputStream inputStream = fileService.getRawFileByID(file_id);
-                sendFile(inputStream, response);
+                sendFile(fileService.getRawFileByID(file_id), response);
+                return null;
+            case SupportedView.TABULAR_VIEW:
+                sendFile(fileService.getTabularFileById(file_id, options), response);
                 return null;
             default:
                 throw new UnsupportedFileViewException();

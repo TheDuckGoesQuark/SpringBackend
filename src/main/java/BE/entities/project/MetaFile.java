@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
 import static BE.services.FileServiceImpl.DIRECTORY_SUPPORTED_VIEWS;
