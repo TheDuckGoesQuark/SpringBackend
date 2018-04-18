@@ -1,10 +1,11 @@
 package BE.models.file;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SupportedViewListModel {
 
-    private Map<String, TabularViewInfoModel> supported_views;
+    private Map<String, TabularViewInfoModel> supported_views = new HashMap<>();
 
     public SupportedViewListModel() {
     }

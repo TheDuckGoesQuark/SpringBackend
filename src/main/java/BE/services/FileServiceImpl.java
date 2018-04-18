@@ -50,7 +50,7 @@ public class FileServiceImpl implements FileService {
     private final
     RowCountRepository rowCountRepository;
 
-    private static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
+    private static final ArrayList<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
 
     private void initialiseDefaults() {
@@ -59,8 +59,6 @@ public class FileServiceImpl implements FileService {
         if (meta == null) meta = supportedViewRepository.save(new SupportedView(SupportedView.META_VIEW));
         SupportedView raw = supportedViewRepository.findByView(SupportedView.RAW_VIEW);
         if (raw == null) raw = supportedViewRepository.save(new SupportedView(SupportedView.RAW_VIEW));
-        SupportedView tabular = supportedViewRepository.findByView(SupportedView.TABULAR_VIEW);
-        if (tabular == null) tabular = supportedViewRepository.save(new SupportedView(SupportedView.TABULAR_VIEW));
         // Init local constants for easy file creation
         DIRECTORY_SUPPORTED_VIEWS.add(meta);
         FILE_SUPPORTED_VIEWS.addAll(DIRECTORY_SUPPORTED_VIEWS);
@@ -273,28 +271,29 @@ public class FileServiceImpl implements FileService {
                     parent);
         } else {
             String type = getTypeFromFilename(path);
-
+            ArrayList<SupportedView> supportedViews = FILE_SUPPORTED_VIEWS;
+            if (FileTypes.isTabular(type)) supportedViews.add(supportedViewRepository.findByView(SupportedView.TABULAR_VIEW));
             metaFile = MetaFile.createFile(
                     fileName,
                     type,
                     options.isFinal() ? FileStatus.READY : FileStatus.UPLOADING,
                     bytes.length,
-                    FILE_SUPPORTED_VIEWS,
+                    supportedViews,
                     parent);
         }
 
-        MetaFile created = fileRepository.save(metaFile);
+        metaFile = fileRepository.save(metaFile);
 
         // Add physical file to storage
         if (!action.equals(Action.MAKE_DIRECTORY)) {
-            storageService.uploadFile(created.getFileId(), options, bytes);
+            storageService.uploadFile(metaFile.getFileId(), options, bytes);
         }
 
         // Add tabular file info to DB
         if (options.isFinal() && FileTypes.isTabular(metaFile.getType())) {
             rowCountRepository.save(
                     new RowCount(
-                            created,
+                            metaFile,
                             TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId())))
             );
             columnHeaderRepository.save(
@@ -302,7 +301,7 @@ public class FileServiceImpl implements FileService {
             );
         }
 
-        return metaFileToFileModel(created);
+        return metaFileToFileModel(metaFile);
     }
 
     private void deleteRecursively(MetaFile parent) {

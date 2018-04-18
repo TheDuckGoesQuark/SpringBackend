@@ -15,7 +15,7 @@ public class RowCount implements Serializable {
 
     @Id
     @Column(name="file_id")
-    private int file_id;
+    private int file_id; // duplicate field needed so that crudrepo would recognise the id
 
     private int rows;
 

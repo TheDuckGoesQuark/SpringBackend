@@ -100,12 +100,13 @@ public class TabularParser {
             for (int i = 0; i < headerLine.length; i++) {
                 String type;
                 // Determine type
+                if (firstValueLine == null) headers.add(new Header(new Header.HeaderPK(metaFile.getFileId(), i), headerLine[i], Header.STRING));
                 if (isNumber(firstValueLine[i])) {
                     type = Header.NUMBER;
                 } else {
                     type = Header.STRING;
                 }
-                headers.add(new Header(new Header.HeaderPK(metaFile.getFileId(), i), headerLine[0], type));
+                headers.add(new Header(new Header.HeaderPK(metaFile.getFileId(), i), headerLine[i], type));
             }
         } catch (IOException e) {
             e.printStackTrace();
