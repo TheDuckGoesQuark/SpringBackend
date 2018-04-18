@@ -1,6 +1,5 @@
 package BE.models.file;
 
-import BE.entities.project.SupportedView;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class FileModel {
 
     private int file_id;
 
-    private List<SupportedView> views;
+    private SupportedViewListModel views;
 
     private FileMetaDataModel metadata;
 
@@ -26,7 +25,7 @@ public class FileModel {
     private List<FileModel> children;
 
     // File meta model
-    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status) {
+    public FileModel(String path, String file_name, int file_id, SupportedViewListModel views, FileMetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -37,7 +36,7 @@ public class FileModel {
     }
 
     // Directory meta model
-    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
+    public FileModel(String path, String file_name, int file_id, SupportedViewListModel views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -80,11 +79,11 @@ public class FileModel {
         this.type = type;
     }
 
-    public List<SupportedView> getViews() {
+    public SupportedViewListModel getViews() {
         return views;
     }
 
-    public void setViews(List<SupportedView> views) {
+    public void setViews(SupportedViewListModel views) {
         this.views = views;
     }
 

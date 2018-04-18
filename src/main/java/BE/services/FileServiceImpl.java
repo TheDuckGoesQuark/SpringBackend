@@ -5,26 +5,21 @@ import BE.entities.project.FileStatus;
 import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
+import BE.entities.project.tabular.Header;
 import BE.exceptions.*;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.RootFileDeletionException;
-import BE.models.file.MoveFileRequestModel;
+import BE.models.file.*;
+import BE.repositories.ColumnHeaderRepository;
 import BE.repositories.FileRepository;
 import BE.repositories.SupportedViewRepository;
-import BE.models.file.FileMetaDataModel;
-import BE.models.file.FileModel;
 
-import BE.models.file.FileRequestOptions;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import jdk.internal.util.xml.impl.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,9 +41,11 @@ public class FileServiceImpl implements FileService {
     private final
     SupportedViewRepository supportedViewRepository;
 
+    private final
+    ColumnHeaderRepository columnHeaderRepository;
+
     private static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
-    private static final List<SupportedView> TABULAR_SUPPORTED_VIEWS = new ArrayList<>();
 
     private void initialiseDefaults() {
         // Init database with supported view types
@@ -62,16 +59,15 @@ public class FileServiceImpl implements FileService {
         DIRECTORY_SUPPORTED_VIEWS.add(meta);
         FILE_SUPPORTED_VIEWS.addAll(DIRECTORY_SUPPORTED_VIEWS);
         FILE_SUPPORTED_VIEWS.add(raw);
-        TABULAR_SUPPORTED_VIEWS.addAll(FILE_SUPPORTED_VIEWS);
-        TABULAR_SUPPORTED_VIEWS.add(tabular);
     }
 
     @Autowired
-    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService, SupportedViewRepository supportedViewRepository) {
+    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService, SupportedViewRepository supportedViewRepository, ColumnHeaderRepository columnHeaderRepository) {
         this.fileRepository = fileRepository;
         this.projectService = projectService;
         this.storageService = storageService;
         this.supportedViewRepository = supportedViewRepository;
+        this.columnHeaderRepository = columnHeaderRepository;
         this.initialiseDefaults();
 
     }
@@ -84,12 +80,28 @@ public class FileServiceImpl implements FileService {
      * @param metaFile the meta file to be converted
      * @return file model
      */
-    private static FileModel metaFileToFileModel(MetaFile metaFile) {
+    private FileModel metaFileToFileModel(MetaFile metaFile) {
+
+        SupportedViewListModel supportedViewList = new SupportedViewListModel();
+
+        // Deals with tabular entry having extra details
+        if (metaFile.getSupported_views().stream().anyMatch(supportedView -> supportedView.getView().equals(SupportedView.TABULAR_VIEW))) {
+            List<Header> columns = this.columnHeaderRepository.getAllByFileOrderByIndexAsc(metaFile.getFileId());
+            TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
+            columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
+        }
+        // Add the rest of the views
+        metaFile.getSupported_views().forEach(supportedView -> {
+            if (!supportedView.getView().equals(SupportedView.TABULAR_VIEW)) {
+                supportedViewList.addSupportedView(supportedView.getView(), null);
+            }
+        });
+
         return new FileModel(
                 metaFile.getPath(),
                 metaFile.getFile_name(),
                 metaFile.getFileId(),
-                metaFile.getSupported_views(),
+                supportedViewList,
                 new FileMetaDataModel(metaFile.getLast_modified(), metaFile.getLength()),
                 metaFile.getType(),
                 metaFile.getStatus()

@@ -43,7 +43,6 @@ public class MetaFile {
             inverseJoinColumns = @JoinColumn(name = "view", referencedColumnName = "view", insertable = false, updatable = false))
     private List<SupportedView> supported_views;
 
-
     @OneToOne(mappedBy = "root_dir")
     @JsonIgnore
     private Project project;

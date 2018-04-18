@@ -2,6 +2,7 @@ package BE.util;
 
 import BE.exceptions.FileOperationException;
 import BE.models.file.FileRequestOptions;
+import BE.models.file.SupportedViewListModel;
 import com.opencsv.CSVReader;
 
 import java.io.ByteArrayInputStream;
