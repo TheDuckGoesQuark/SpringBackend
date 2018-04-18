@@ -7,6 +7,10 @@ import javax.persistence.*;
 @Table(name = "header")
 public class Header {
 
+    public static final String NUMBER = "number";
+    public static final String CATEGORY = "category";
+    public static final String STRING = "string";
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")
     @Id

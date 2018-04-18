@@ -6,14 +6,17 @@ import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
 import BE.entities.project.tabular.Header;
+import BE.entities.project.tabular.RowCount;
 import BE.exceptions.*;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.RootFileDeletionException;
 import BE.models.file.*;
 import BE.repositories.ColumnHeaderRepository;
 import BE.repositories.FileRepository;
+import BE.repositories.RowCountRepository;
 import BE.repositories.SupportedViewRepository;
 
+import BE.util.TabularParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +47,9 @@ public class FileServiceImpl implements FileService {
     private final
     ColumnHeaderRepository columnHeaderRepository;
 
+    private final
+    RowCountRepository rowCountRepository;
+
     private static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
 
@@ -62,12 +68,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Autowired
-    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService, SupportedViewRepository supportedViewRepository, ColumnHeaderRepository columnHeaderRepository) {
+    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService, SupportedViewRepository supportedViewRepository, ColumnHeaderRepository columnHeaderRepository, RowCountRepository rowCountRepository) {
         this.fileRepository = fileRepository;
         this.projectService = projectService;
         this.storageService = storageService;
         this.supportedViewRepository = supportedViewRepository;
         this.columnHeaderRepository = columnHeaderRepository;
+        this.rowCountRepository = rowCountRepository;
         this.initialiseDefaults();
 
     }
@@ -89,7 +96,9 @@ public class FileServiceImpl implements FileService {
             List<Header> columns = this.columnHeaderRepository.getAllByFileOrderByIndexAsc(metaFile.getFileId());
             TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
             columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
+            tabularViewInfoModel.setRows(rowCountRepository.findByFile(metaFile.getFileId()).getRows());
         }
+
         // Add the rest of the views
         metaFile.getSupported_views().forEach(supportedView -> {
             if (!supportedView.getView().equals(SupportedView.TABULAR_VIEW)) {
@@ -120,17 +129,19 @@ public class FileServiceImpl implements FileService {
         if (i > 0) {
             extension = filename.substring(i + 1);
         } else {
-            return "none";
+            return FileTypes.UNKNOWN;
         }
-        return extension;
+
+        if (FileTypes.isTabular(extension)) return FileTypes.TABULAR;
+        else return extension;
     }
 
-    private static FileModel getFileModelWithChildren(MetaFile root) {
+    private FileModel getFileModelWithChildren(MetaFile root) {
         if (!root.getType().equals(FileTypes.DIR)) throw new UnsupportedFileViewException();
         FileModel fileModel = metaFileToFileModel(root);
         fileModel.setChildren(
                 root.getChildren().stream()
-                        .map(FileServiceImpl::metaFileToFileModel)
+                        .map(this::metaFileToFileModel)
                         .collect(Collectors.toList()));
         return fileModel;
     }
@@ -222,6 +233,22 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public boolean supportsView(int file_id, String view) {
+        return fileRepository.findByFileId(file_id)
+                .getSupported_views()
+                .stream()
+                .anyMatch(supportedView -> supportedView.getView().equals(view));
+    }
+
+    @Override
+    public boolean supportsView(String project_name, String filePath, String view) {
+        return getMetaFileFromPath(project_name, filePath)
+                .getSupported_views()
+                .stream()
+                .anyMatch(supportedView -> supportedView.getView().equals(view));
+    }
+
+    @Override
     @Transactional
     public FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
         if (path.equals(ROOT_FILE_NAME)) throw new FileAlreadyExistsException(); // root will already exist
@@ -246,7 +273,7 @@ public class FileServiceImpl implements FileService {
                     parent);
         } else {
             String type = getTypeFromFilename(path);
-            if (FileTypes.isTabular(type)) type = FileTypes.TABULAR;
+
             metaFile = MetaFile.createFile(
                     fileName,
                     type,
@@ -261,6 +288,18 @@ public class FileServiceImpl implements FileService {
         // Add physical file to storage
         if (!action.equals(Action.MAKE_DIRECTORY)) {
             storageService.uploadFile(created.getFileId(), options, bytes);
+        }
+
+        // Add tabular file info to DB
+        if (options.isFinal() && FileTypes.isTabular(metaFile.getType())) {
+            rowCountRepository.save(
+                    new RowCount(
+                            created,
+                            TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId())))
+            );
+            columnHeaderRepository.save(
+                    TabularParser.parseHeaders(metaFile, storageService.getFileStream(metaFile.getFileId()))
+            );
         }
 
         return metaFileToFileModel(created);

@@ -184,6 +184,7 @@ public class ProjectController {
         FileRequestOptions options = readOptions(otherOptions);
 
         // Return appropriate response
+        if (!fileService.supportsView(project_name, relativePath, view)) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
                 if (includeChildren != null) return fileService.getFileMetaWithChildren(project_name, relativePath);
@@ -216,6 +217,7 @@ public class ProjectController {
         FileRequestOptions options = readOptions(otherOptions);
 
         // Return appropriate response
+        if (!fileService.supportsView(file_id, view)) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
                 if (includeChildren != null) return fileService.getFileMetaWithChildrenById(file_id);

@@ -1,18 +1,19 @@
 package BE.util;
 
+import BE.entities.project.MetaFile;
+import BE.entities.project.tabular.Header;
+import BE.entities.project.tabular.RowCount;
 import BE.exceptions.FileOperationException;
 import BE.models.file.FileRequestOptions;
-import BE.models.file.SupportedViewListModel;
 import com.opencsv.CSVReader;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.math.NumberUtils.isNumber;
 
 public class TabularParser {
 
@@ -88,5 +89,60 @@ public class TabularParser {
                 .collect(Collectors.joining("\n"))
                 .getBytes(StandardCharsets.UTF_8)
         );
+    }
+
+    public static List<Header> parseHeaders(MetaFile metaFile, InputStream inputStream) {
+
+        List<Header> headers = new ArrayList<>();
+
+        try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
+            String[] headerLine = reader.readNext();
+            String[] firstValueLine = reader.readNext();
+            for (int i = 0; i < headerLine.length; i++) {
+                String type;
+                // Determine type
+                if (isNumber(firstValueLine[i])) {
+                    type = Header.NUMBER;
+                } else {
+                    type = Header.STRING;
+                }
+                headers.add(new Header(metaFile, headerLine[0], type, i));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return headers;
+    }
+
+    /**
+     * Efficient solution taken from https://stackoverflow.com/a/14411695/4364101
+     *
+     * @param inputStream
+     * @return
+     */
+    public static int getNumberOfRows( InputStream inputStream) {
+
+        int count = 0;
+
+        try {
+            byte[] c = new byte[1024];
+            int readChars = 0;
+            boolean endsWithoutNewLine = false;
+            while ((readChars = inputStream.read(c)) != -1) {
+                for (int i = 0; i < readChars; ++i) {
+                    if (c[i] == '\n')
+                        ++count;
+                }
+                endsWithoutNewLine = (c[readChars - 1] != '\n');
+            }
+            if (endsWithoutNewLine) {
+                ++count;
+            }
+        } catch (IOException e) {
+            throw new FileOperationException(e);
+        }
+
+        return count;
     }
 }
