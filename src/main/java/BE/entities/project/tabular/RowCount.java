@@ -3,14 +3,19 @@ package BE.entities.project.tabular;
 import BE.entities.project.MetaFile;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
+@Entity
 @Table(name = "row_count")
-public class RowCount {
+public class RowCount implements Serializable {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "file_id")
-    @Id
+    @OneToOne
+    @JoinColumn(name="file_id")
     private MetaFile file;
+
+    @Id
+    @Column(name="file_id")
+    private int file_id;
 
     private int rows;
 
@@ -22,13 +27,6 @@ public class RowCount {
         this.rows = rows;
     }
 
-    public MetaFile getFile() {
-        return file;
-    }
-
-    public void setFile(MetaFile file) {
-        this.file = file;
-    }
 
     public int getRows() {
         return rows;
@@ -36,5 +34,13 @@ public class RowCount {
 
     public void setRows(int rows) {
         this.rows = rows;
+    }
+
+    public void setFile(MetaFile file) {
+        this.file = file;
+    }
+
+    public MetaFile getFile() {
+        return file;
     }
 }

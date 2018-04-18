@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `file`;
 CREATE TABLE IF NOT EXISTS `user` (
   `username` VARCHAR(100) NOT NULL,
   `password` VARCHAR(500) NOT NULL,
-  `email`    VARCHAR(320) NOT NULL,
+  `email`    VARCHAR(320),
   PRIMARY KEY (`username`)
 );
 
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `header` (
   `index`   INT UNSIGNED NOT NULL,
   PRIMARY KEY (`file_id`, `index`),
   INDEX `header_idx` (`file_id` ASC),
-  CONSTRAINT `file_id`
+  CONSTRAINT `header_id`
   FOREIGN KEY (`file_id`)
   REFERENCES `file` (`file_id`)
     ON DELETE CASCADE
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `row_count` (
   `rows`    INT UNSIGNED NOT NULL,
   PRIMARY KEY (`file_id`),
   INDEX `row_count_idx` (`file_id` ASC),
-  CONSTRAINT `file_id`
+  CONSTRAINT `row_count_id`
   FOREIGN KEY (`file_id`)
   REFERENCES `file` (`file_id`)
     ON DELETE CASCADE

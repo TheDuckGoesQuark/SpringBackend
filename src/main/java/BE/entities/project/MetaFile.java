@@ -1,11 +1,14 @@
 package BE.entities.project;
 
+import BE.entities.project.tabular.Header;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
 import static BE.services.FileServiceImpl.DIRECTORY_SUPPORTED_VIEWS;

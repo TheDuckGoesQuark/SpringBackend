@@ -2,7 +2,6 @@ package BE.util;
 
 import BE.entities.project.MetaFile;
 import BE.entities.project.tabular.Header;
-import BE.entities.project.tabular.RowCount;
 import BE.exceptions.FileOperationException;
 import BE.models.file.FileRequestOptions;
 import com.opencsv.CSVReader;
@@ -106,7 +105,7 @@ public class TabularParser {
                 } else {
                     type = Header.STRING;
                 }
-                headers.add(new Header(metaFile, headerLine[0], type, i));
+                headers.add(new Header(new Header.HeaderPK(metaFile.getFileId(), i), headerLine[0], type));
             }
         } catch (IOException e) {
             e.printStackTrace();

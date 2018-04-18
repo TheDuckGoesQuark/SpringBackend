@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface ColumnHeaderRepository extends CrudRepository<Header, Integer> {
-    List<Header> getAllByFileOrderByIndexAsc(int file_id);
+public interface ColumnHeaderRepository extends CrudRepository<Header, Header.HeaderPK> {
+    List<Header> getAllByIdFileid(int file_id);
 }

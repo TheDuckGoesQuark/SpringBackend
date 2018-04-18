@@ -93,7 +93,7 @@ public class FileServiceImpl implements FileService {
 
         // Deals with tabular entry having extra details
         if (metaFile.getSupported_views().stream().anyMatch(supportedView -> supportedView.getView().equals(SupportedView.TABULAR_VIEW))) {
-            List<Header> columns = this.columnHeaderRepository.getAllByFileOrderByIndexAsc(metaFile.getFileId());
+            List<Header> columns = this.columnHeaderRepository.getAllByIdFileid(metaFile.getFileId());
             TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
             columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
             tabularViewInfoModel.setRows(rowCountRepository.findByFile(metaFile.getFileId()).getRows());
@@ -459,7 +459,6 @@ public class FileServiceImpl implements FileService {
         }
 
         MetaFile original = getMetaFileFromPath(project_name, path);
-
 
         // Check new parent exists
         MetaFile destParent = getParentFromPath(project_name, new_path);
