@@ -137,10 +137,6 @@ CREATE TABLE IF NOT EXISTS `supported_view` (
   PRIMARY KEY (`view`)
 );
 
-INSERT INTO supported_view (view) VALUES
-  ("meta"),
-  ("raw");
-
 CREATE TABLE IF NOT EXISTS `supports_view` (
   `file_id` INT UNSIGNED NOT NULL,
   `view`    VARCHAR(10)  NOT NULL,

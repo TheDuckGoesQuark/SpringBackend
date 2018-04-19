@@ -60,6 +60,8 @@ public class FileServiceImpl implements FileService {
         SupportedView raw = supportedViewRepository.findByView(SupportedView.RAW_VIEW);
         if (raw == null) raw = supportedViewRepository.save(new SupportedView(SupportedView.RAW_VIEW));
         // Init local constants for easy file creation
+        SupportedView tabular = supportedViewRepository.findByView(SupportedView.TABULAR_VIEW);
+        if (tabular == null) tabular = supportedViewRepository.save(new SupportedView(SupportedView.TABULAR_VIEW));
         DIRECTORY_SUPPORTED_VIEWS.add(meta);
         FILE_SUPPORTED_VIEWS.addAll(DIRECTORY_SUPPORTED_VIEWS);
         FILE_SUPPORTED_VIEWS.add(raw);
