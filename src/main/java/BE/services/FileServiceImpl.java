@@ -44,8 +44,9 @@ public class FileServiceImpl implements FileService {
     private final
     SupportedViewRepository supportedViewRepository;
 
-    private static final ArrayList<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
+    private static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
+    public static final List<SupportedView> TABULAR_SUPPORTED_VIEWS = new ArrayList<>();
 
     private void initialiseDefaults() {
         // Init database with supported view types
@@ -59,6 +60,8 @@ public class FileServiceImpl implements FileService {
         DIRECTORY_SUPPORTED_VIEWS.add(meta);
         FILE_SUPPORTED_VIEWS.addAll(DIRECTORY_SUPPORTED_VIEWS);
         FILE_SUPPORTED_VIEWS.add(raw);
+        TABULAR_SUPPORTED_VIEWS.addAll(FILE_SUPPORTED_VIEWS);
+        TABULAR_SUPPORTED_VIEWS.add(tabular);
     }
 
     @Autowired
@@ -89,6 +92,7 @@ public class FileServiceImpl implements FileService {
             TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
             columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
             tabularViewInfoModel.setRows(metaFile.getRowCount().getRows());
+            supportedViewList.addSupportedView(SupportedView.TABULAR_VIEW, tabularViewInfoModel);
         }
 
         // Add the rest of the views
@@ -265,8 +269,9 @@ public class FileServiceImpl implements FileService {
                     parent);
         } else {
             String type = getTypeFromFilename(path);
-            ArrayList<SupportedView> supportedViews = FILE_SUPPORTED_VIEWS;
-            if (FileTypes.isTabular(type)) supportedViews.add(supportedViewRepository.findByView(SupportedView.TABULAR_VIEW));
+            List<SupportedView> supportedViews;
+            if (FileTypes.isTabular(type)) supportedViews = TABULAR_SUPPORTED_VIEWS;
+            else supportedViews = FILE_SUPPORTED_VIEWS;
             metaFile = MetaFile.createFile(
                     fileName,
                     type,
