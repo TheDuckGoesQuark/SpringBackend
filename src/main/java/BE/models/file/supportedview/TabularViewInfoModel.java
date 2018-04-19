@@ -1,12 +1,13 @@
-package BE.models.file;
+package BE.models.file.supportedview;
 
+import BE.entities.project.SupportedView;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TabularViewInfoModel {
+public class TabularViewInfoModel extends SupportedViewMeta {
 
     private Map<String,String> columns = new HashMap<>();
     private int rows;
@@ -42,4 +43,10 @@ public class TabularViewInfoModel {
     public void removeColumn(String name) {
         this.columns.remove(name);
     }
+
+    @Override
+    public String getName() {
+        return SupportedView.TABULAR_VIEW;
+    }
+
 }

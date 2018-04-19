@@ -27,7 +27,7 @@ import static BE.security.SecurityUtils.validateRequestStructure;
  */
 public class FormAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final String CHARACTER_ENCODING_UTF_8 = "UTF-8";
+    public static final String CHARACTER_ENCODING_UTF_8 = "UTF-8";
 
     private TokenService tokenService;
 

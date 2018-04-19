@@ -13,14 +13,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class JSONErrorAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
-    protected ResponseEntity<ErrorResponseWrapper> handleKnownExceptions(BaseException ex){
+    public ResponseEntity<ErrorResponseWrapper> handleKnownExceptions(BaseException ex){
         return ResponseEntity
                 .status(ex.getError())
                 .body(new ErrorResponseWrapper(ex));
     }
 
     @ExceptionHandler
-    protected ResponseEntity<ErrorResponseWrapper> handleGenericException(Exception ex){
+    public ResponseEntity<ErrorResponseWrapper> handleGenericException(Exception ex){
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponseWrapper(new GenericInternalServerException(ex)));

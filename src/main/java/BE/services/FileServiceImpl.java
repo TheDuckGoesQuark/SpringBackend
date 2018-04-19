@@ -11,19 +11,21 @@ import BE.exceptions.*;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.RootFileDeletionException;
 import BE.models.file.*;
-import BE.repositories.ColumnHeaderRepository;
+import BE.models.file.supportedview.MetaViewInfoModel;
+import BE.models.file.supportedview.RawViewInfoModel;
+import BE.models.file.supportedview.SupportedViewMeta;
+import BE.models.file.supportedview.TabularViewInfoModel;
 import BE.repositories.FileRepository;
 import BE.repositories.SupportedViewRepository;
 
 import BE.util.TabularParser;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
@@ -71,7 +73,6 @@ public class FileServiceImpl implements FileService {
         this.storageService = storageService;
         this.supportedViewRepository = supportedViewRepository;
         this.initialiseDefaults();
-
     }
 
     // Conversion Functions
@@ -84,21 +85,21 @@ public class FileServiceImpl implements FileService {
      */
     private FileModel metaFileToFileModel(MetaFile metaFile) {
 
-        SupportedViewListModel supportedViewList = new SupportedViewListModel();
+        Map<String, SupportedViewMeta> supportedViewList = new HashMap<>();
 
-        // Deals with tabular entry having extra details
-        if (metaFile.getSupported_views().stream().anyMatch(supportedView -> supportedView.getView().equals(SupportedView.TABULAR_VIEW))) {
-            Set<Header> columns = metaFile.getHeaders();
-            TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
-            columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
-            tabularViewInfoModel.setRows(metaFile.getRowCount().getRows());
-            supportedViewList.addSupportedView(SupportedView.TABULAR_VIEW, tabularViewInfoModel);
-        }
-
-        // Add the rest of the views
         metaFile.getSupported_views().forEach(supportedView -> {
-            if (!supportedView.getView().equals(SupportedView.TABULAR_VIEW)) {
-                supportedViewList.addSupportedView(supportedView.getView(), null);
+            switch (supportedView.getView()) {
+                case SupportedView.RAW_VIEW:
+                    RawViewInfoModel rawViewInfoModel = new RawViewInfoModel(metaFile.getLength());
+                    supportedViewList.put(rawViewInfoModel.getName(), rawViewInfoModel);
+                    break;
+                case SupportedView.TABULAR_VIEW:
+                    TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
+                    Set<Header> columns = metaFile.getHeaders();
+                    columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
+                    tabularViewInfoModel.setRows(metaFile.getRowCount().getRows());
+                    supportedViewList.put(tabularViewInfoModel.getName(), tabularViewInfoModel);
+                    break;
             }
         });
 
