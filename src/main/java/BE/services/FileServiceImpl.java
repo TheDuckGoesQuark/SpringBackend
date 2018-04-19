@@ -273,7 +273,7 @@ public class FileServiceImpl implements FileService {
                     options.isFinal() ? FileStatus.READY : FileStatus.UPLOADING,
                     bytes.length,
                     supportedViews,
-                    parent, null);
+                    parent);
         }
 
         metaFile = fileRepository.save(metaFile);
@@ -286,7 +286,10 @@ public class FileServiceImpl implements FileService {
         // Add tabular file info to DB
         if (options.isFinal() && FileTypes.isTabular(metaFile.getType())) {
             metaFile.setHeaders(TabularParser.parseHeaders(metaFile, storageService.getFileStream(metaFile.getFileId())));
-            metaFile.setRowCount(new RowCount(metaFile, TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId()))));
+            RowCount rowCount = new RowCount(metaFile, TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId())));
+            metaFile.setRowCount(rowCount);
+            rowCount.setFile(metaFile);
+            rowCount.setFile_id(metaFile.getFileId());
             metaFile = fileRepository.save(metaFile);
         }
 
@@ -396,6 +399,12 @@ public class FileServiceImpl implements FileService {
         throw new NotImplementedException();
     }
 
+    private static Set<Header> deepCopyHeaders(MetaFile dest, Set<Header> headers) {
+        return headers.stream()
+                .map(header-> new Header(new Header.HeaderPK(dest, header.getId().getIndex()), header.getName(), header.getType())
+        ).collect(Collectors.toSet());
+    }
+
     private MetaFile deepCopy(MetaFile original, MetaFile newParent, String newName) {
         final MetaFile metaFile;
 
@@ -406,14 +415,12 @@ public class FileServiceImpl implements FileService {
                             newName,
                             newParent
                     ));
-
             // Deep copy children
             List<MetaFile> children = original.getChildren()
                     .stream()
                     .map(child -> deepCopy(child, metaFile, child.getFile_name()))
                     .collect(Collectors.toList());
             metaFile.setChildren(children);
-
         } else {
             metaFile = fileRepository.save(
                     MetaFile.createFile(
@@ -422,8 +429,15 @@ public class FileServiceImpl implements FileService {
                             original.getStatus(),
                             original.getLength(),
                             original.getSupported_views(),
-                            newParent, null // TODO copy
-                    ));
+                            newParent));
+
+            // Add tabular file info to DB
+            if (FileTypes.isTabular(metaFile.getType())) {
+                Set<Header> headers = deepCopyHeaders(metaFile, original.getHeaders());
+                metaFile.setHeaders(headers);
+                metaFile.setRowCount(new RowCount(metaFile, original.getRowCount().getRows()));
+            }
+
             // Copy physical file
             storageService.copyFile(original.getFileId(), metaFile.getFileId());
         }

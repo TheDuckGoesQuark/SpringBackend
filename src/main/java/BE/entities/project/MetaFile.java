@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,12 +56,12 @@ public class MetaFile {
     private RowCount rowCount;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "id.file")
-    private Set<Header> headers;
+    private Set<Header> headers = new HashSet<>();
 
     protected MetaFile() {
     }
 
-    private MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent, RowCount rowCount) {
+    private MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
         this.file_name = file_name;
         this.type = type;
         this.status = status;
@@ -68,7 +69,6 @@ public class MetaFile {
         this.length = length;
         this.supported_views = supported_views;
         this.parent = parent;
-        this.rowCount = rowCount;
     }
 
     public MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, MetaFile parent, List<MetaFile> children, List<SupportedView> supported_views, Project project, RowCount rowCount, Set<Header> headers) {
@@ -93,10 +93,10 @@ public class MetaFile {
                 new Timestamp(System.currentTimeMillis()),
                 0,
                 DIRECTORY_SUPPORTED_VIEWS,
-                null, null);
+                null);
     }
 
-    public static MetaFile createFile(String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent, RowCount rowCount) {
+    public static MetaFile createFile(String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
         MetaFile metaFile = new MetaFile(
                 file_name,
                 type,
@@ -104,14 +104,13 @@ public class MetaFile {
                 new Timestamp(System.currentTimeMillis()),
                 length,
                 supportedViews,
-                parent,
-                rowCount);
+                parent);
         parent.children.add(metaFile);
         return metaFile;
     }
 
     public static MetaFile createDirectory(String file_name, MetaFile parent) {
-        return createFile(file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent, null);
+        return createFile(file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
     }
 
     public int getFileId() {
