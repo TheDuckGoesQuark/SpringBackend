@@ -1,5 +1,7 @@
 package BE.entities.project.tabular;
 
+import BE.entities.project.MetaFile;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -52,26 +54,27 @@ public class Header implements Serializable {
     @Embeddable
     public static class HeaderPK implements Serializable {
 
-        @Column(name = "file_id", nullable = false, updatable = false)
-        protected int fileid;
+        @ManyToOne(optional = false)
+        @JoinColumn(name="file_id")
+        MetaFile file;
 
-        @Column(nullable = false, updatable = false)
-        protected int index;
+        @Column(name="\"index\"", nullable = false, updatable = false)
+        int index;
 
         public HeaderPK() {
         }
 
-        public HeaderPK(int file_id, int index) {
-            this.fileid = file_id;
+        public HeaderPK(MetaFile file, int index) {
+            this.file = file;
             this.index = index;
         }
 
-        public int getFile_id() {
-            return fileid;
+        public MetaFile getFile() {
+            return file;
         }
 
-        public void setFile_id(int file_id) {
-            this.fileid = file_id;
+        public void setFile(MetaFile file) {
+            this.file = file;
         }
 
         public int getIndex() {
@@ -82,23 +85,6 @@ public class Header implements Serializable {
             this.index = index;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            HeaderPK headerPK = (HeaderPK) o;
-
-            if (fileid != headerPK.fileid) return false;
-            return index == headerPK.index;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = fileid;
-            result = 31 * result + index;
-            return result;
-        }
     }
 
 }

@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface ColumnHeaderRepository extends CrudRepository<Header, Header.HeaderPK> {
-    List<Header> getAllByIdFileid(int file_id);
+    List<Header> getAllById_File_FileId(int file_id);
 }

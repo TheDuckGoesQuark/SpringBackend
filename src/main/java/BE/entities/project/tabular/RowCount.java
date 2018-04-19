@@ -9,14 +9,16 @@ import java.io.Serializable;
 @Table(name = "row_count")
 public class RowCount implements Serializable {
 
+    @MapsId
     @OneToOne
-    @JoinColumn(name="file_id")
+    @JoinColumn(name = "file_id")
     private MetaFile file;
 
     @Id
-    @Column(name="file_id")
+    @Column(name = "file_id")
     private int file_id; // duplicate field needed so that crudrepo would recognise the id
 
+    @Column(name="\"rows\"")
     private int rows;
 
     protected RowCount() {
@@ -46,6 +48,7 @@ public class RowCount implements Serializable {
 
     public void setFile(MetaFile file) {
         this.file = file;
+        this.setFile_id(file.getFileId());
     }
 
     public MetaFile getFile() {

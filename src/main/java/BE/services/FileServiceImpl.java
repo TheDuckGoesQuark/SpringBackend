@@ -13,7 +13,6 @@ import BE.exceptions.RootFileDeletionException;
 import BE.models.file.*;
 import BE.repositories.ColumnHeaderRepository;
 import BE.repositories.FileRepository;
-import BE.repositories.RowCountRepository;
 import BE.repositories.SupportedViewRepository;
 
 import BE.util.TabularParser;
@@ -24,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
@@ -44,12 +44,6 @@ public class FileServiceImpl implements FileService {
     private final
     SupportedViewRepository supportedViewRepository;
 
-    private final
-    ColumnHeaderRepository columnHeaderRepository;
-
-    private final
-    RowCountRepository rowCountRepository;
-
     private static final ArrayList<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
 
@@ -68,13 +62,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Autowired
-    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService, SupportedViewRepository supportedViewRepository, ColumnHeaderRepository columnHeaderRepository, RowCountRepository rowCountRepository) {
+    public FileServiceImpl(FileRepository fileRepository, ProjectService projectService, StorageService storageService, SupportedViewRepository supportedViewRepository) {
         this.fileRepository = fileRepository;
         this.projectService = projectService;
         this.storageService = storageService;
         this.supportedViewRepository = supportedViewRepository;
-        this.columnHeaderRepository = columnHeaderRepository;
-        this.rowCountRepository = rowCountRepository;
         this.initialiseDefaults();
 
     }
@@ -93,10 +85,10 @@ public class FileServiceImpl implements FileService {
 
         // Deals with tabular entry having extra details
         if (metaFile.getSupported_views().stream().anyMatch(supportedView -> supportedView.getView().equals(SupportedView.TABULAR_VIEW))) {
-            List<Header> columns = this.columnHeaderRepository.getAllByIdFileid(metaFile.getFileId());
+            Set<Header> columns = metaFile.getHeaders();
             TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
             columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
-            tabularViewInfoModel.setRows(rowCountRepository.findByFile(metaFile.getFileId()).getRows());
+            tabularViewInfoModel.setRows(metaFile.getRowCount().getRows());
         }
 
         // Add the rest of the views
@@ -281,7 +273,7 @@ public class FileServiceImpl implements FileService {
                     options.isFinal() ? FileStatus.READY : FileStatus.UPLOADING,
                     bytes.length,
                     supportedViews,
-                    parent);
+                    parent, null);
         }
 
         metaFile = fileRepository.save(metaFile);
@@ -293,14 +285,9 @@ public class FileServiceImpl implements FileService {
 
         // Add tabular file info to DB
         if (options.isFinal() && FileTypes.isTabular(metaFile.getType())) {
-            rowCountRepository.save(
-                    new RowCount(
-                            metaFile,
-                            TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId())))
-            );
-            columnHeaderRepository.save(
-                    TabularParser.parseHeaders(metaFile, storageService.getFileStream(metaFile.getFileId()))
-            );
+            metaFile.setHeaders(TabularParser.parseHeaders(metaFile, storageService.getFileStream(metaFile.getFileId())));
+            metaFile.setRowCount(new RowCount(metaFile, TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId()))));
+            metaFile = fileRepository.save(metaFile);
         }
 
         return metaFileToFileModel(metaFile);
@@ -435,7 +422,7 @@ public class FileServiceImpl implements FileService {
                             original.getStatus(),
                             original.getLength(),
                             original.getSupported_views(),
-                            newParent
+                            newParent, null // TODO copy
                     ));
             // Copy physical file
             storageService.copyFile(original.getFileId(), metaFile.getFileId());

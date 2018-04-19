@@ -2,12 +2,13 @@ package BE.models.file;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TabularViewInfoModel {
 
-    private Map<String,String> columns;
+    private Map<String,String> columns = new HashMap<>();
     private int rows;
 
     public TabularViewInfoModel() {

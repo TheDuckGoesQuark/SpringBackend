@@ -9,7 +9,9 @@ import com.opencsv.CSVReader;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.math.NumberUtils.isNumber;
@@ -90,9 +92,15 @@ public class TabularParser {
         );
     }
 
-    public static List<Header> parseHeaders(MetaFile metaFile, InputStream inputStream) {
+    /**
+     * Parses header row to determine type and index of each header.
+     *
+     * @param inputStream input stream to file being parsed
+     * @return List of header objects with associated file_ids, header name, index, and type.
+     */
+    public static Set<Header> parseHeaders(MetaFile metaFile, InputStream inputStream) {
 
-        List<Header> headers = new ArrayList<>();
+        Set<Header> headers = new LinkedHashSet<>();
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
             String[] headerLine = reader.readNext();
@@ -100,13 +108,13 @@ public class TabularParser {
             for (int i = 0; i < headerLine.length; i++) {
                 String type;
                 // Determine type
-                if (firstValueLine == null) headers.add(new Header(new Header.HeaderPK(metaFile.getFileId(), i), headerLine[i], Header.STRING));
+                if (firstValueLine == null) break;
                 if (isNumber(firstValueLine[i])) {
                     type = Header.NUMBER;
                 } else {
                     type = Header.STRING;
                 }
-                headers.add(new Header(new Header.HeaderPK(metaFile.getFileId(), i), headerLine[i], type));
+                headers.add(new Header(new Header.HeaderPK(metaFile, i), headerLine[i], type));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,7 +129,7 @@ public class TabularParser {
      * @param inputStream
      * @return
      */
-    public static int getNumberOfRows( InputStream inputStream) {
+    public static int getNumberOfRows(InputStream inputStream) {
 
         int count = 0;
 

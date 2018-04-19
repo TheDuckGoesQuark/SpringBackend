@@ -1,11 +1,14 @@
 package BE.entities.project;
 
+import BE.entities.project.tabular.Header;
+import BE.entities.project.tabular.RowCount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
 import static BE.services.FileServiceImpl.DIRECTORY_SUPPORTED_VIEWS;
@@ -47,10 +50,17 @@ public class MetaFile {
     @JsonIgnore
     private Project project;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "file")
+    @JsonIgnore
+    private RowCount rowCount;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "id.file")
+    private Set<Header> headers;
+
     protected MetaFile() {
     }
 
-    private MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent) {
+    private MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, List<SupportedView> supported_views, MetaFile parent, RowCount rowCount) {
         this.file_name = file_name;
         this.type = type;
         this.status = status;
@@ -58,6 +68,21 @@ public class MetaFile {
         this.length = length;
         this.supported_views = supported_views;
         this.parent = parent;
+        this.rowCount = rowCount;
+    }
+
+    public MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, MetaFile parent, List<MetaFile> children, List<SupportedView> supported_views, Project project, RowCount rowCount, Set<Header> headers) {
+        this.file_name = file_name;
+        this.type = type;
+        this.status = status;
+        this.last_modified = last_modified;
+        this.length = length;
+        this.parent = parent;
+        this.children = children;
+        this.supported_views = supported_views;
+        this.project = project;
+        this.rowCount = rowCount;
+        this.headers = headers;
     }
 
     public static MetaFile createRoot() {
@@ -68,10 +93,10 @@ public class MetaFile {
                 new Timestamp(System.currentTimeMillis()),
                 0,
                 DIRECTORY_SUPPORTED_VIEWS,
-                null);
+                null, null);
     }
 
-    public static MetaFile createFile(String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
+    public static MetaFile createFile(String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent, RowCount rowCount) {
         MetaFile metaFile = new MetaFile(
                 file_name,
                 type,
@@ -79,13 +104,14 @@ public class MetaFile {
                 new Timestamp(System.currentTimeMillis()),
                 length,
                 supportedViews,
-                parent);
+                parent,
+                rowCount);
         parent.children.add(metaFile);
         return metaFile;
     }
 
     public static MetaFile createDirectory(String file_name, MetaFile parent) {
-        return createFile(file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent);
+        return createFile(file_name, FileTypes.DIR, FileStatus.READY, 0, DIRECTORY_SUPPORTED_VIEWS, parent, null);
     }
 
     public int getFileId() {
@@ -172,5 +198,21 @@ public class MetaFile {
 
     public void setChildren(List<MetaFile> children) {
         this.children = children;
+    }
+
+    public RowCount getRowCount() {
+        return rowCount;
+    }
+
+    public void setRowCount(RowCount rowCount) {
+        this.rowCount = rowCount;
+    }
+
+    public Set<Header> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Set<Header> headers) {
+        this.headers = headers;
     }
 }
