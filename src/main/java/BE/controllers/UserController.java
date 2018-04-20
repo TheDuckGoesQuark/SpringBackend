@@ -63,9 +63,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/current_user",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
-    public UserModel updateCurrentUser(@RequestBody UserModel user, HttpServletResponse response) {
+    public UserModel updateCurrentUser(@RequestBody UserModel user, Principal principal, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
-        return userService.updateUser(user.getUsername(), user);
+        return userService.updateUser(principal.getName(), user);
     }
 
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.CREATE}, method = RequestMethod.POST)
