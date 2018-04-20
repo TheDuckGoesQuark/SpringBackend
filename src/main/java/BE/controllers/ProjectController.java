@@ -244,7 +244,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.POST)
     public FileModel createOrUpdateFile(@PathVariable(value = "project_name") String project_name,
-                                        @RequestParam Map<String, String> otherOptions,
+                                        @RequestParam(required = false) Map<String, String> otherOptions,
                                         @RequestParam("action") String action,
                                         @RequestBody(required = false) byte[] bytes,
                                         HttpServletRequest request) {
