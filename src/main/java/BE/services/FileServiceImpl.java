@@ -11,9 +11,6 @@ import BE.exceptions.*;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.RootFileDeletionException;
 import BE.models.file.*;
-import BE.models.file.supportedview.RawViewInfoModel;
-import BE.models.file.supportedview.SupportedViewMeta;
-import BE.models.file.supportedview.TabularViewInfoModel;
 import BE.repositories.FileRepository;
 import BE.repositories.SupportedViewRepository;
 
@@ -27,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
+import static BE.util.MetaFileUtil.*;
 import static BE.util.TabularParser.applyTabularSettings;
 
 @Service
@@ -44,7 +42,7 @@ public class FileServiceImpl implements FileService {
     private final
     SupportedViewRepository supportedViewRepository;
 
-    private static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
+    public static final List<SupportedView> FILE_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> DIRECTORY_SUPPORTED_VIEWS = new ArrayList<>();
     public static final List<SupportedView> TABULAR_SUPPORTED_VIEWS = new ArrayList<>();
 
@@ -71,74 +69,6 @@ public class FileServiceImpl implements FileService {
         this.storageService = storageService;
         this.supportedViewRepository = supportedViewRepository;
         this.initialiseDefaults();
-    }
-
-    // Conversion Functions
-
-    /**
-     * Converts a specific meta file to a file model
-     *
-     * @param metaFile the meta file to be converted
-     * @return file model
-     */
-    private FileModel metaFileToFileModel(MetaFile metaFile) {
-
-        Map<String, SupportedViewMeta> supportedViewList = new HashMap<>();
-
-        metaFile.getSupported_views().forEach(supportedView -> {
-            switch (supportedView.getView()) {
-                case SupportedView.RAW_VIEW:
-                    RawViewInfoModel rawViewInfoModel = new RawViewInfoModel(metaFile.getLength());
-                    supportedViewList.put(rawViewInfoModel.getName(), rawViewInfoModel);
-                    break;
-                case SupportedView.TABULAR_VIEW:
-                    TabularViewInfoModel tabularViewInfoModel = new TabularViewInfoModel();
-                    Set<Header> columns = metaFile.getHeaders();
-                    columns.forEach(column -> tabularViewInfoModel.addColumn(column.getName(), column.getType()));
-                    tabularViewInfoModel.setRows(metaFile.getRowCount().getRows());
-                    supportedViewList.put(tabularViewInfoModel.getName(), tabularViewInfoModel);
-                    break;
-            }
-        });
-
-        return new FileModel(
-                metaFile.getPath(),
-                metaFile.getFile_name(),
-                metaFile.getFileId(),
-                supportedViewList,
-                new FileMetaDataModel(metaFile.getLast_modified(), metaFile.getLength()),
-                metaFile.getType(),
-                metaFile.getStatus()
-        );
-    }
-
-    private static String getFilenameFromPath(String path) {
-        File file = new File(path);
-        return file.getName();
-    }
-
-    private static String getTypeFromFilename(String filename) {
-        String extension = "";
-
-        int i = filename.lastIndexOf('.');
-        if (i > 0) {
-            extension = filename.substring(i + 1);
-        } else {
-            return FileTypes.UNKNOWN;
-        }
-
-        if (FileTypes.isTabular(extension)) return FileTypes.TABULAR;
-        else return extension;
-    }
-
-    private FileModel getFileModelWithChildren(MetaFile root) {
-        if (!root.getType().equals(FileTypes.DIR)) throw new UnsupportedFileViewException();
-        FileModel fileModel = metaFileToFileModel(root);
-        fileModel.setChildren(
-                root.getChildren().stream()
-                        .map(this::metaFileToFileModel)
-                        .collect(Collectors.toList()));
-        return fileModel;
     }
 
     private MetaFile getMetaFileFromPath(String projectName, String filePath) {
@@ -188,20 +118,20 @@ public class FileServiceImpl implements FileService {
      * @return file
      */
     @Override
-    public FileModel getFileMetaByID(int file_id) {
+    public FileModel getMetaFile(int file_id) {
         MetaFile metaFile = fileRepository.findByFileId(file_id);
         if (metaFile != null) return metaFileToFileModel(metaFile);
         else throw new FileNotFoundException();
     }
 
     @Override
-    public FileModel getFileMetaWithChildren(String projectName, String filePath) {
+    public FileModel getMetaFileWithChildren(String projectName, String filePath) {
         MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
         return getFileModelWithChildren(root);
     }
 
     @Override
-    public FileModel getFileMetaWithChildrenById(int file_id) {
+    public FileModel getMetaFileWithChildren(int file_id) {
         MetaFile root = fileRepository.findByFileId(file_id);
         return getFileModelWithChildren(root);
     }
@@ -213,7 +143,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public InputStream getRawFileByID(int file_id) {
+    public InputStream getRawFile(int file_id) {
         return storageService.getFileStream(file_id);
     }
 
@@ -223,24 +153,24 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public InputStream getTabularFileById(int file_id, FileRequestOptions fileRequestOptions) {
-        return applyTabularSettings(getRawFileByID(file_id), fileRequestOptions);
+    public InputStream getTabularFile(int file_id, FileRequestOptions fileRequestOptions) {
+        return applyTabularSettings(getRawFile(file_id), fileRequestOptions);
     }
 
     @Override
-    public boolean supportsView(int file_id, String view) {
-        return fileRepository.findByFileId(file_id)
+    public SupportsViewModel supportsView(String project_name, int file_id, String view) {
+        return new SupportsViewModel(fileRepository.findByFileId(file_id)
                 .getSupported_views()
                 .stream()
-                .anyMatch(supportedView -> supportedView.getView().equals(view));
+                .anyMatch(supportedView -> supportedView.getView().equals(view)));
     }
 
     @Override
-    public boolean supportsView(String project_name, String filePath, String view) {
-        return getMetaFileFromPath(project_name, filePath)
+    public SupportsViewModel supportsView(String project_name, String filePath, String view) {
+        return new SupportsViewModel(getMetaFileFromPath(project_name, filePath)
                 .getSupported_views()
                 .stream()
-                .anyMatch(supportedView -> supportedView.getView().equals(view));
+                .anyMatch(supportedView -> supportedView.getView().equals(view)));
     }
 
     private MetaFile addTabularInformation(MetaFile metaFile) {
@@ -321,6 +251,12 @@ public class FileServiceImpl implements FileService {
         return metaFileToFileModel(metaFile);
     }
 
+    @Override
+    public FileModel createOrUpdateFile(String project_name, int file_id, String action, FileRequestOptions options, byte[] bytes) {
+        MetaFile metaFile = fileRepository.findByFileId(file_id);
+        return createOrUpdateFile(project_name, metaFile.getPath(), action, options, bytes);
+    }
+
     private void deleteRecursively(MetaFile parent) {
         // Delete children
         if (parent.getType().equals(FileTypes.DIR)) {
@@ -349,7 +285,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public void deleteFileById(int file_id) {
+    public void deleteFile(String projectName, int file_id) {
         MetaFile metaFile = fileRepository.findByFileId(file_id);
 
         deleteRecursively(metaFile);
@@ -357,11 +293,13 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public FileModel updateFileMeta(String project_name, String path) {
+    public FileModel updateFileMetaData(String project_name, String path) {
+        throw new NotImplementedException(); //TODO update file meta data
+    }
 
-//        if (fileName.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
-
-        throw new NotImplementedException();
+    @Override
+    public FileModel updateFileMetaData(String project_name, int file_id) {
+        throw new NotImplementedException(); //TODO update file meta data
     }
 
     @Override
@@ -402,6 +340,12 @@ public class FileServiceImpl implements FileService {
         // persist
         original = fileRepository.save(original);
         return metaFileToFileModel(original);
+    }
+
+    @Override
+    public FileModel moveFile(String project_name, int file_id, MoveFileRequestModel moveFileRequestModel) {
+        MetaFile metaFile = fileRepository.findByFileId(file_id);
+        return moveFile(project_name, metaFile.getPath(), moveFileRequestModel);
     }
 
     private boolean checkForCycles(MetaFile original) {
@@ -488,5 +432,11 @@ public class FileServiceImpl implements FileService {
         MetaFile newFile = deepCopy(original, destParent, new_name);
 
         return metaFileToFileModel(newFile);
+    }
+
+    @Override
+    public FileModel copyFile(String project_name, int file_id, MoveFileRequestModel moveFileRequestModel) {
+        MetaFile metaFile = fileRepository.findByFileId(file_id);
+        return copyFile(project_name, metaFile.getPath(), moveFileRequestModel);
     }
 }

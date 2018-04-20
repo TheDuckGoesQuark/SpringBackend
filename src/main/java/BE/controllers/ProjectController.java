@@ -1,6 +1,7 @@
 package BE.controllers;
 
 // JavaIO
+
 import java.io.*;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import BE.exceptions.UnsupportedFileViewException;
 import BE.models.file.FileModel;
 import BE.models.file.FileRequestOptions;
 import BE.models.file.MoveFileRequestModel;
+import BE.models.file.SupportsViewModel;
 import BE.models.project.ProjectModel;
 import BE.models.project.ProjectRoleModel;
 import BE.models.project.UserListModel;
@@ -64,7 +66,8 @@ public class ProjectController {
 
     /**
      * Gets the path of a specific file in a request
-     * @param request the request to get the file path from
+     *
+     * @param request      the request to get the file path from
      * @param project_name name of the project the file is in
      * @return file path
      */
@@ -75,6 +78,7 @@ public class ProjectController {
 
     /**
      * Sends a file
+     *
      * @param inputStream input stream of the file
      * @param response
      */
@@ -97,6 +101,7 @@ public class ProjectController {
 
     /**
      * Gets all projects
+     *
      * @return a list of all projects
      **/
     @RequestMapping(value = "/projects", method = RequestMethod.GET)
@@ -106,6 +111,7 @@ public class ProjectController {
 
     /**
      * Gets a specific project
+     *
      * @param project_name the name of the project to get
      * @return project
      */
@@ -116,6 +122,7 @@ public class ProjectController {
 
     /**
      * Creates a new project
+     *
      * @param project_name the name of the project to create
      * @return project
      */
@@ -126,7 +133,7 @@ public class ProjectController {
 
     /**
      * @param project_name the name of the project to update
-     * @param project the project to update
+     * @param project      the project to update
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.UPDATE}, method = RequestMethod.POST)
@@ -145,7 +152,8 @@ public class ProjectController {
 
     /**
      * Updates the list of users that can update a specific project
-     * @param project_name the name of the project to update
+     *
+     * @param project_name  the name of the project to update
      * @param userListModel the list of users to update
      * @return project
      */
@@ -166,10 +174,11 @@ public class ProjectController {
 
     /**
      * Gets a specific file in a specific project
+     *
      * @param project_name the name of the project that has the file
-     * @param view which type of file type to be returned i.e. 'raw' for a bytestream or 'meta' for just file meta data.
-     * @param request object containing information about the request
-     * @param response object to return the bytestream if chosen.
+     * @param view         which type of file type to be returned i.e. 'raw' for a bytestream or 'meta' for just file meta data.
+     * @param request      object containing information about the request
+     * @param response     object to return the bytestream if chosen.
      * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
@@ -184,10 +193,10 @@ public class ProjectController {
         FileRequestOptions options = readOptions(otherOptions);
 
         // Return appropriate response
-        if (!fileService.supportsView(project_name, relativePath, view)) throw new UnsupportedFileViewException();
+        if (!fileService.supportsView(project_name, relativePath, view).isSupportedView()) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
-                if (includeChildren != null) return fileService.getFileMetaWithChildren(project_name, relativePath);
+                if (includeChildren != null) return fileService.getMetaFileWithChildren(project_name, relativePath);
                 else return fileService.getMetaFile(project_name, relativePath);
             case SupportedView.RAW_VIEW:
                 sendFile(fileService.getRawFile(project_name, relativePath), response, MediaType.APPLICATION_JSON_VALUE);
@@ -202,8 +211,9 @@ public class ProjectController {
 
     /**
      * Gets a specific file by file id in a specific project
+     *
      * @param project_name the name of the project that has the file
-     * @param file_id the id of the file to get
+     * @param file_id      the id of the file to get
      * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
@@ -217,16 +227,16 @@ public class ProjectController {
         FileRequestOptions options = readOptions(otherOptions);
 
         // Return appropriate response
-        if (!fileService.supportsView(file_id, view)) throw new UnsupportedFileViewException();
+        if (!fileService.supportsView(project_name, file_id, view).isSupportedView()) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
-                if (includeChildren != null) return fileService.getFileMetaWithChildrenById(file_id);
-                else return fileService.getFileMetaByID(file_id);
+                if (includeChildren != null) return fileService.getMetaFileWithChildren(file_id);
+                else return fileService.getMetaFile(file_id);
             case SupportedView.RAW_VIEW:
-                sendFile(fileService.getRawFileByID(file_id), response, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+                sendFile(fileService.getRawFile(file_id), response, MediaType.APPLICATION_OCTET_STREAM_VALUE);
                 return null;
             case SupportedView.TABULAR_VIEW:
-                sendFile(fileService.getTabularFileById(file_id, options), response, MediaType.TEXT_CSV_VALUE);
+                sendFile(fileService.getTabularFile(file_id, options), response, MediaType.TEXT_CSV_VALUE);
                 return null;
             default:
                 throw new UnsupportedFileViewException();
@@ -234,12 +244,37 @@ public class ProjectController {
     }
 
     /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + Action.SUPPORTS_VIEW}, method = RequestMethod.GET)
+    public SupportsViewModel supportsView(@PathVariable(value = "project_name") String project_name,
+                                          @RequestParam(value = "view") String view,
+                                          HttpServletRequest request) {
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+
+        return fileService.supportsView(project_name, relativeFilePath, view);
+    }
+
+    /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", params = {"action=" + Action.SUPPORTS_VIEW}, method = RequestMethod.GET)
+    public SupportsViewModel supportsView(@PathVariable(value = "project_name") String project_name,
+                                          @PathVariable(value = "file_id") int file_id,
+                                          @RequestParam(value = "view") String view) {
+        return fileService.supportsView(project_name, file_id, view);
+    }
+
+    /**
      * Creates or updates a specific file in a specific project
+     *
      * @param project_name the name of the project that has the file
      * @param bytes
      * @param otherOptions
      * @param request
-     * @param action create or delete
+     * @param action       create or delete
      * @return file
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.POST)
@@ -256,17 +291,72 @@ public class ProjectController {
     }
 
     /**
-     * Deletes a specific file in a specific project
+     * Creates or updates a specific file in a specific project
+     *
+     * @param project_name the name of the project that has the file
+     * @param bytes
+     * @param otherOptions
+     * @param action       create or delete
+     * @return file
+     */
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.POST)
+    public FileModel createOrUpdateFileBy(@PathVariable(value = "project_name") String project_name,
+                                          @PathVariable(value = "file_id") int file_id,
+                                          @RequestParam(required = false) Map<String, String> otherOptions,
+                                          @RequestParam("action") String action,
+                                          @RequestBody(required = false) byte[] bytes) {
+
+        FileRequestOptions options = readOptions(otherOptions);
+
+        return fileService.createOrUpdateFile(project_name, file_id, action, options, bytes);
+    }
+
+    /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + Action.DELETE}, method = RequestMethod.POST)
+    public void deleteFile(@PathVariable(value = "project_name") String project_name,
+                           HttpServletRequest request) {
+        String relativeFilePath = getRelativeFilePath(request, project_name);
+
+        fileService.deleteFile(project_name, relativeFilePath);
+    }
+
+    /**
+     * @param project_name
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", params = {"action=" + Action.DELETE}, method = RequestMethod.POST)
+    public void deleteFile(@PathVariable(value = "project_name") String project_name,
+                           @PathVariable(value = "file_id") int file_id) {
+        fileService.deleteFile(project_name, file_id);
+    }
+
+    /**
+     * Updates the meta data for a file
+     *
      * @param project_name the name of the project that has the file
      * @param request
-     * @return file
      * @return
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + SET_METADATA}, method = RequestMethod.POST)
     public FileModel updateFileMetaData(@PathVariable(value = "project_name") String project_name,
                                         HttpServletRequest request) {
         String relativeFilePath = getRelativeFilePath(request, project_name);
-        return fileService.updateFileMeta(project_name, relativeFilePath);
+        return fileService.updateFileMetaData(project_name, relativeFilePath);
+    }
+
+    /**
+     * Updates the meta data for a file
+     *
+     * @param project_name the name of the project that has the file
+     * @return
+     */
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", params = {"action=" + SET_METADATA}, method = RequestMethod.POST)
+    public FileModel updateFileMetaData(@PathVariable(value = "project_name") String project_name,
+                                        @PathVariable(value = "file_id") int file_id) {
+        return fileService.updateFileMetaData(project_name, file_id);
     }
 
     /**
@@ -283,6 +373,16 @@ public class ProjectController {
     /**
      * @return
      */
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", params = {"action=" + MOVE}, method = RequestMethod.POST)
+    public FileModel moveFile(@PathVariable(value = "project_name") String project_name,
+                              @PathVariable(value = "file_id") int file_id,
+                              @RequestBody MoveFileRequestModel moveFileRequestModel) {
+        return fileService.moveFile(project_name, file_id, moveFileRequestModel);
+    }
+
+    /**
+     * @return
+     */
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + COPY}, method = RequestMethod.POST)
     public FileModel copyFile(@PathVariable(value = "project_name") String project_name,
                               @RequestBody MoveFileRequestModel moveFileRequestModel,
@@ -292,14 +392,12 @@ public class ProjectController {
     }
 
     /**
-     * @param project_name
      * @return
      */
-    @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + Action.DELETE}, method = RequestMethod.POST)
-    public void deleteFile(@PathVariable(value = "project_name") String project_name,
-                           HttpServletRequest request) {
-        String relativeFilePath = getRelativeFilePath(request, project_name);
-
-        fileService.deleteFile(project_name, relativeFilePath);
+    @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", params = {"action=" + COPY}, method = RequestMethod.POST)
+    public FileModel copyFile(@PathVariable(value = "project_name") String project_name,
+                              @PathVariable(value = "file_id") int file_id,
+                              @RequestBody MoveFileRequestModel moveFileRequestModel) {
+        return fileService.copyFile(project_name, file_id, moveFileRequestModel);
     }
 }
