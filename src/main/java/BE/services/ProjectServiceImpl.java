@@ -10,6 +10,8 @@ import BE.repositories.ProjectRepository;
 import BE.models.project.ProjectModel;
 import BE.models.project.ProjectRoleModel;
 import BE.models.project.UserListModel;
+import BE.repositories.RoleRepository;
+import BE.repositories.UserProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +25,17 @@ public class ProjectServiceImpl implements ProjectService {
     private final
     ProjectRepository projectRepository;
 
+    private final
+    RoleRepository roleRepository;
+
+    private final
+    UserProjectRepository userProjectRepository;
+
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, RoleRepository roleRepository, UserProjectRepository userProjectRepository) {
         this.projectRepository = projectRepository;
+        this.roleRepository = roleRepository;
+        this.userProjectRepository = userProjectRepository;
     }
 
     // Conversion Functions
@@ -55,6 +65,19 @@ public class ProjectServiceImpl implements ProjectService {
                 user.getUsername(),
                 userProject.getAccess_level());
     }
+
+    /**
+     * Converts a specific role to a role model
+     * @param role the userProject to convert
+     * @return user list model
+     */
+    private static ProjectRoleModel roleToProjectRoleMode(Role role) {
+        return new ProjectRoleModel(
+                role.getRole(),
+                role.getDescription(),
+                role.isInternal());
+        }
+
 
     /**
      * Gets all projects
@@ -140,6 +163,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectRoleModel> getAllRoles() {
-        throw new NotImplementedException();
+        //IN PROGRESS
+        //List<Role> roleList = roleRepository.findAll();
+
+
+        return ((List<Role>) roleRepository.findAll()).stream().map(
+                ProjectServiceImpl::roleToProjectRoleMode
+        ).collect(Collectors.toList());
     }
 }

@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS `dir_contains`;
 DROP TABLE IF EXISTS `header`;
 DROP TABLE IF EXISTS `row_count`;
 DROP TABLE IF EXISTS `file`;
+DROP TABLE IF EXISTS `role`;
 
 
 CREATE TABLE IF NOT EXISTS `user` (
@@ -27,6 +28,18 @@ CREATE TABLE IF NOT EXISTS `privilege` (
   `internal`    BOOL         NOT NULL,
   PRIMARY KEY (`name`)
 );
+
+CREATE TABLE IF NOT EXISTS `role` (
+  `role`        VARCHAR(45)  NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `internal`    BOOL         NOT NULL,
+  PRIMARY KEY (`role`)
+);
+
+INSERT INTO role (role, description, internal) VALUES
+  ("role1", "can do everything", TRUE),
+  ("role2", "can do some stuff", FALSE);
+
 
 INSERT INTO privilege (name, description, internal) VALUES
   ("admin", "can do everything", TRUE),

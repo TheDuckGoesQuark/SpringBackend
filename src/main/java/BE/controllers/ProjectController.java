@@ -157,7 +157,8 @@ public class ProjectController {
     @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
     public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
-        throw new NotImplementedException();
+        return projectService.getAllRoles();
+        //throw new NotImplementedException();
     }
 
     /* -----------------|-----------------------------------|---------------- */
