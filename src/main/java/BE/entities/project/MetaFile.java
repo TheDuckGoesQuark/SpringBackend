@@ -1,5 +1,6 @@
 package BE.entities.project;
 
+import BE.entities.MetaData;
 import BE.entities.project.tabular.Header;
 import BE.entities.project.tabular.RowCount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,6 +59,10 @@ public class MetaFile {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "id.file")
     private Set<Header> headers = new HashSet<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "metadata_id", referencedColumnName = "metadataID")
+    private MetaData metadata_id = new MetaData();
+
     protected MetaFile() {
     }
 
@@ -71,7 +76,7 @@ public class MetaFile {
         this.parent = parent;
     }
 
-    public MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, MetaFile parent, List<MetaFile> children, List<SupportedView> supported_views, Project project, RowCount rowCount, Set<Header> headers) {
+    public MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, MetaFile parent, List<MetaFile> children, List<SupportedView> supported_views, Project project, RowCount rowCount, Set<Header> headers, MetaData metadata_id) {
         this.file_name = file_name;
         this.type = type;
         this.status = status;
@@ -83,6 +88,7 @@ public class MetaFile {
         this.project = project;
         this.rowCount = rowCount;
         this.headers = headers;
+        this.metadata_id = metadata_id;
     }
 
     public static MetaFile createRoot() {
@@ -93,7 +99,8 @@ public class MetaFile {
                 new Timestamp(System.currentTimeMillis()),
                 0,
                 DIRECTORY_SUPPORTED_VIEWS,
-                null);
+                null
+        );
     }
 
     public static MetaFile createFile(String file_name, String type, String status, long length, List<SupportedView> supportedViews, MetaFile parent) {
@@ -213,5 +220,13 @@ public class MetaFile {
 
     public void setHeaders(Set<Header> headers) {
         this.headers = headers;
+    }
+
+    public MetaData getMetadata_id() {
+        return metadata_id;
+    }
+
+    public void setMetadata_id(MetaData metadata_id) {
+        this.metadata_id = metadata_id;
     }
 }

@@ -50,7 +50,7 @@ public class MetaFileUtil {
                 metaFile.getFile_name(),
                 metaFile.getFileId(),
                 supportedViewList,
-                new MetaDataModel(0, null),
+                new MetaDataModel(metaFile.getMetadata_id().getVersion(), null), // TODO String to map<String, Object>
                 metaFile.getType(),
                 metaFile.getStatus()
         );

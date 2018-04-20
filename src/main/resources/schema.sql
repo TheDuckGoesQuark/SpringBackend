@@ -71,7 +71,12 @@ CREATE TABLE IF NOT EXISTS file (
   `last_modified`  TIMESTAMP       NOT NULL,
   `length`         BIGINT UNSIGNED NOT NULL,
   `parent_file_id` INT UNSIGNED,
-  PRIMARY KEY (file_id)
+  `metadata_id` INT UNSIGNED,
+  PRIMARY KEY (file_id),
+  FOREIGN KEY (`metadata_id`)
+  REFERENCES `metadata` (`metadataID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `header` (
