@@ -1,9 +1,11 @@
 package BE.models.file;
 
-import BE.entities.project.SupportedView;
+import BE.models.file.supportedview.SupportedViewMeta;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
+import java.util.Map;
+
 public class FileModel {
 
     public static final String ROOT_FILE_NAME= "";
@@ -14,7 +16,7 @@ public class FileModel {
 
     private int file_id;
 
-    private List<SupportedView> views;
+    private Map<String, SupportedViewMeta> supported_views;
 
     private FileMetaDataModel metadata;
 
@@ -26,22 +28,22 @@ public class FileModel {
     private List<FileModel> children;
 
     // File meta model
-    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status) {
+    public FileModel(String path, String file_name, int file_id, Map<String, SupportedViewMeta> supported_views, FileMetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
-        this.views = views;
+        this.supported_views = supported_views;
         this.metadata = metadata;
         this.type = type;
         this.status = status;
     }
 
     // Directory meta model
-    public FileModel(String path, String file_name, int file_id, List<SupportedView> views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
+    public FileModel(String path, String file_name, int file_id, Map<String, SupportedViewMeta> supported_views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
-        this.views = views;
+        this.supported_views = supported_views;
         this.metadata = metadata;
         this.type = type;
         this.status = status;
@@ -80,12 +82,12 @@ public class FileModel {
         this.type = type;
     }
 
-    public List<SupportedView> getViews() {
-        return views;
+    public Map<String, SupportedViewMeta> getSupported_views() {
+        return supported_views;
     }
 
-    public void setViews(List<SupportedView> views) {
-        this.views = views;
+    public void setSupported_views(Map<String, SupportedViewMeta> supported_views) {
+        this.supported_views = supported_views;
     }
 
     public String getStatus() {

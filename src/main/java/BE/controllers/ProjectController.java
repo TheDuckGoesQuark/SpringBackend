@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 
 // Spring
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -81,9 +80,9 @@ public class ProjectController {
      * @param inputStream input stream of the file
      * @param response
      */
-    private void sendFile(InputStream inputStream, HttpServletResponse response) {
+    private void sendFile(InputStream inputStream, HttpServletResponse response, String mediaType) {
 
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setContentType(mediaType);
 
         try {
             IOUtils.copy(inputStream, response.getOutputStream());
@@ -161,7 +160,8 @@ public class ProjectController {
     @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
     public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
-        throw new NotImplementedException();
+        return projectService.getAllRoles();
+        //throw new NotImplementedException();
     }
 
     /* -----------------|-----------------------------------|---------------- */
@@ -178,21 +178,26 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
     public FileModel getFile(@PathVariable(value = "project_name") String project_name,
+                             @RequestParam Map<String, String> otherOptions,
                              @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
                              @RequestParam(value = "include_children", required = false) String includeChildren,
                              HttpServletRequest request,
                              HttpServletResponse response) {
         // Retrieves file path from request
         String relativePath = getRelativeFilePath(request, project_name);
+        FileRequestOptions options = readOptions(otherOptions);
 
         // Return appropriate response
+        if (!fileService.supportsView(project_name, relativePath, view)) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
                 if (includeChildren != null) return fileService.getFileMetaWithChildren(project_name, relativePath);
                 else return fileService.getMetaFile(project_name, relativePath);
             case SupportedView.RAW_VIEW:
-                InputStream inputStream = fileService.getRawFile(project_name, relativePath);
-                sendFile(inputStream, response);
+                sendFile(fileService.getRawFile(project_name, relativePath), response, MediaType.APPLICATION_JSON_VALUE);
+                return null;
+            case SupportedView.TABULAR_VIEW:
+                sendFile(fileService.getTabularFile(project_name, relativePath, options), response, MediaType.TEXT_CSV_VALUE);
                 return null;
             default:
                 throw new UnsupportedFileViewException();
@@ -208,17 +213,24 @@ public class ProjectController {
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
     public FileModel getFileByID(@PathVariable(value = "project_name") String project_name,
                                  @PathVariable(value = "file_id") int file_id,
+                                 @RequestParam Map<String, String> otherOptions,
                                  @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
                                  @RequestParam(value = "include_children", required = false) String includeChildren,
                                  HttpServletResponse response) {
+
+        FileRequestOptions options = readOptions(otherOptions);
+
         // Return appropriate response
+        if (!fileService.supportsView(file_id, view)) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
                 if (includeChildren != null) return fileService.getFileMetaWithChildrenById(file_id);
                 else return fileService.getFileMetaByID(file_id);
             case SupportedView.RAW_VIEW:
-                InputStream inputStream = fileService.getRawFileByID(file_id);
-                sendFile(inputStream, response);
+                sendFile(fileService.getRawFileByID(file_id), response, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+                return null;
+            case SupportedView.TABULAR_VIEW:
+                sendFile(fileService.getTabularFileById(file_id, options), response, MediaType.TEXT_CSV_VALUE);
                 return null;
             default:
                 throw new UnsupportedFileViewException();

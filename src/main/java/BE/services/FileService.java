@@ -5,7 +5,6 @@ import BE.models.file.FileRequestOptions;
 import BE.models.file.MoveFileRequestModel;
 
 import java.io.InputStream;
-import java.util.List;
 
 public interface FileService {
 
@@ -18,6 +17,14 @@ public interface FileService {
     InputStream getRawFile(String projectName, String filePath);
 
     InputStream getRawFileByID(int file_id);
+
+    InputStream getTabularFile(String projectName, String filePath, FileRequestOptions fileRequestOptions);
+
+    InputStream getTabularFileById(int file_id, FileRequestOptions fileRequestOptions);
+
+    boolean supportsView(int file_id, String view);
+
+    boolean supportsView(String project_name, String filePath, String view);
 
     FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes);
 

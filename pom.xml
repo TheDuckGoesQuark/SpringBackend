@@ -172,6 +172,13 @@
             <version>4.2.3.RELEASE</version>
         </dependency>
 
+        <!-- CSV Parsing -->
+
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.1</version>
+        </dependency>
 
     </dependencies>
 

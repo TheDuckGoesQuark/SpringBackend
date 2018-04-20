@@ -1,11 +1,11 @@
 package BE.repositories;
 
 import BE.entities.UserProject;
+import BE.entities.project.Role;
 import org.springframework.data.repository.CrudRepository;
 
-public interface UserProjectRepository extends CrudRepository<UserProject, String> {
+import java.util.List;
 
-//    UserProject findByUsernameAndProjectName(String username, String project_name);
-//
-//    void deleteByUsernameAndProjectName(String username, String project_name);
+public interface UserProjectRepository extends CrudRepository<UserProject, String> {
+    List<UserProject> findAll();
 }

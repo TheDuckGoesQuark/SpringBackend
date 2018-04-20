@@ -1,5 +1,7 @@
 package BE.security.handlers;
 
+import BE.security.SecurityUtils;
+import BE.security.enums.AuthenticationFailureType;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +21,8 @@ public class AccessDeniedHandler implements org.springframework.security.web.acc
         httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
         httpServletResponse.setCharacterEncoding("UTF-8");
         JSONObject jsonResponse = new JSONObject();
-        jsonResponse.put("message", "Access Denied");
+        jsonResponse.put("error", AuthenticationFailureType.INVALID_GRANT);
+        jsonResponse.put("error_description", AuthenticationFailureType.INVALID_GRANT);
         httpServletResponse.getWriter().write(jsonResponse.toString());
     }
 }

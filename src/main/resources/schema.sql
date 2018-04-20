@@ -9,13 +9,16 @@ DROP TABLE IF EXISTS `project`;
 DROP TABLE IF EXISTS `supports_view`;
 DROP TABLE IF EXISTS `supported_view`;
 DROP TABLE IF EXISTS `dir_contains`;
+DROP TABLE IF EXISTS `header`;
+DROP TABLE IF EXISTS `row_count`;
 DROP TABLE IF EXISTS `file`;
+DROP TABLE IF EXISTS `role`;
 
 
 CREATE TABLE IF NOT EXISTS `user` (
   `username` VARCHAR(100) NOT NULL,
   `password` VARCHAR(500) NOT NULL,
-  `email`    VARCHAR(320) NOT NULL,
+  `email`    VARCHAR(320),
   PRIMARY KEY (`username`)
 );
 
@@ -25,6 +28,18 @@ CREATE TABLE IF NOT EXISTS `privilege` (
   `internal`    BOOL         NOT NULL,
   PRIMARY KEY (`name`)
 );
+
+CREATE TABLE IF NOT EXISTS `role` (
+  `role`        VARCHAR(45)  NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `internal`    BOOL         NOT NULL,
+  PRIMARY KEY (`role`)
+);
+
+INSERT INTO role (role, description, internal) VALUES
+  ("role1", "can do everything", TRUE),
+  ("role2", "can do some stuff", FALSE);
+
 
 INSERT INTO privilege (name, description, internal) VALUES
   ("admin", "can do everything", TRUE),
@@ -48,14 +63,41 @@ CREATE TABLE IF NOT EXISTS `has_privilege` (
 );
 
 CREATE TABLE IF NOT EXISTS file (
-  `file_id`       INT UNSIGNED    NOT NULL AUTO_INCREMENT,
-  `file_name`     VARCHAR(54)     NOT NULL,
-  `type`          VARCHAR(45)     NOT NULL,
-  `status`        VARCHAR(10)     NOT NULL,
-  `last_modified` TIMESTAMP       NOT NULL,
-  `length`        BIGINT UNSIGNED NOT NULL,
+  `file_id`        INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+  `file_name`      VARCHAR(54)     NOT NULL,
+  `type`           VARCHAR(45)     NOT NULL,
+  `status`         VARCHAR(10)     NOT NULL,
+  `last_modified`  TIMESTAMP       NOT NULL,
+  `length`         BIGINT UNSIGNED NOT NULL,
   `parent_file_id` INT UNSIGNED,
-  PRIMARY KEY (file_id));
+  PRIMARY KEY (file_id)
+);
+
+CREATE TABLE IF NOT EXISTS `header` (
+  `file_id` INT UNSIGNED NOT NULL,
+  `name`    VARCHAR(100) NOT NULL,
+  `type`    VARCHAR(100) NOT NULL,
+  `index`   INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`file_id`, `index`),
+  INDEX `header_idx` (`file_id` ASC),
+  CONSTRAINT `header_id`
+  FOREIGN KEY (`file_id`)
+  REFERENCES `file` (`file_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `row_count` (
+  `file_id` INT UNSIGNED NOT NULL,
+  `rows`    INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`file_id`),
+  INDEX `row_count_idx` (`file_id` ASC),
+  CONSTRAINT `row_count_id`
+  FOREIGN KEY (`file_id`)
+  REFERENCES `file` (`file_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS `project` (
   `name`        VARCHAR(100) NOT NULL,
@@ -108,10 +150,6 @@ CREATE TABLE IF NOT EXISTS `supported_view` (
   PRIMARY KEY (`view`)
 );
 
-INSERT INTO supported_view (view) VALUES
-  ("meta"),
-  ("raw");
-
 CREATE TABLE IF NOT EXISTS `supports_view` (
   `file_id` INT UNSIGNED NOT NULL,
   `view`    VARCHAR(10)  NOT NULL,
@@ -128,13 +166,3 @@ CREATE TABLE IF NOT EXISTS `supports_view` (
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
-
-
-# insert into file (file_id, path, file_name, type, metadata, status) values ('12323', 'ohaa','ohaa', 'dir', 'file meta-data', 'status');
-# insert into file (file_id, path, file_name, type, metadata, status) values ('12324', '/projects/Protege/root1','root1', 'dir', 'file meta-data', 'status');
-# insert into file (file_id, path, file_name, type, metadata, status) values ('1231', '/projects/Protege/root1/oze','oze', 'dir', 'file meta-data', 'status');
-# insert into file (file_id, path, file_name, type, metadata, status) values ('1232', '/projects/Protege/root1/oze/file1','file1', 'file', 'file meta-data', 'status');
-# insert into project (name, root_dir_id) values ('Protege', '12324');
-# insert into supported_view(file_id, view)  values ('12324', 'meta');
-# insert into supported_view(file_id, view)  values ('1232', 'meta');
-# insert into supported_view(file_id, view)  values ('1232', 'raw');

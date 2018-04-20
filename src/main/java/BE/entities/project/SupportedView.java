@@ -9,6 +9,7 @@ public class SupportedView {
 
     public static final String META_VIEW = "meta";
     public static final String RAW_VIEW = "raw";
+    public static final String TABULAR_VIEW= "tabular";
 
     @Id
     private String view;

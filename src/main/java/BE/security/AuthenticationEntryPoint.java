@@ -12,7 +12,8 @@ import java.io.IOException;
 @Component
 public class AuthenticationEntryPoint implements org.springframework.security.web.AuthenticationEntryPoint {
     @Override
-    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.toString());
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
+        BE.exceptions.excludedFromBaseException.AuthenticationException ex = (BE.exceptions.excludedFromBaseException.AuthenticationException) e;
+        response.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getErrorResponse().toString());
     }
 }

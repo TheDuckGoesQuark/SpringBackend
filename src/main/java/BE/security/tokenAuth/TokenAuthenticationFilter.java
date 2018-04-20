@@ -4,6 +4,9 @@ import BE.models.security.TokenHeaderModel;
 import BE.exceptions.excludedFromBaseException.AuthenticationException;
 import BE.security.enums.AuthenticationFailureType;
 import BE.security.SecurityUtils;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static BE.security.passwordAuth.FormAuthenticationFilter.CHARACTER_ENCODING_UTF_8;
 
 /**
  * Filters requests that contain the authorisation header and a suitable token.
@@ -80,5 +85,14 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         context.setAuthentication(authResult);
         SecurityContextHolder.setContext(context);
         chain.doFilter(request, response);
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException failed) throws IOException, ServletException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(CHARACTER_ENCODING_UTF_8);
+        JSONObject jsonObject = ((BE.exceptions.excludedFromBaseException.AuthenticationException) failed).getErrorResponse();
+        response.getWriter().write(jsonObject.toString());
     }
 }

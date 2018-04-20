@@ -4,7 +4,7 @@ import BE.security.enums.AuthenticationFailureType;
 import org.json.JSONObject;
 
 public class AuthenticationException extends org.springframework.security.core.AuthenticationException {
-    
+
     private AuthenticationFailureType authenticationFailureType;
 
     public AuthenticationException(String msg, AuthenticationFailureType authenticationFailureType) {

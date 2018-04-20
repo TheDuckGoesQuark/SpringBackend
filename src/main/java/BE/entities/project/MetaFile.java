@@ -1,12 +1,15 @@
 package BE.entities.project;
 
+import BE.entities.project.tabular.Header;
+import BE.entities.project.tabular.RowCount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import static BE.models.file.FileModel.ROOT_FILE_NAME;
 import static BE.services.FileServiceImpl.DIRECTORY_SUPPORTED_VIEWS;
@@ -44,10 +47,16 @@ public class MetaFile {
             inverseJoinColumns = @JoinColumn(name = "view", referencedColumnName = "view", insertable = false, updatable = false))
     private List<SupportedView> supported_views;
 
-
     @OneToOne(mappedBy = "root_dir")
     @JsonIgnore
     private Project project;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "file")
+    @JsonIgnore
+    private RowCount rowCount;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "id.file")
+    private Set<Header> headers = new HashSet<>();
 
     protected MetaFile() {
     }
@@ -60,6 +69,20 @@ public class MetaFile {
         this.length = length;
         this.supported_views = supported_views;
         this.parent = parent;
+    }
+
+    public MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, MetaFile parent, List<MetaFile> children, List<SupportedView> supported_views, Project project, RowCount rowCount, Set<Header> headers) {
+        this.file_name = file_name;
+        this.type = type;
+        this.status = status;
+        this.last_modified = last_modified;
+        this.length = length;
+        this.parent = parent;
+        this.children = children;
+        this.supported_views = supported_views;
+        this.project = project;
+        this.rowCount = rowCount;
+        this.headers = headers;
     }
 
     public static MetaFile createRoot() {
@@ -174,5 +197,21 @@ public class MetaFile {
 
     public void setChildren(List<MetaFile> children) {
         this.children = children;
+    }
+
+    public RowCount getRowCount() {
+        return rowCount;
+    }
+
+    public void setRowCount(RowCount rowCount) {
+        this.rowCount = rowCount;
+    }
+
+    public Set<Header> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Set<Header> headers) {
+        this.headers = headers;
     }
 }

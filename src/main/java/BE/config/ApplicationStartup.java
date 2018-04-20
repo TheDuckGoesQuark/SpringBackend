@@ -1,6 +1,8 @@
 package BE.config;
 
+import BE.entities.project.SupportedView;
 import BE.models.user.UserModel;
+import BE.repositories.SupportedViewRepository;
 import BE.security.enums.Privileges;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
