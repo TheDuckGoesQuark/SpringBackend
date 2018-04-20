@@ -1,11 +1,13 @@
 package BE.models.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 public class UserModel {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

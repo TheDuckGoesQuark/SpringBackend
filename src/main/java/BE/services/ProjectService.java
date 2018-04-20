@@ -12,9 +12,9 @@ public interface ProjectService {
 
     public ProjectModel getProjectByName(String project_name);
 
-    public ProjectModel createProject(String project_name);
+    public ProjectModel createProject(String project_name, String username);
 
-    public ProjectModel updateProject(ProjectModel project);
+    public ProjectModel updateProject(String project_name, ProjectModel project);
 
     public ProjectModel updateGrant(String project_name, UserListModel grant);
 

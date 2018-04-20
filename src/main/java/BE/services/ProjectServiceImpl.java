@@ -3,17 +3,18 @@ package BE.services;
 import BE.entities.UserProject;
 import BE.entities.project.*;
 import BE.entities.user.User;
-import BE.exceptions.NotImplementedException;
-import BE.exceptions.ProjectAlreadyExistsException;
-import BE.exceptions.ProjectNotFoundException;
+import BE.exceptions.*;
 import BE.repositories.ProjectRepository;
 import BE.models.project.ProjectModel;
 import BE.models.project.ProjectRoleModel;
 import BE.models.project.UserListModel;
+import BE.repositories.UserRepository;
+import BE.repositories.UserProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +24,17 @@ public class ProjectServiceImpl implements ProjectService {
     private final
     ProjectRepository projectRepository;
 
+    private final
+    UserRepository userRepository;
+
+    private final
+    UserProjectRepository userProjectRepository;
+
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, UserRepository userRepository, UserProjectRepository userProjectRepository) {
         this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
+        this.userProjectRepository = userProjectRepository;
     }
 
     // Conversion Functions
@@ -87,12 +96,23 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public ProjectModel createProject(String project_name) {
+    public ProjectModel createProject(String project_name, String username) {
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
         MetaFile projectRoot = MetaFile.createRoot();
         Project project = new Project(project_name, projectRoot);
         // Save to database
         projectRepository.save(project);
+        // Make current user an admin of the new project
+        User user = userRepository.findByUsername(username);
+        UserProject userProject = new UserProject();
+        userProject.setProject(project);
+        userProject.setUser(user);
+        userProject.setAccess_level("project_admin");
+        userProjectRepository.save(userProject);
+
+        List<UserProject> userProjects = new ArrayList<>();
+        userProjects.add(userProject);
+        project.setUserProjects(userProjects);
         return projectToProjectModel(project);
     }
 
@@ -103,8 +123,8 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public ProjectModel updateProject(ProjectModel project) {
-        Project updated = projectRepository.findByName(project.getProject_name());
+    public ProjectModel updateProject(String project_name, ProjectModel project) {
+        Project updated = projectRepository.findByName(project_name);
         if (updated == null) throw new ProjectNotFoundException();
         // .save performs both update and creation
         // TODO method updates project meta-data, which we don't track yet :(
@@ -113,7 +133,26 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectModel updateGrant(String project_name, UserListModel grant) {
-        throw new NotImplementedException();
+        Project project = projectRepository.findByName(project_name);
+        if (project == null) throw new ProjectNotFoundException();
+        User user = userRepository.findByUsername(grant.getUsername());
+        if (user == null) throw new UserNotFoundException();
+        String access_level = grant.getAccess_level();
+        if(!access_level.equals("regular") && !access_level.equals("project_admin")) throw new InvalidAccessLevelException();
+        UserProject userProject = new UserProject();
+        userProject.setProject(project);
+        userProject.setUser(user);
+        userProject.setAccess_level(access_level);
+        userProjectRepository.save(userProject);
+
+        //do I need to check if the UserProject is already in the list?
+        //is it possible to have two UserProjects that are the same besides access_level and role? if so need to avoid this
+
+        List<UserProject> userProjects = new ArrayList<>();
+        if (project.getUserProjects() != null) userProjects = project.getUserProjects();
+        userProjects.add(userProject);
+        project.setUserProjects(userProjects);
+        return projectToProjectModel(project);
     }
 
     /**
