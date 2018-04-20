@@ -17,16 +17,17 @@ public class StorageServiceImpl implements StorageService {
     private final String root_directory;
 
     public StorageServiceImpl(@Value("${storage_root_directory:storage}") String root_directory) {
-        this.root_directory = root_directory.replaceAll("^.|.$", "")+"/";
+        this.root_directory = root_directory.replaceAll("^.|.$", "") + "/";
     }
 
     /**
      * Gets a specific file input stream
+     *
      * @param file_id the id of the file to read
      * @return input stream
      */
     @Override
-    public InputStream getFileStream(int file_id) throws FileRetrievalException{
+    public InputStream getFileStream(int file_id) throws FileRetrievalException {
         File file = new File(root_directory + Integer.toString(file_id));
 
         if (!file.exists()) throw new FileNotFoundException();
@@ -39,25 +40,54 @@ public class StorageServiceImpl implements StorageService {
 
     /**
      * Uploads a new file
+     *
      * @param file_id the id of the file to be uploaded
      * @param options
-     * @param bytes contents of the file to be uploaded
+     * @param bytes   contents of the file to be uploaded
      * @return
      */
     @Override
     public boolean uploadFile(int file_id, FileRequestOptions options, byte[] bytes) {
+
         File file = new File(root_directory + Integer.toString(file_id));
-        if (file.exists() && options.isOverwrite()) throw new FileAlreadyExistsException();
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(bytes);
-        } catch (Exception e) {
-            throw new FileOperationException(e);
+
+        if (file.exists()) {
+            // overwrite must be specified for existing files
+            if (!options.isOverwrite()) throw new FileAlreadyExistsException();
+            // apply offset and write to file
+            try (RandomAccessFile randomAccessFile = new RandomAccessFile(file.getName(), "rw")) {
+                randomAccessFile.seek(options.getOffset());
+                randomAccessFile.write(bytes);
+            } catch (IOException e) {
+                throw new FileOperationException(e);
+            }
+        } else {
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(bytes);
+            } catch (Exception e) {
+                throw new FileOperationException(e);
+            }
+        }
+
+        // Truncate file if requested
+        if (options.isTruncate()) {
+            try (RandomAccessFile randomAccessFile = new RandomAccessFile(file.getName(), "rw")) {
+                // If no data is given, file is truncated to given offset
+                if (bytes.length == 0) {
+                    randomAccessFile.setLength(options.getOffset());
+                } else {
+                    randomAccessFile.setLength(bytes.length);
+                }
+            } catch (IOException e) {
+                throw new FileOperationException(e);
+            }
         }
         return true;
     }
 
     /**
      * Deletes a specific file
+     *
      * @param file_id the id of the file to be deleted
      * @return
      */
@@ -70,7 +100,8 @@ public class StorageServiceImpl implements StorageService {
 
     /**
      * Copies a specific file
-     * @param src_id the id of the file to be copied
+     *
+     * @param src_id  the id of the file to be copied
      * @param dest_id the id of of the destination file
      * @return true if successful, exception otherwise
      */

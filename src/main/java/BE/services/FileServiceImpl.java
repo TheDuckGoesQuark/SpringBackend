@@ -11,7 +11,6 @@ import BE.exceptions.*;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.RootFileDeletionException;
 import BE.models.file.*;
-import BE.models.file.supportedview.MetaViewInfoModel;
 import BE.models.file.supportedview.RawViewInfoModel;
 import BE.models.file.supportedview.SupportedViewMeta;
 import BE.models.file.supportedview.TabularViewInfoModel;
@@ -244,34 +243,60 @@ public class FileServiceImpl implements FileService {
                 .anyMatch(supportedView -> supportedView.getView().equals(view));
     }
 
+    private MetaFile addTabularInformation(MetaFile metaFile) {
+        metaFile.setHeaders(TabularParser.parseHeaders(metaFile, storageService.getFileStream(metaFile.getFileId())));
+        RowCount rowCount = new RowCount(metaFile, TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId())));
+        metaFile.setRowCount(rowCount);
+        rowCount.setFile(metaFile);
+        rowCount.setFile_id(metaFile.getFileId());
+        return fileRepository.save(metaFile);
+    }
+
     @Override
     @Transactional
-    public FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
-        if (path.equals(ROOT_FILE_NAME)) throw new FileAlreadyExistsException(); // root will already exist
+    public FileModel createOrUpdateFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes) {
+
+        if (path.equals(ROOT_FILE_NAME)) throw new FileAlreadyExistsException(); // root will already exist and cannot be updated
 
         MetaFile parent = getParentFromPath(project_name, path);
-        MetaFile metaFile;
+        MetaFile metaFile = null;
         final String fileName = getFilenameFromPath(path);
 
         if (fileName.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
 
         // Check file doesn't already exist in directory
-        if (parent.getChildren().stream().anyMatch(
-                child -> child.getFile_name().equals(fileName)) && !options.isOverwrite()
-                ) {
-            throw new FileAlreadyExistsException();
+        Optional<MetaFile> possibleExistingFile = parent.getChildren().stream().filter(child->child.getFile_name().equals(fileName)).findFirst();
+        if (possibleExistingFile.isPresent()) {
+
+            if (!options.isOverwrite()) throw new FileAlreadyExistsException();
+
+            MetaFile existingFile = possibleExistingFile.get();
+
+            if (existingFile.getType().equals(FileTypes.DIR)) throw new NotAFileException();
+            metaFile = existingFile;
+
+            // Update metadata to reflect imminent truncation
+            if (bytes.length == 0 && options.isTruncate()) metaFile.setLength(options.getOffset());
+            // Extend file if overwrite is greater than current size
+            else if (options.getOffset()+bytes.length > metaFile.getLength()) metaFile.setLength(options.getOffset()+bytes.length);
+
+            if (options.isFinal()) metaFile.setStatus(FileStatus.READY);
         }
 
         // Create file
-        if (action.equals(Action.MAKE_DIRECTORY)) {
+        if (action.equals(Action.MAKE_DIRECTORY) && !options.isOverwrite()) {
             metaFile = MetaFile.createDirectory(
                     fileName,
                     parent);
-        } else {
+        } else if (metaFile == null) {
+
             String type = getTypeFromFilename(path);
             List<SupportedView> supportedViews;
+
+            // Add tabular view if necessary
             if (FileTypes.isTabular(type)) supportedViews = TABULAR_SUPPORTED_VIEWS;
             else supportedViews = FILE_SUPPORTED_VIEWS;
+
             metaFile = MetaFile.createFile(
                     fileName,
                     type,
@@ -290,12 +315,7 @@ public class FileServiceImpl implements FileService {
 
         // Add tabular file info to DB
         if (options.isFinal() && FileTypes.isTabular(metaFile.getType())) {
-            metaFile.setHeaders(TabularParser.parseHeaders(metaFile, storageService.getFileStream(metaFile.getFileId())));
-            RowCount rowCount = new RowCount(metaFile, TabularParser.getNumberOfRows(storageService.getFileStream(metaFile.getFileId())));
-            metaFile.setRowCount(rowCount);
-            rowCount.setFile(metaFile);
-            rowCount.setFile_id(metaFile.getFileId());
-            metaFile = fileRepository.save(metaFile);
+            metaFile = addTabularInformation(metaFile);
         }
 
         return metaFileToFileModel(metaFile);
@@ -397,13 +417,6 @@ public class FileServiceImpl implements FileService {
         return false;
     }
 
-    @Override
-    public FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options) {
-        //if (new_name.equals(ROOT_FILE_NAME)) throw new InvalidFileNameException();
-
-        throw new NotImplementedException();
-    }
-
     private static Set<Header> deepCopyHeaders(MetaFile dest, Set<Header> headers) {
         return headers.stream()
                 .map(header-> new Header(new Header.HeaderPK(dest, header.getId().getIndex()), header.getName(), header.getType())
@@ -476,12 +489,4 @@ public class FileServiceImpl implements FileService {
 
         return metaFileToFileModel(newFile);
     }
-
-
-    //TODO 12.9 Changing metadata
-    //TODO 12.14 Extra file types
-    //TODO 12.13 Tabular files
-    //TODO 13.1 The tabular view
-    //TODO 14 Zoommable image files
-    //TODO 14.1 The Scalable Image view
 }

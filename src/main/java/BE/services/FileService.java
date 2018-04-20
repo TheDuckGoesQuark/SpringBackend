@@ -26,7 +26,7 @@ public interface FileService {
 
     boolean supportsView(String project_name, String filePath, String view);
 
-    FileModel createFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes);
+    FileModel createOrUpdateFile(String project_name, String path, String action, FileRequestOptions options, byte[] bytes);
 
     void deleteFile(String projectName, String filePath);
 
@@ -37,8 +37,6 @@ public interface FileService {
     FileModel moveFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel);
 
     FileModel getFileMetaWithChildren(String projectName, String filePath);
-
-    FileModel updateFile(String project_name, String relativeFilePath, FileRequestOptions options);
 
     FileModel copyFile(String project_name, String relativeFilePath, MoveFileRequestModel moveFileRequestModel);
 }

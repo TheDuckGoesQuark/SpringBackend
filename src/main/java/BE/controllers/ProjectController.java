@@ -252,9 +252,7 @@ public class ProjectController {
         String relativeFilePath = getRelativeFilePath(request, project_name);
         FileRequestOptions options = readOptions(otherOptions);
 
-        if ((options.isOverwrite() || options.isTruncate()) && !action.equals(Action.MAKE_DIRECTORY))
-            return fileService.updateFile(project_name, relativeFilePath, options);
-        else return fileService.createFile(project_name, relativeFilePath, action, options, bytes);
+        return fileService.createOrUpdateFile(project_name, relativeFilePath, action, options, bytes);
     }
 
     /**
