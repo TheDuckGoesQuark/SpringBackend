@@ -2,11 +2,11 @@ package BE.models.file;
 
 import java.util.Map;
 
-public class FileMetaDataModel {
+public class MetaDataModel {
     private int version;
     private Map<String, Object> namespaces;
 
-    public FileMetaDataModel(int version, Map<String, Object> namespaces) {
+    public MetaDataModel(int version, Map<String, Object> namespaces) {
         this.version = version;
         this.namespaces = namespaces;
     }

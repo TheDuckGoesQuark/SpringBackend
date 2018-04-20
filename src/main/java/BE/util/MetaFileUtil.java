@@ -5,7 +5,7 @@ import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
 import BE.entities.project.tabular.Header;
 import BE.exceptions.UnsupportedFileViewException;
-import BE.models.file.FileMetaDataModel;
+import BE.models.file.MetaDataModel;
 import BE.models.file.FileModel;
 import BE.models.file.supportedviewinfoobjects.RawViewInfoModel;
 import BE.models.file.supportedviewinfoobjects.BaseSupportedViewInfo;
@@ -50,7 +50,7 @@ public class MetaFileUtil {
                 metaFile.getFile_name(),
                 metaFile.getFileId(),
                 supportedViewList,
-                new FileMetaDataModel(metaFile.getLast_modified(), metaFile.getLength()),
+                new MetaDataModel(0, null),
                 metaFile.getType(),
                 metaFile.getStatus()
         );

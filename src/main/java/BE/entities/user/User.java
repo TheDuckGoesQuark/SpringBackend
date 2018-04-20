@@ -1,5 +1,6 @@
 package BE.entities.user;
 
+import BE.entities.MetaData;
 import BE.entities.UserProject;
 import org.hibernate.annotations.Fetch;
 
@@ -27,7 +28,35 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<UserProject> userProjects;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="public_user_metadata", referencedColumnName = "metadataID")
+    private MetaData public_user_metadata;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="private_user_metadata", referencedColumnName = "metadataID")
+    private MetaData private_user_metadata;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="public_admin_metadata", referencedColumnName = "metadataID")
+    private MetaData public_admin_metadata;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="private_admin_metadata", referencedColumnName = "metadataID")
+    private MetaData private_admin_metadata;
+
     protected User() {}
+
+    public User(String username, String password, String email, List<Privilege> privileges, List<UserProject> userProjects, MetaData public_user_metadata, MetaData private_user_metadata, MetaData public_admin_metadata, MetaData private_admin_metadata) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.privileges = privileges;
+        this.userProjects = userProjects;
+        this.public_user_metadata = public_user_metadata;
+        this.private_user_metadata = private_user_metadata;
+        this.public_admin_metadata = public_admin_metadata;
+        this.private_admin_metadata = private_admin_metadata;
+    }
 
     public User(String username, String password, String email, List<Privilege> privileges, List<UserProject> userProjects) {
         this.username = username;
@@ -35,6 +64,11 @@ public class User {
         this.email = email;
         this.privileges = privileges;
         this.userProjects = userProjects;
+        this.public_user_metadata = new MetaData();
+        this.private_user_metadata = new MetaData();
+        this.public_admin_metadata = new MetaData();
+        this.private_admin_metadata = new MetaData();
+
     }
 
     public String getUsername() {
@@ -75,5 +109,37 @@ public class User {
 
     public void setUserProjects(List<UserProject> userProjects) {
         this.userProjects = userProjects;
+    }
+
+    public MetaData getPublic_user_metadata() {
+        return public_user_metadata;
+    }
+
+    public void setPublic_user_metadata(MetaData public_user_metadata) {
+        this.public_user_metadata = public_user_metadata;
+    }
+
+    public MetaData getPrivate_user_metadata() {
+        return private_user_metadata;
+    }
+
+    public void setPrivate_user_metadata(MetaData private_user_metadata) {
+        this.private_user_metadata = private_user_metadata;
+    }
+
+    public MetaData getPublic_admin_metadata() {
+        return public_admin_metadata;
+    }
+
+    public void setPublic_admin_metadata(MetaData public_admin_metadata) {
+        this.public_admin_metadata = public_admin_metadata;
+    }
+
+    public MetaData getPrivate_admin_metadata() {
+        return private_admin_metadata;
+    }
+
+    public void setPrivate_admin_metadata(MetaData private_admin_metadata) {
+        this.private_admin_metadata = private_admin_metadata;
     }
 }

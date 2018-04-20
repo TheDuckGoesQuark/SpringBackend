@@ -1,24 +1,38 @@
 /* Author nd33 */
 
-DROP TABLE IF EXISTS `oauth_access_token`;
-DROP TABLE IF EXISTS `has_privilege`;
-DROP TABLE IF EXISTS `involved_in`;
-DROP TABLE IF EXISTS `user`;
-DROP TABLE IF EXISTS `privilege`;
-DROP TABLE IF EXISTS `project`;
-DROP TABLE IF EXISTS `supports_view`;
-DROP TABLE IF EXISTS `supported_view`;
-DROP TABLE IF EXISTS `dir_contains`;
-DROP TABLE IF EXISTS `header`;
-DROP TABLE IF EXISTS `row_count`;
-DROP TABLE IF EXISTS `file`;
-
+CREATE TABLE IF NOT EXISTS `metadata` (
+  `metadataID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `namespaces` JSON,
+  `version` INT UNSIGNED NOT NULL,
+  `type`    VARCHAR(15),
+  PRIMARY KEY (`metadataID`)
+);
 
 CREATE TABLE IF NOT EXISTS `user` (
   `username` VARCHAR(100) NOT NULL,
   `password` VARCHAR(500) NOT NULL,
   `email`    VARCHAR(320),
-  PRIMARY KEY (`username`)
+  `public_user_metadata` INT UNSIGNED,
+  `private_user_metadata` INT UNSIGNED,
+  `public_admin_metadata` INT UNSIGNED,
+  `private_admin_metadata` INT UNSIGNED,
+  PRIMARY KEY (`username`),
+  FOREIGN KEY (`public_user_metadata`)
+  REFERENCES `metadata` (`metadataID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`private_user_metadata`)
+  REFERENCES `metadata` (`metadataID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`public_admin_metadata`)
+  REFERENCES `metadata` (`metadataID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`private_admin_metadata`)
+  REFERENCES `metadata` (`metadataID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `privilege` (
@@ -28,9 +42,9 @@ CREATE TABLE IF NOT EXISTS `privilege` (
   PRIMARY KEY (`name`)
 );
 
-INSERT INTO privilege (name, description, internal) VALUES
-  ("admin", "can do everything", TRUE),
-  ("user", "can do some stuff", FALSE);
+# INSERT INTO IF NOT EXISTS privilege (name, description, internal) VALUES
+#   ("admin", "can do everything", TRUE),
+#   ("user", "can do some stuff", FALSE);
 
 CREATE TABLE IF NOT EXISTS `has_privilege` (
   `username`       VARCHAR(100) NOT NULL,

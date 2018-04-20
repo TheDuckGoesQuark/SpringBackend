@@ -18,7 +18,7 @@ public class FileModel {
 
     private Map<String, BaseSupportedViewInfo> supported_views;
 
-    private FileMetaDataModel metadata;
+    private MetaDataModel metadata;
 
     private String type;
 
@@ -28,7 +28,7 @@ public class FileModel {
     private List<FileModel> children;
 
     // File meta model
-    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, FileMetaDataModel metadata, String type, String status) {
+    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, MetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -39,7 +39,7 @@ public class FileModel {
     }
 
     // Directory meta model
-    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
+    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, MetaDataModel metadata, String type, String status, List<FileModel> children) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -98,11 +98,11 @@ public class FileModel {
         this.status = status;
     }
 
-    public FileMetaDataModel getMetadata() {
+    public MetaDataModel getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(FileMetaDataModel metadata) {
+    public void setMetadata(MetaDataModel metadata) {
         this.metadata = metadata;
     }
 
