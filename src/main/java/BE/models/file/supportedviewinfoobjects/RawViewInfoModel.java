@@ -1,8 +1,8 @@
-package BE.models.file.supportedview;
+package BE.models.file.supportedviewinfoobjects;
 
 import BE.entities.project.SupportedView;
 
-public class RawViewInfoModel extends SupportedViewMeta {
+public class RawViewInfoModel extends BaseSupportedViewInfo {
 
     private long size;
 

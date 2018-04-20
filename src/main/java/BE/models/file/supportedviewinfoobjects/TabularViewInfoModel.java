@@ -1,4 +1,4 @@
-package BE.models.file.supportedview;
+package BE.models.file.supportedviewinfoobjects;
 
 import BE.entities.project.SupportedView;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TabularViewInfoModel extends SupportedViewMeta {
+public class TabularViewInfoModel extends BaseSupportedViewInfo {
 
     private Map<String,String> columns = new HashMap<>();
     private int rows;

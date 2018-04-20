@@ -1,29 +1,29 @@
 package BE.models.file;
 
-import java.sql.Timestamp;
+import java.util.Map;
 
 public class FileMetaDataModel {
-    private Timestamp last_modified;
-    private long length;
+    private int version;
+    private Map<String, Object> namespaces;
 
-    public FileMetaDataModel(Timestamp last_modified, long length) {
-        this.last_modified = last_modified;
-        this.length = length;
+    public FileMetaDataModel(int version, Map<String, Object> namespaces) {
+        this.version = version;
+        this.namespaces = namespaces;
     }
 
-    public Timestamp getLast_modified() {
-        return last_modified;
+    public int getVersion() {
+        return version;
     }
 
-    public void setLast_modified(Timestamp last_modified) {
-        this.last_modified = last_modified;
+    public void setVersion(int version) {
+        this.version = version;
     }
 
-    public long getLength() {
-        return length;
+    public Map<String, Object> getNamespaces() {
+        return namespaces;
     }
 
-    public void setLength(long length) {
-        this.length = length;
+    public void setNamespaces(Map<String, Object> namespaces) {
+        this.namespaces = namespaces;
     }
 }

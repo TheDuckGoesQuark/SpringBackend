@@ -7,9 +7,9 @@ import BE.entities.project.tabular.Header;
 import BE.exceptions.UnsupportedFileViewException;
 import BE.models.file.FileMetaDataModel;
 import BE.models.file.FileModel;
-import BE.models.file.supportedview.RawViewInfoModel;
-import BE.models.file.supportedview.SupportedViewMeta;
-import BE.models.file.supportedview.TabularViewInfoModel;
+import BE.models.file.supportedviewinfoobjects.RawViewInfoModel;
+import BE.models.file.supportedviewinfoobjects.BaseSupportedViewInfo;
+import BE.models.file.supportedviewinfoobjects.TabularViewInfoModel;
 
 import java.io.File;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class MetaFileUtil {
      */
     public static FileModel metaFileToFileModel(MetaFile metaFile) {
 
-        Map<String, SupportedViewMeta> supportedViewList = new HashMap<>();
+        Map<String, BaseSupportedViewInfo> supportedViewList = new HashMap<>();
 
         metaFile.getSupported_views().forEach(supportedView -> {
             switch (supportedView.getView()) {

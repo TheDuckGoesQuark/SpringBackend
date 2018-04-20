@@ -1,6 +1,6 @@
 package BE.models.file;
 
-import BE.models.file.supportedview.SupportedViewMeta;
+import BE.models.file.supportedviewinfoobjects.BaseSupportedViewInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class FileModel {
 
     private int file_id;
 
-    private Map<String, SupportedViewMeta> supported_views;
+    private Map<String, BaseSupportedViewInfo> supported_views;
 
     private FileMetaDataModel metadata;
 
@@ -28,7 +28,7 @@ public class FileModel {
     private List<FileModel> children;
 
     // File meta model
-    public FileModel(String path, String file_name, int file_id, Map<String, SupportedViewMeta> supported_views, FileMetaDataModel metadata, String type, String status) {
+    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, FileMetaDataModel metadata, String type, String status) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -39,7 +39,7 @@ public class FileModel {
     }
 
     // Directory meta model
-    public FileModel(String path, String file_name, int file_id, Map<String, SupportedViewMeta> supported_views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
+    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, FileMetaDataModel metadata, String type, String status, List<FileModel> children) {
         this.path = path;
         this.file_name = file_name;
         this.file_id = file_id;
@@ -82,11 +82,11 @@ public class FileModel {
         this.type = type;
     }
 
-    public Map<String, SupportedViewMeta> getSupported_views() {
+    public Map<String, BaseSupportedViewInfo> getSupported_views() {
         return supported_views;
     }
 
-    public void setSupported_views(Map<String, SupportedViewMeta> supported_views) {
+    public void setSupported_views(Map<String, BaseSupportedViewInfo> supported_views) {
         this.supported_views = supported_views;
     }
 
