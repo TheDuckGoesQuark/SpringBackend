@@ -37,11 +37,10 @@ public class ProjectServiceImpl implements ProjectService {
      */
     private static ProjectModel projectToProjectModel(Project project) {
         return new ProjectModel(project.getName(),
-//TODO get user projects returns null and that causes the program to throw NullPointerException
-/*                project.getUserProjects().stream().map(
-                        ProjectServiceImpl::userProjectToUserListModel
-                ).collect(Collectors.toList())*/
-                null);
+                project.getUserProjects()
+                        .stream()
+                        .map(ProjectServiceImpl::userProjectToUserListModel)
+                        .collect(Collectors.toList()));
     }
 
     /**

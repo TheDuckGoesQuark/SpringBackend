@@ -174,7 +174,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", method = RequestMethod.GET)
     public FileModel getFile(@PathVariable(value = "project_name") String project_name,
-                             @RequestParam Map<String, String> otherOptions,
+                             @RequestParam(required = false) Map<String, String> otherOptions,
                              @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
                              @RequestParam(value = "include_children", required = false) String includeChildren,
                              HttpServletRequest request,
@@ -209,7 +209,7 @@ public class ProjectController {
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", method = RequestMethod.GET)
     public FileModel getFileByID(@PathVariable(value = "project_name") String project_name,
                                  @PathVariable(value = "file_id") int file_id,
-                                 @RequestParam Map<String, String> otherOptions,
+                                 @RequestParam(required = false) Map<String, String> otherOptions,
                                  @RequestParam(value = "view", required = false, defaultValue = SupportedView.META_VIEW) String view,
                                  @RequestParam(value = "include_children", required = false) String includeChildren,
                                  HttpServletResponse response) {

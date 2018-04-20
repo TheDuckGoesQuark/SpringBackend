@@ -4,6 +4,7 @@ package BE.entities.project;
 import BE.entities.UserProject;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,7 @@ public class Project {
     private MetaFile root_dir;
 
     @OneToMany(mappedBy = "project")
-    private List<UserProject> userProjects;
+    private List<UserProject> userProjects = new ArrayList<>();
 
     protected Project() {
     }
