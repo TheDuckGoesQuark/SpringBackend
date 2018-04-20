@@ -28,14 +28,11 @@ public class ProjectServiceImpl implements ProjectService {
     private final
     RoleRepository roleRepository;
 
-    private final
-    UserProjectRepository userProjectRepository;
 
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, RoleRepository roleRepository, UserProjectRepository userProjectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, RoleRepository roleRepository) {
         this.projectRepository = projectRepository;
         this.roleRepository = roleRepository;
-        this.userProjectRepository = userProjectRepository;
     }
 
     // Conversion Functions
@@ -163,10 +160,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectRoleModel> getAllRoles() {
-        //IN PROGRESS
-        //List<Role> roleList = roleRepository.findAll();
-
-
         return ((List<Role>) roleRepository.findAll()).stream().map(
                 ProjectServiceImpl::roleToProjectRoleMode
         ).collect(Collectors.toList());
