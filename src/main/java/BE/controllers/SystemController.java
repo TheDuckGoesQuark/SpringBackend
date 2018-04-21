@@ -15,8 +15,8 @@ public class SystemController {
 
     private static final Logger logger = Logger.getLogger(SystemController.class);
 
-    private static String[] SUPPORTED_PROTOCOLS = {"BE01", "BE50", "BE70"};
-    private static String[] REQUIRED_PROTOCOLS = {"BE01"};
+    private static String[] SUPPORTED_PROTOCOLS = {"BE01", "BE02", "BE50", "BE70"};
+    private static String[] REQUIRED_PROTOCOLS = {"BE01", "BE02"};
     private static final SupportedProtocolListModel SUPPORTED_PROTOCOL_LIST = new SupportedProtocolListModel(
             Arrays.asList(SUPPORTED_PROTOCOLS),
             Arrays.asList(REQUIRED_PROTOCOLS)

@@ -256,8 +256,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileModel createOrUpdateFile(String project_name, int file_id, String action, FileRequestOptions options, byte[] bytes) {
-        MetaFile metaFile = fileRepository.findByFileId(file_id);
-        return createOrUpdateFile(project_name, metaFile.getPath(), action, options, bytes);
+        return createOrUpdateFile(project_name, fileRepository.getPathFromId(file_id), action, options, bytes);
     }
 
     private void deleteRecursively(MetaFile parent) {
@@ -294,11 +293,7 @@ public class FileServiceImpl implements FileService {
         deleteRecursively(metaFile);
     }
 
-    @Override
-    @Transactional
-    public FileModel updateFileMetaData(String project_name, String path, MetaDataModel metaDataModel) {
-        MetaFile metaFile = getMetaFileFromPath(project_name, path);
-
+    private MetaFile updateMetaFile(MetaFile metaFile, MetaDataModel metaDataModel) {
         if (metaFile.getMetadata().getVersion() != metaDataModel.getVersion()-1) throw new InvalidMetadataException();
 
         // Map <String,Object> to jsonObject, to string for database
@@ -309,12 +304,22 @@ public class FileServiceImpl implements FileService {
         metaData.setVersion(metaData.getVersion()+1);
         metaFile.setMetadata(metaData);
 
-        return metaFileToFileModel(metaFile);
+        return metaFile;
+    }
+
+    @Override
+    @Transactional
+    public FileModel updateFileMetaData(String project_name, String path, MetaDataModel metaDataModel) {
+        MetaFile metaFile = getMetaFileFromPath(project_name, path);
+
+        return metaFileToFileModel(updateMetaFile(metaFile, metaDataModel));
     }
 
     @Override
     public FileModel updateFileMetaData(String project_name, int file_id, MetaDataModel metaDataModel) {
-        throw new NotImplementedException(); //TODO update file meta data
+        MetaFile metaFile = fileRepository.findByFileId(file_id);
+
+        return metaFileToFileModel(updateMetaFile(metaFile, metaDataModel));
     }
 
     @Override
@@ -359,8 +364,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileModel moveFile(String project_name, int file_id, MoveFileRequestModel moveFileRequestModel) {
-        MetaFile metaFile = fileRepository.findByFileId(file_id);
-        return moveFile(project_name, metaFile.getPath(), moveFileRequestModel);
+        return moveFile(project_name, fileRepository.getPathFromId(file_id), moveFileRequestModel);
     }
 
     private boolean checkForCycles(MetaFile original) {
@@ -451,7 +455,6 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileModel copyFile(String project_name, int file_id, MoveFileRequestModel moveFileRequestModel) {
-        MetaFile metaFile = fileRepository.findByFileId(file_id);
-        return copyFile(project_name, metaFile.getPath(), moveFileRequestModel);
+        return copyFile(project_name,fileRepository.getPathFromId(file_id), moveFileRequestModel);
     }
 }
