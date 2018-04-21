@@ -19,7 +19,7 @@ public class JSONErrorAdvisor extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponseWrapper(ex));
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseWrapper> handleGenericException(Exception ex){
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

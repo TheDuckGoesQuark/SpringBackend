@@ -1,6 +1,7 @@
 package BE.config;
 
 import BE.entities.project.SupportedView;
+import BE.models.MetaDataModel;
 import BE.models.user.UserModel;
 import BE.repositories.SupportedViewRepository;
 import BE.security.enums.Privileges;
@@ -33,9 +34,13 @@ public class ApplicationStartup
         String[] userPrivileges = {Privileges.USER};
         String[] adminPrivileges = {Privileges.USER, Privileges.ADMIN};
         // TODO GET RID OF THESE MAJOR SECURITY HOLES
-        UserModel userModel = new UserModel("username1", "password1", "email", null, Arrays.asList(userPrivileges));
-        UserModel adminModel = new UserModel("admin1", "password1", "email", null, Arrays.asList(adminPrivileges));
-        userService.createUser(userModel);
-        userService.createUser(adminModel);
+        if (!userService.usernameExists("username1")) {
+            UserModel userModel = new UserModel("username1", "password1", "email", null, Arrays.asList(userPrivileges));
+            userService.createUser(userModel);
+        }
+        if (!userService.usernameExists("admin1")) {
+            UserModel adminModel = new UserModel("admin1", "password1", "email", null, Arrays.asList(adminPrivileges));
+            userService.createUser(adminModel);
+        }
     }
 }

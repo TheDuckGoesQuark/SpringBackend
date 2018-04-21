@@ -1,5 +1,6 @@
 package BE.models.file;
 
+import BE.models.MetaDataModel;
 import BE.models.file.supportedviewinfoobjects.BaseSupportedViewInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 

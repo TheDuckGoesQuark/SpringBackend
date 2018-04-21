@@ -4,14 +4,19 @@ import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
 import BE.entities.project.SupportedView;
 import BE.entities.project.tabular.Header;
+import BE.exceptions.GenericInternalServerException;
 import BE.exceptions.UnsupportedFileViewException;
-import BE.models.file.MetaDataModel;
+import BE.models.MetaDataModel;
 import BE.models.file.FileModel;
 import BE.models.file.supportedviewinfoobjects.RawViewInfoModel;
 import BE.models.file.supportedviewinfoobjects.BaseSupportedViewInfo;
 import BE.models.file.supportedviewinfoobjects.TabularViewInfoModel;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +24,21 @@ import java.util.stream.Collectors;
 
 
 public class MetaFileUtil {
+
+    private static Map<String, Object> jsonStringToMap(String json) {
+
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+            map = new ObjectMapper().readValue(json, new TypeReference<HashMap<String,Object>>() {});
+        } catch (IOException e) {
+            throw new GenericInternalServerException(e);
+        }
+
+        return map;
+
+    }
+
     /**
      * Converts a specific meta file to a file model
      *
@@ -45,12 +65,15 @@ public class MetaFileUtil {
             }
         });
 
+        Map<String,Object> namespaces = jsonStringToMap(metaFile.getMetadata().getNamespaces());
+
+
         return new FileModel(
                 metaFile.getPath(),
                 metaFile.getFile_name(),
                 metaFile.getFileId(),
                 supportedViewList,
-                new MetaDataModel(metaFile.getMetadata_id().getVersion(), null), // TODO String to map<String, Object>
+                new MetaDataModel(metaFile.getMetadata().getVersion(), namespaces), // TODO String to map<String, Object>
                 metaFile.getType(),
                 metaFile.getStatus()
         );

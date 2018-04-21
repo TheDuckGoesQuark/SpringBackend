@@ -1,6 +1,7 @@
 package BE.services;
 
 import BE.controllers.Action;
+import BE.entities.MetaData;
 import BE.entities.project.FileStatus;
 import BE.entities.project.FileTypes;
 import BE.entities.project.MetaFile;
@@ -10,11 +11,13 @@ import BE.entities.project.tabular.RowCount;
 import BE.exceptions.*;
 import BE.exceptions.FileNotFoundException;
 import BE.exceptions.RootFileDeletionException;
+import BE.models.MetaDataModel;
 import BE.models.file.*;
 import BE.repositories.FileRepository;
 import BE.repositories.SupportedViewRepository;
 
 import BE.util.TabularParser;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -293,12 +296,24 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public FileModel updateFileMetaData(String project_name, String path) {
-        throw new NotImplementedException(); //TODO update file meta data
+    public FileModel updateFileMetaData(String project_name, String path, MetaDataModel metaDataModel) {
+        MetaFile metaFile = getMetaFileFromPath(project_name, path);
+
+        if (metaFile.getMetadata().getVersion() != metaDataModel.getVersion()-1) throw new InvalidMetadataException();
+
+        // Map <String,Object> to jsonObject, to string for database
+        MetaData metaData = metaFile.getMetadata();
+        JSONObject jsonObject = new JSONObject();
+        metaDataModel.getNamespaces().forEach(jsonObject::put);
+        metaData.setNamespaces(jsonObject.toString());
+        metaData.setVersion(metaData.getVersion()+1);
+        metaFile.setMetadata(metaData);
+
+        return metaFileToFileModel(metaFile);
     }
 
     @Override
-    public FileModel updateFileMetaData(String project_name, int file_id) {
+    public FileModel updateFileMetaData(String project_name, int file_id, MetaDataModel metaDataModel) {
         throw new NotImplementedException(); //TODO update file meta data
     }
 

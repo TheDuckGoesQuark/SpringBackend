@@ -1,5 +1,3 @@
-/* Author nd33 */
-
 CREATE TABLE IF NOT EXISTS `metadata` (
   `metadataID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `namespaces` JSON,

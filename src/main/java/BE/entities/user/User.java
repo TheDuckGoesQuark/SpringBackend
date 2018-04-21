@@ -30,19 +30,19 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="public_user_metadata", referencedColumnName = "metadataID")
-    private MetaData public_user_metadata;
+    private MetaData public_user_metadata = new MetaData(MetaData.PUBLIC_USER);
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="private_user_metadata", referencedColumnName = "metadataID")
-    private MetaData private_user_metadata;
+    private MetaData private_user_metadata = new MetaData(MetaData.PRIVATE_USER);
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="public_admin_metadata", referencedColumnName = "metadataID")
-    private MetaData public_admin_metadata;
+    private MetaData public_admin_metadata = new MetaData(MetaData.PUBLIC_ADMIN);
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="private_admin_metadata", referencedColumnName = "metadataID")
-    private MetaData private_admin_metadata;
+    private MetaData private_admin_metadata = new MetaData(MetaData.PRIVATE_ADMIN);
 
     protected User() {}
 
@@ -64,11 +64,6 @@ public class User {
         this.email = email;
         this.privileges = privileges;
         this.userProjects = userProjects;
-        this.public_user_metadata = new MetaData();
-        this.private_user_metadata = new MetaData();
-        this.public_admin_metadata = new MetaData();
-        this.private_admin_metadata = new MetaData();
-
     }
 
     public String getUsername() {

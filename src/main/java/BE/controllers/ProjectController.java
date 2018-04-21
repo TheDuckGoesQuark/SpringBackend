@@ -1,15 +1,13 @@
 package BE.controllers;
 
 // JavaIO
-
 import java.io.*;
 import java.util.List;
 import java.util.Map;
 
 // Models
 import BE.entities.project.SupportedView;
-import BE.exceptions.FileRetrievalException;
-import BE.exceptions.UnsupportedFileViewException;
+import BE.models.MetaDataModel;
 import BE.models.file.FileModel;
 import BE.models.file.FileRequestOptions;
 import BE.models.file.MoveFileRequestModel;
@@ -24,7 +22,8 @@ import BE.services.ProjectService;
 
 // Exceptions
 import BE.exceptions.NotImplementedException;
-//import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
+import BE.exceptions.FileRetrievalException;
+import BE.exceptions.UnsupportedFileViewException;
 
 // Apache
 import org.apache.log4j.Logger;
@@ -41,7 +40,6 @@ import org.springframework.web.bind.annotation.*;
 //Other
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import static BE.controllers.Action.COPY;
 import static BE.controllers.Action.MOVE;
 import static BE.controllers.Action.SET_METADATA;
@@ -342,9 +340,10 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}/files/**", params = {"action=" + SET_METADATA}, method = RequestMethod.POST)
     public FileModel updateFileMetaData(@PathVariable(value = "project_name") String project_name,
+                                        @RequestBody MetaDataModel metaDataModel,
                                         HttpServletRequest request) {
         String relativeFilePath = getRelativeFilePath(request, project_name);
-        return fileService.updateFileMetaData(project_name, relativeFilePath);
+        return fileService.updateFileMetaData(project_name, relativeFilePath, metaDataModel);
     }
 
     /**
@@ -355,8 +354,9 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}/files_by_id/{file_id}", params = {"action=" + SET_METADATA}, method = RequestMethod.POST)
     public FileModel updateFileMetaData(@PathVariable(value = "project_name") String project_name,
-                                        @PathVariable(value = "file_id") int file_id) {
-        return fileService.updateFileMetaData(project_name, file_id);
+                                        @PathVariable(value = "file_id") int file_id,
+                                        @RequestBody MetaDataModel metaDataModel) {
+        return fileService.updateFileMetaData(project_name, file_id, metaDataModel);
     }
 
     /**

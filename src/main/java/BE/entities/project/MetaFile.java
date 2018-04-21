@@ -61,7 +61,7 @@ public class MetaFile {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "metadata_id", referencedColumnName = "metadataID")
-    private MetaData metadata_id = new MetaData();
+    private MetaData metadata = new MetaData(MetaData.GENERIC);
 
     protected MetaFile() {
     }
@@ -76,7 +76,7 @@ public class MetaFile {
         this.parent = parent;
     }
 
-    public MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, MetaFile parent, List<MetaFile> children, List<SupportedView> supported_views, Project project, RowCount rowCount, Set<Header> headers, MetaData metadata_id) {
+    public MetaFile(String file_name, String type, String status, Timestamp last_modified, long length, MetaFile parent, List<MetaFile> children, List<SupportedView> supported_views, Project project, RowCount rowCount, Set<Header> headers, MetaData metadata) {
         this.file_name = file_name;
         this.type = type;
         this.status = status;
@@ -88,7 +88,7 @@ public class MetaFile {
         this.project = project;
         this.rowCount = rowCount;
         this.headers = headers;
-        this.metadata_id = metadata_id;
+        this.metadata = metadata;
     }
 
     public static MetaFile createRoot() {
@@ -222,11 +222,11 @@ public class MetaFile {
         this.headers = headers;
     }
 
-    public MetaData getMetadata_id() {
-        return metadata_id;
+    public MetaData getMetadata() {
+        return metadata;
     }
 
-    public void setMetadata_id(MetaData metadata_id) {
-        this.metadata_id = metadata_id;
+    public void setMetadata(MetaData metadata) {
+        this.metadata = metadata;
     }
 }

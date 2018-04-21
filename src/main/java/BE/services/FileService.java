@@ -1,5 +1,6 @@
 package BE.services;
 
+import BE.models.MetaDataModel;
 import BE.models.file.FileModel;
 import BE.models.file.FileRequestOptions;
 import BE.models.file.MoveFileRequestModel;
@@ -40,9 +41,9 @@ public interface FileService {
 
     void deleteFile(String project_name, int file_id);
 
-    FileModel updateFileMetaData(String project_name, String path);
+    FileModel updateFileMetaData(String project_name, String path, MetaDataModel metaDataModel);
 
-    FileModel updateFileMetaData(String project_name, int file_id);
+    FileModel updateFileMetaData(String project_name, int file_id, MetaDataModel metaDataModel);
 
     FileModel moveFile(String project_name, String path, MoveFileRequestModel moveFileRequestModel);
 
