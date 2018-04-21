@@ -47,15 +47,6 @@ CREATE TABLE IF NOT EXISTS `role` (
   PRIMARY KEY (`role`)
 );
 
-INSERT INTO role (role, description, internal) VALUES
-  ("role1", "can do everything", TRUE),
-  ("role2", "can do some stuff", FALSE);
-
-
-INSERT INTO privilege (name, description, internal) VALUES
-  ("admin", "can do everything", TRUE),
-  ("user", "can do some stuff", FALSE);
-
 CREATE TABLE IF NOT EXISTS `has_privilege` (
   `username`       VARCHAR(100) NOT NULL,
   `privilege_name` VARCHAR(45)  NOT NULL,

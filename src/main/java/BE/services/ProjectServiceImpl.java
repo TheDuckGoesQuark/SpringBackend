@@ -115,22 +115,21 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public ProjectModel createProject(String project_name, String username) {
+
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
         MetaFile projectRoot = MetaFile.createRoot();
         Project project = new Project(project_name, projectRoot);
         // Save to database
-        projectRepository.save(project);
+        project = projectRepository.save(project);
         // Make current user an admin of the new project
         User user = userRepository.findByUsername(username);
         UserProject userProject = new UserProject();
-        userProject.setProject(project);
         userProject.setUser(user);
         userProject.setAccess_level("project_admin");
-        userProjectRepository.save(userProject);
+        userProject.setProject(project);
+        project.getUserProjects().add(userProject);
 
-        List<UserProject> userProjects = new ArrayList<>();
-        userProjects.add(userProject);
-        project.setUserProjects(userProjects);
+
         return projectToProjectModel(project);
     }
 

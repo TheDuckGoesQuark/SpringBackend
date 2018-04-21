@@ -6,6 +6,7 @@ import java.util.List;
 // Exceptions
 // Models
 // Spring
+import BE.exceptions.InvalidRequestStructureException;
 import BE.models.user.AvailabilityModel;
 import BE.models.user.PrivilegeModel;
 import BE.models.user.UserModel;
@@ -89,8 +90,10 @@ public class UserController {
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.CREATE}, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public UserModel createUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
+
         user.setUsername(username);
         return userService.createUser(user);
+
     }
 
     /**

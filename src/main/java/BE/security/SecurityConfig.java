@@ -94,6 +94,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests()
                     .antMatchers("/swagger-ui.html").permitAll()
                 .and()
+                    .authorizeRequests()
+                    .antMatchers("/loggers").permitAll()
+                .and()
                         .authorizeRequests()
                         //.antMatchers("/secure/admin").access("hasRole('ADMIN')") // Configures specified URL to be accessed with user having role as ADMIN
                         .anyRequest().authenticated() // Any resources not mentioned above needs to be authenticated

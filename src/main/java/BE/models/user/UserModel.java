@@ -27,11 +27,11 @@ public class UserModel {
 
     private MetaDataModel public_user_metadata = new MetaDataModel();
 
-    private MetaDataModel private_user_metadata;
+    private MetaDataModel private_user_metadata = new MetaDataModel();
 
-    private MetaDataModel public_admin_metadata;
+    private MetaDataModel public_admin_metadata = new MetaDataModel();
 
-    private MetaDataModel private_admin_metadata;
+    private MetaDataModel private_admin_metadata = new MetaDataModel();
 
     protected UserModel() {}
 
