@@ -2,6 +2,8 @@ package BE.controllers;
 
 // JavaIO
 import java.io.*;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -125,8 +127,9 @@ public class ProjectController {
      * @return project
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.CREATE}, method = RequestMethod.POST)
-    public ProjectModel createProject(@PathVariable(value = "project_name") String project_name) {
-        return projectService.createProject(project_name);
+    public ProjectModel createProject(@PathVariable(value = "project_name") String project_name, Principal principal, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_CREATED);
+        return projectService.createProject(project_name, principal.getName());
     }
 
     /**
@@ -136,7 +139,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.UPDATE}, method = RequestMethod.POST)
     public ProjectModel updateProject(@PathVariable(value = "project_name") String project_name, @RequestBody ProjectModel project) {
-        return projectService.updateProject(project);
+        return projectService.updateProject(project_name, project);
     }
 
     /**
@@ -156,14 +159,15 @@ public class ProjectController {
      * @return project
      */
     @RequestMapping(value = "/projects/{project_name}", params = {"action=" + Action.UPDATE_GRANT}, method = RequestMethod.POST)
-    public void updateGrant(@PathVariable(value = "project_name") String project_name, @RequestBody UserListModel userListModel) {
-        projectService.updateGrant(project_name, userListModel);
+    public ProjectModel updateGrant(@PathVariable(value = "project_name") String project_name, @RequestBody UserListModel userListModel) {
+        return projectService.updateGrant(project_name, userListModel);
     }
 
     @RequestMapping(value = "/project_roles", method = RequestMethod.GET)
     public List<ProjectRoleModel> getProjectRoles() throws NotImplementedException {
         //TODO this
-        throw new NotImplementedException();
+        return projectService.getAllRoles();
+        //throw new NotImplementedException();
     }
 
     /* -----------------|-----------------------------------|---------------- */

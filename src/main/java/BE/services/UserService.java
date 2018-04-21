@@ -13,7 +13,7 @@ public interface UserService extends UserDetailsService {
 
     public UserModel createUser(UserModel user);
 
-    public UserModel updateUser(UserModel user);
+    public UserModel updateUser(String username, UserModel user);
 
     public UserModel deleteUser(String username);
 

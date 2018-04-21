@@ -76,8 +76,8 @@ public class UserController {
      * @return current user
      */
     @RequestMapping(value = "/current_user",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
-    public UserModel updateCurrentUser(@RequestBody UserModel user) {
-        return userService.updateUser(user);
+    public UserModel updateCurrentUser(@RequestBody UserModel user, Principal principal) {
+        return userService.updateUser(principal.getName(), user);
     }
 
     /**
@@ -101,7 +101,7 @@ public class UserController {
      */
     @RequestMapping(value = "/users/{username}",params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public UserModel updateUser(@PathVariable(value="username") String username, @RequestBody UserModel user) {
-        return userService.updateUser(user);
+        return userService.updateUser(username, user);
     }
 
     /**

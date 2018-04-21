@@ -40,9 +40,21 @@ CREATE TABLE IF NOT EXISTS `privilege` (
   PRIMARY KEY (`name`)
 );
 
-# INSERT INTO IF NOT EXISTS privilege (name, description, internal) VALUES
-#   ("admin", "can do everything", TRUE),
-#   ("user", "can do some stuff", FALSE);
+CREATE TABLE IF NOT EXISTS `role` (
+  `role`        VARCHAR(45)  NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `internal`    BOOL         NOT NULL,
+  PRIMARY KEY (`role`)
+);
+
+INSERT INTO role (role, description, internal) VALUES
+  ("role1", "can do everything", TRUE),
+  ("role2", "can do some stuff", FALSE);
+
+
+INSERT INTO privilege (name, description, internal) VALUES
+  ("admin", "can do everything", TRUE),
+  ("user", "can do some stuff", FALSE);
 
 CREATE TABLE IF NOT EXISTS `has_privilege` (
   `username`       VARCHAR(100) NOT NULL,

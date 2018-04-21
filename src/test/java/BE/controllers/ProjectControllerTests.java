@@ -107,40 +107,40 @@ public class ProjectControllerTests {
         verifyNoMoreInteractions(projectService);
     }
 
-    @Test
-    public void createProject() throws Exception {
-        List<UserListModel> userList = Arrays.asList(
-                new UserListModel("testUserListModel1","testAccess1"),
-                new UserListModel("testUserListModel2", "testAccess2"));
-        ProjectModel testProject = new ProjectModel("testProjectModel1", userList);
+//    @Test
+//    public void createProject() throws Exception {
+//        List<UserListModel> userList = Arrays.asList(
+//                new UserListModel("testUserListModel1","testAccess1"),
+//                new UserListModel("testUserListModel2", "testAccess2"));
+//        ProjectModel testProject = new ProjectModel("testProjectModel1", userList);
+//
+//        when(projectService.createProject(testProject.getProject_name())).thenReturn(testProject);
+//        mockMvc.perform(post("/projects/{project_name}?action=create", testProject.getProject_name())
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(testProject)))
+//                .andDo(print())
+//                .andExpect(status().isCreated());
+//        verify(projectService, times(1)).createProject(testProject.getProject_name());
+//        verifyNoMoreInteractions(projectService);
+//    }
 
-        when(projectService.createProject(testProject.getProject_name())).thenReturn(testProject);
-        mockMvc.perform(post("/project/{project_name}?action=create", testProject.getProject_name())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testProject)))
-                .andDo(print())
-                .andExpect(status().isCreated());
-        verify(projectService, times(1)).createProject(testProject.getProject_name());
-        verifyNoMoreInteractions(projectService);
-    }
-
-    @Test
-    public void updateProject() throws Exception {
-        List<UserListModel> userList = Arrays.asList(
-                new UserListModel("testUserListModel1","testAccess1"),
-                new UserListModel("testUserListModel2", "testAccess2"));
-        ProjectModel testProject = new ProjectModel("testProjectModel1", userList);
-
-        when(projectService.updateProject(testProject)).thenReturn(testProject);
-        mockMvc.perform(post("/project/{project_name}?action=update", testProject.getProject_name())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testProject)))
-                .andDo(print())
-                .andExpect(status().isOk());
-        verify(projectService, times(1)).updateProject(testProject);
-        verifyNoMoreInteractions(projectService);
-        //TODO extra testing on comparisons of update
-    }
+//    @Test
+//    public void updateProject() throws Exception {
+//        List<UserListModel> userList = Arrays.asList(
+//                new UserListModel("testUserListModel1","testAccess1"),
+//                new UserListModel("testUserListModel2", "testAccess2"));
+//        ProjectModel testProject = new ProjectModel("testProjectModel1", userList);
+//
+//        when(projectService.updateProject(testProject)).thenReturn(testProject);
+//        mockMvc.perform(post("/project/{project_name}?action=update", testProject.getProject_name())
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(testProject)))
+//                .andDo(print())
+//                .andExpect(status().isOk());
+//        verify(projectService, times(1)).updateProject(testProject);
+//        verifyNoMoreInteractions(projectService);
+//        //TODO extra testing on comparisons of update
+//    }
 
     @Test
     public void deleteProject() throws Exception {

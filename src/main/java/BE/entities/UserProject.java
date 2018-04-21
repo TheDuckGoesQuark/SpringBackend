@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 /**
  *  Since involved_in involves attribute,
- *  A seperate entity class had to be created to handle
+ *  A separate entity class had to be created to handle
  *  this relationship.
  */
 
@@ -39,7 +39,7 @@ public class UserProject {
         this.access_level = access_level;
     }
 
-    protected UserProject() {}
+    public UserProject() {}
 
     public User getUser() {
         return user;
