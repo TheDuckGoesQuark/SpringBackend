@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class SystemController {
 
     private static final Logger logger = Logger.getLogger(SystemController.class);

@@ -48,6 +48,7 @@ import static BE.controllers.Action.SET_METADATA;
 import static BE.models.file.FileRequestOptions.readOptions;
 
 @RestController
+@CrossOrigin
 public class ProjectController {
 
     private static final Logger logger = Logger.getLogger(ProjectController.class);

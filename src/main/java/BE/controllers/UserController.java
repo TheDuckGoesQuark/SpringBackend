@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin
 public class UserController {
 
     private static final Logger logger = Logger.getLogger(UserController.class);
