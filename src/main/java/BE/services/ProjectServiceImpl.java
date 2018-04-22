@@ -12,7 +12,6 @@ import BE.models.project.UserListModel;
 import BE.repositories.UserRepository;
 import BE.repositories.UserProjectRepository;
 import BE.repositories.RoleRepository;
-import BE.repositories.UserProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,20 +161,18 @@ public class ProjectServiceImpl implements ProjectService {
         User user = userRepository.findByUsername(grant.getUsername());
         if (user == null) throw new UserNotFoundException();
         String access_level = grant.getAccess_level();
-        if(!access_level.equals("regular") && !access_level.equals("project_admin")) throw new InvalidAccessLevelException();
+        if(!access_level.equals(AccessRight.REGULAR) && !access_level.equals(AccessRight.ADMIN)) throw new InvalidAccessLevelException();
         UserProject userProject = new UserProject();
-        userProject.setProject(project);
-        userProject.setUser(user);
         userProject.setAccess_level(access_level);
-        userProjectRepository.save(userProject);
+        userProject.setRole(access_level);
 
-        //do I need to check if the UserProject is already in the list?
-        //is it possible to have two UserProjects that are the same besides access_level and role? if so need to avoid this
+        userProject.setUser(user);
+        userProject.setProject(project);
 
-        List<UserProject> userProjects = new ArrayList<>();
-        if (project.getUserProjects() != null) userProjects = project.getUserProjects();
-        userProjects.add(userProject);
-        project.setUserProjects(userProjects);
+        userProject = userProjectRepository.save(userProject);
+
+        project.setUserProjects(Collections.singletonList(userProject));
+
         return projectToProjectModel(project);
     }
 
