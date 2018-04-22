@@ -202,8 +202,11 @@ public class ProjectController {
         switch (view) {
             case SupportedView.META_VIEW:
                 FileModel fileModel = fileService.getMetaFileWithChildren(project_name, relativePath);
-                if (includeChildren != null && fileModel.getType().equals(FileTypes.DIR)) return fileService.getMetaFileWithChildren(project_name, relativePath);
-                else return fileService.getMetaFile(project_name, relativePath);
+                if (includeChildren != null && fileModel.getType().equals(FileTypes.DIR)) return fileModel;
+                else {
+                    fileModel.setChildren(null);
+                    return fileModel;
+                }
             case SupportedView.RAW_VIEW:
                 sendFile(fileService.getRawFile(project_name, relativePath), response, MediaType.APPLICATION_JSON_VALUE);
                 return null;
@@ -237,8 +240,11 @@ public class ProjectController {
         switch (view) {
             case SupportedView.META_VIEW:
                 FileModel fileModel = fileService.getMetaFileWithChildren(file_id);
-                if (includeChildren != null && fileModel.getType().equals(FileTypes.DIR)) return fileService.getMetaFileWithChildren(project_name, relativePath);
-                else return fileService.getMetaFile(file_id);
+                if (includeChildren != null && fileModel.getType().equals(FileTypes.DIR)) return fileModel;
+                else {
+                    fileModel.setChildren(null);
+                    return fileModel;
+                }
             case SupportedView.RAW_VIEW:
                 sendFile(fileService.getRawFile(file_id), response, MediaType.APPLICATION_OCTET_STREAM_VALUE);
                 return null;
