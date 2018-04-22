@@ -1,6 +1,7 @@
 package BE.services;
 
 import BE.entities.system.Logging;
+import BE.exceptions.LogValueAlreadyExistsException;
 import BE.models.system.LoggingModel;
 import BE.repositories.LoggingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,9 @@ public class SystemServiceImpl implements SystemService{
     }
 
     @Override
-    public LoggingModel storeLogging(LoggingModel loggingModel, String username) {
+    public LoggingModel storeLog(LoggingModel loggingModel, String username) {
+        Logging log = loggingRepository.findByValue(loggingModel.getValue());
+        if (log != null) throw new LogValueAlreadyExistsException();
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         dateFormat.setTimeZone(timeZone);
@@ -45,14 +48,14 @@ public class SystemServiceImpl implements SystemService{
     }
 
     @Override
-    public List<LoggingModel> retrieveLoggings(String beforeDate, String afterDate, String level) throws ParseException {
-        List<Logging> loggings = loggingRepository.findByLevel(level);
+    public List<LoggingModel> retrieveLogs(String beforeDate, String afterDate, String level) throws ParseException {
+        List<Logging> logs = loggingRepository.findByLevel(level);
         List<LoggingModel> loggingModels = new ArrayList<>();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         Date bD = dateFormat.parse(beforeDate);
         Date aD = dateFormat.parse(afterDate);
-        for (int i = 0; i < loggings.size(); i++) {
-            Logging logging = loggings.get(i);
+        for (int i = 0; i < logs.size(); i++) {
+            Logging logging = logs.get(i);
             Date loggingTZ = dateFormat.parse(logging.getTimestamp());
             if (loggingTZ.before(bD) && loggingTZ.after(aD)) {
                 loggingModels.add(loggingToLoggingModel(logging));

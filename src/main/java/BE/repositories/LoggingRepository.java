@@ -9,4 +9,5 @@ public interface LoggingRepository extends CrudRepository<Logging, String> {
 
     List<Logging> findByLevel(String level);
 
+    Logging findByValue(String value);
 }

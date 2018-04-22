@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SystemService {
 
-    LoggingModel storeLogging(LoggingModel loggingModel, String username);
+    LoggingModel storeLog(LoggingModel loggingModel, String username);
 
-    List<LoggingModel> retrieveLoggings(String beforeDate, String afterDate, String level) throws ParseException;
+    List<LoggingModel> retrieveLogs(String beforeDate, String afterDate, String level) throws ParseException;
 }

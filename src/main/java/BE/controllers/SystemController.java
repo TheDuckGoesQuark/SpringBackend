@@ -50,7 +50,7 @@ public class SystemController {
     public List<LoggingModel> getLogs(@RequestParam(value = "before", required = false) String beforeDate,
                                       @RequestParam(value = "after", required = false) String afterDate,
                                       @RequestParam(value = "level", required = false) String level) throws ParseException{
-        return systemService.retrieveLoggings(beforeDate, afterDate, level);
+        return systemService.retrieveLogs(beforeDate, afterDate, level);
     }
 
     /**
@@ -61,7 +61,7 @@ public class SystemController {
     @RequestMapping(value = "/log", method = RequestMethod.POST)
     public LoggingModel postLog(Principal principal, @RequestBody LoggingModel loggingModel) {
         String username = principal.getName();
-        return systemService.storeLogging(loggingModel, username);
+        return systemService.storeLog(loggingModel, username);
     }
 
     /**
