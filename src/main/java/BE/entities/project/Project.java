@@ -18,7 +18,7 @@ public class Project {
     @OneToOne(cascade = CascadeType.ALL)
     private MetaFile root_dir;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<UserProject> userProjects = new ArrayList<>();
 
     protected Project() {

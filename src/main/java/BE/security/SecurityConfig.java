@@ -8,6 +8,7 @@ import BE.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -21,6 +22,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 import javax.sql.DataSource;
 
@@ -76,7 +78,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**");
+        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**")
+        .and().ignoring().regexMatchers(HttpMethod.POST, "(\\/users\\/)([^\\/]+)(\\?action=create)");
     }
 
     @Override
@@ -84,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .csrf().disable() // disable CSRF for this application
+                 .csrf().disable() // disable CSRF for this application
                 .formLogin() // Using form based login instead of Basic Authentication
                     .loginProcessingUrl("/oauth/token") // Endpoint which will process the authentication request. This is where we will post our credentials to authenticate
                 .and()
@@ -94,9 +97,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests()
                     .antMatchers("/swagger-ui.html").permitAll()
                 .and()
-                    .authorizeRequests()
-                    .antMatchers("/loggers").permitAll()
-                .and()
                         .authorizeRequests()
                         //.antMatchers("/secure/admin").access("hasRole('ADMIN')") // Configures specified URL to be accessed with user having role as ADMIN
                         .anyRequest().authenticated() // Any resources not mentioned above needs to be authenticated
@@ -105,8 +105,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                     .and()
                         .addFilterBefore(getFormAuthenticationFilter("/oauth/token"), UsernamePasswordAuthenticationFilter.class)
-                        .addFilterBefore(getTokenAuthenticationFilter("/**"), UsernamePasswordAuthenticationFilter.class)
-                .anonymous()
-                    .disable(); // Disables anonymous authentication with anonymous role.
+                        .addFilterBefore(getTokenAuthenticationFilter("/**"), UsernamePasswordAuthenticationFilter.class);
     }
 }

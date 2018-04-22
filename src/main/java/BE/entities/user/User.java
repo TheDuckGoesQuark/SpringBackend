@@ -25,7 +25,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "privilege_name", referencedColumnName = "name"))
     private List<Privilege> privileges;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserProject> userProjects;
 
     @OneToOne(cascade = CascadeType.ALL)

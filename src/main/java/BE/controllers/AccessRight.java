@@ -1,6 +1,6 @@
 package BE.controllers;
 
-final class AccessRight {
-    static final String REGULAR = "regular";
-    static final String ADMIN = "project_admin";
+public final class AccessRight {
+    public static final String REGULAR = "regular";
+    public static final String ADMIN = "project_admin";
 }

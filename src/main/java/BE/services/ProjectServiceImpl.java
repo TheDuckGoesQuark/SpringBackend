@@ -1,5 +1,6 @@
 package BE.services;
 
+import BE.controllers.AccessRight;
 import BE.entities.UserProject;
 import BE.entities.project.*;
 import BE.entities.user.User;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -118,17 +121,21 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (projectRepository.findByName(project_name) != null) throw new ProjectAlreadyExistsException();
         MetaFile projectRoot = MetaFile.createRoot();
+
         Project project = new Project(project_name, projectRoot);
-        // Save to database
-        project = projectRepository.save(project);
+
         // Make current user an admin of the new project
         User user = userRepository.findByUsername(username);
         UserProject userProject = new UserProject();
-        userProject.setUser(user);
-        userProject.setAccess_level("project_admin");
-        userProject.setProject(project);
-        project.getUserProjects().add(userProject);
+        userProject.setAccess_level(AccessRight.ADMIN);
+        userProject.setRole(AccessRight.ADMIN);
 
+        userProject.setUser(user);
+        userProject.setProject(project);
+
+        userProject = userProjectRepository.save(userProject);
+
+        project.setUserProjects(Collections.singletonList(userProject));
 
         return projectToProjectModel(project);
     }
