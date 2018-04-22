@@ -11,11 +11,11 @@ public class FileModel {
 
     public static final String ROOT_FILE_NAME= "";
 
-    private String path;
+    private String file_path;
 
     private String file_name;
 
-    private int file_id;
+    private int id;
 
     private Map<String, BaseSupportedViewInfo> supported_views;
 
@@ -29,10 +29,10 @@ public class FileModel {
     private List<FileModel> children;
 
     // File meta model
-    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, MetaDataModel metadata, String type, String status) {
-        this.path = path;
+    public FileModel(String file_path, String file_name, int id, Map<String, BaseSupportedViewInfo> supported_views, MetaDataModel metadata, String type, String status) {
+        this.file_path = file_path;
         this.file_name = file_name;
-        this.file_id = file_id;
+        this.id = id;
         this.supported_views = supported_views;
         this.metadata = metadata;
         this.type = type;
@@ -40,10 +40,10 @@ public class FileModel {
     }
 
     // Directory meta model
-    public FileModel(String path, String file_name, int file_id, Map<String, BaseSupportedViewInfo> supported_views, MetaDataModel metadata, String type, String status, List<FileModel> children) {
-        this.path = path;
+    public FileModel(String file_path, String file_name, int id, Map<String, BaseSupportedViewInfo> supported_views, MetaDataModel metadata, String type, String status, List<FileModel> children) {
+        this.file_path = file_path;
         this.file_name = file_name;
-        this.file_id = file_id;
+        this.id = id;
         this.supported_views = supported_views;
         this.metadata = metadata;
         this.type = type;
@@ -51,20 +51,20 @@ public class FileModel {
         this.children = children;
     }
 
-    public int getFile_id() {
-        return file_id;
+    public int getId() {
+        return id;
     }
 
-    public void setFile_id(int file_id) {
-        this.file_id = file_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getPath() {
-        return path;
+    public String getFile_path() {
+        return file_path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setFile_path(String file_path) {
+        this.file_path = file_path;
     }
 
     public String getFile_name() {

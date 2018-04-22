@@ -141,7 +141,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public InputStream getRawFile(String projectName, String filePath) {
-        int id = getMetaFile(projectName, filePath).getFile_id();
+        int id = getMetaFile(projectName, filePath).getId();
         return storageService.getFileStream(id);
     }
 
