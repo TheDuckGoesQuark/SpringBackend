@@ -17,12 +17,12 @@ import javax.persistence.*;
 public class UserProject {
 
     @Id
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
 
     @Id
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_name", referencedColumnName = "name")
     private Project project;
 
