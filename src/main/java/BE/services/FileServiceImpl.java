@@ -169,10 +169,11 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public SupportsViewModel supportsView(String project_name, String filePath, String view) {
-        return new SupportsViewModel(getMetaFileFromPath(project_name, filePath)
+        boolean supportsView = getMetaFileFromPath(project_name, filePath)
                 .getSupported_views()
                 .stream()
-                .anyMatch(supportedView -> supportedView.getView().equals(view)));
+                .anyMatch(supportedView -> supportedView.getView().equals(view));
+        return new SupportsViewModel(supportsView);
     }
 
     private MetaFile addTabularInformation(MetaFile metaFile) {

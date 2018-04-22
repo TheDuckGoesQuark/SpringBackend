@@ -99,12 +99,13 @@ public class MetaFileUtil {
     }
 
     public static FileModel getFileModelWithChildren(MetaFile root) {
-        if (!root.getType().equals(FileTypes.DIR)) throw new UnsupportedFileViewException();
         FileModel fileModel = metaFileToFileModel(root);
-        fileModel.setChildren(
-                root.getChildren().stream()
-                        .map(MetaFileUtil::metaFileToFileModel)
-                        .collect(Collectors.toList()));
+        if (root.getChildren() != null) {
+            fileModel.setChildren(
+                    root.getChildren().stream()
+                            .map(MetaFileUtil::metaFileToFileModel)
+                            .collect(Collectors.toList()));
+        }
         return fileModel;
     }
 }
