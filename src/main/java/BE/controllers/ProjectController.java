@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 // Models
+import BE.entities.project.FileTypes;
 import BE.entities.project.SupportedView;
 import BE.models.MetaDataModel;
 import BE.models.file.FileModel;
@@ -32,6 +33,7 @@ import org.apache.log4j.Logger;
 
 // Spring
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -199,7 +201,8 @@ public class ProjectController {
         if (!fileService.supportsView(project_name, relativePath, view).isSupportedView()) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
-                if (includeChildren != null) return fileService.getMetaFileWithChildren(project_name, relativePath);
+                FileModel fileModel = fileService.getMetaFileWithChildren(project_name, relativePath);
+                if (includeChildren != null && fileModel.getType().equals(FileTypes.DIR)) return fileService.getMetaFileWithChildren(project_name, relativePath);
                 else return fileService.getMetaFile(project_name, relativePath);
             case SupportedView.RAW_VIEW:
                 sendFile(fileService.getRawFile(project_name, relativePath), response, MediaType.APPLICATION_JSON_VALUE);
@@ -233,7 +236,8 @@ public class ProjectController {
         if (!fileService.supportsView(project_name, file_id, view).isSupportedView()) throw new UnsupportedFileViewException();
         switch (view) {
             case SupportedView.META_VIEW:
-                if (includeChildren != null) return fileService.getMetaFileWithChildren(file_id);
+                FileModel fileModel = fileService.getMetaFileWithChildren(file_id);
+                if (includeChildren != null && fileModel.getType().equals(FileTypes.DIR)) return fileService.getMetaFileWithChildren(project_name, relativePath);
                 else return fileService.getMetaFile(file_id);
             case SupportedView.RAW_VIEW:
                 sendFile(fileService.getRawFile(file_id), response, MediaType.APPLICATION_OCTET_STREAM_VALUE);
