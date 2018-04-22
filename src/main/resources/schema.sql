@@ -6,6 +6,15 @@ CREATE TABLE IF NOT EXISTS `metadata` (
   PRIMARY KEY (`metadataID`)
 );
 
+CREATE TABLE IF NOT EXISTS `logging` (
+  `component` VARCHAR(15),
+  `level` VARCHAR(15),
+  `value` VARCHAR(15),
+  `username`    VARCHAR(15),
+  `timestamp`  VARCHAR(25),
+  PRIMARY KEY (`value`)
+);
+
 CREATE TABLE IF NOT EXISTS `user` (
   `username` VARCHAR(100) NOT NULL,
   `password` VARCHAR(500) NOT NULL,

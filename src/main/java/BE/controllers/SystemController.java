@@ -4,9 +4,13 @@ import BE.exceptions.NotImplementedException;
 import BE.models.system.LoggingModel;
 import BE.models.system.PropertyModel;
 import BE.models.system.SupportedProtocolListModel;
+import BE.services.SystemService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,6 +27,9 @@ public class SystemController {
             Arrays.asList(REQUIRED_PROTOCOLS)
     );
 
+    @Autowired
+    private SystemService systemService;
+
     /**
      * Gets a list of all supported protocols
      * @return a list of protocols
@@ -34,16 +41,16 @@ public class SystemController {
 
     /**
      * Gets a list of all system logs
-     * @param beforeData
+     * @param beforeDate
      * @param afterDate
      * @param level
      * @return a list of all system logs
      */
     @RequestMapping(value = "/log", method = RequestMethod.GET)
-    public List<LoggingModel> getLogs(@RequestParam(value = "before", required = false) String beforeData,
+    public List<LoggingModel> getLogs(@RequestParam(value = "before", required = false) String beforeDate,
                                       @RequestParam(value = "after", required = false) String afterDate,
-                                      @RequestParam(value = "level", required = false) String level) {
-        throw new NotImplementedException();
+                                      @RequestParam(value = "level", required = false) String level) throws ParseException{
+        return systemService.retrieveLoggings(beforeDate, afterDate, level);
     }
 
     /**
@@ -52,8 +59,9 @@ public class SystemController {
      * @return log
      */
     @RequestMapping(value = "/log", method = RequestMethod.POST)
-    public LoggingModel postLog(@RequestBody LoggingModel loggingModel) {
-        throw new NotImplementedException();
+    public LoggingModel postLog(Principal principal, @RequestBody LoggingModel loggingModel) {
+        String username = principal.getName();
+        return systemService.storeLogging(loggingModel, username);
     }
 
     /**
