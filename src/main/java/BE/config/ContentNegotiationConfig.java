@@ -12,5 +12,4 @@ public class ContentNegotiationConfig extends WebMvcConfigurerAdapter {
         // Turn off suffix-based content negotiation
         configurer.favorPathExtension(false);
     }
-
 }
