@@ -22,7 +22,7 @@ public class JSONErrorAdvisor extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseWrapper> handleGenericException(Exception ex){
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.I_AM_A_TEAPOT)
                 .body(new ErrorResponseWrapper(new GenericInternalServerException(ex)));
     }
 }
