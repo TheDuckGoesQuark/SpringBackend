@@ -7,13 +7,18 @@ import java.util.List;
 // Models
 // Spring
 import BE.exceptions.InvalidRequestStructureException;
+import BE.models.JsonViews;
 import BE.models.user.AvailabilityModel;
 import BE.models.user.PrivilegeModel;
 import BE.models.user.UserModel;
 import BE.services.UserService;
+import org.apache.coyote.Response;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreFilter;
@@ -71,8 +76,13 @@ public class UserController {
      * @return user
      */
     @RequestMapping(value = "/current_user", method = RequestMethod.GET)
-    public UserModel getCurrentUser(Principal principal) {
-        return userService.getUserByUserName(principal.getName());
+    public MappingJacksonValue getCurrentUser(Principal principal) {
+        UserModel user = userService.getUserByUserName(principal.getName());
+        MappingJacksonValue jacksonValue;
+        jacksonValue = new MappingJacksonValue(user);
+        jacksonValue.setSerializationView(JsonViews.CurrentUserView.class);
+
+        return jacksonValue;
     }
 
     /**

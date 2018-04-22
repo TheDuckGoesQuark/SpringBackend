@@ -1,14 +1,17 @@
 package BE.models.user;
 
 import BE.entities.MetaData;
+import BE.models.JsonViews;
 import BE.models.MetaDataModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.CascadeType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import java.util.List;
+
 
 public class UserModel {
 
@@ -21,16 +24,22 @@ public class UserModel {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String email;
 
+
     private List<ProjectListModel> projects;
+
 
     private List<String> privileges;
 
+
     private MetaDataModel public_user_metadata = new MetaDataModel();
 
+    @JsonView(JsonViews.CurrentUserView.class)
     private MetaDataModel private_user_metadata = new MetaDataModel();
+
 
     private MetaDataModel public_admin_metadata = new MetaDataModel();
 
+    @JsonView(JsonViews.AdminView.class)
     private MetaDataModel private_admin_metadata = new MetaDataModel();
 
     protected UserModel() {}
