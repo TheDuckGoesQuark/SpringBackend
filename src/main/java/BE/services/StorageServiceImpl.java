@@ -10,14 +10,27 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Date;
 
 @Service
 public class StorageServiceImpl implements StorageService {
 
-    private final String root_directory;
+    private String root_directory;
+
+    private void createRootDir() {
+        File file = new File(this.root_directory);
+        if (!file.exists()) {
+            file.mkdir();
+        } else if (file.isFile()) {
+            root_directory = "BE5-"+(new Date()).toString()+"-"+root_directory;
+            createRootDir();
+        }
+    }
+
 
     public StorageServiceImpl(@Value("${storage_root_directory:storage}") String root_directory) {
         this.root_directory = root_directory.replaceAll("^.|.$", "") + "/";
+        createRootDir();
     }
 
     /**
