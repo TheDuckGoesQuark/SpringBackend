@@ -6,6 +6,7 @@ import BE.security.tokenAuth.TokenAuthenticationFilter;
 import BE.security.tokenAuth.TokenAuthenticationProvider;
 import BE.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,9 +23,11 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import javax.servlet.Filter;
 
 import javax.sql.DataSource;
+
+import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 @Configuration
 @EnableWebSecurity
@@ -61,6 +64,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return tokenAuthenticationFilter;
     }
 
+    @Bean
+    public FilterRegistrationBean CORSFilterRegistration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(getCORSFilter());
+        registration.addUrlPatterns("*");
+        registration.setName("CORSFilter");
+        registration.setOrder(-1);
+        return registration;
+    }
+
+    public Filter getCORSFilter() {
+        return new CORSFilter();
+    }
+
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -86,6 +103,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                    .cors()
                 .and()
                  .csrf().disable() // disable CSRF for this application
                 .formLogin() // Using form based login instead of Basic Authentication

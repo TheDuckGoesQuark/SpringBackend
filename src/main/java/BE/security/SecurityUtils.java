@@ -16,7 +16,7 @@ public class SecurityUtils {
     public static final String TOKEN_BEARER_STRING_FOR_APPENDING = "Bearer ";
 
     public static void validateRequestStructure(String username, String password, String grant_type, String refresh_token) {
-        // Check grant type is supplied
+        // Check grant type is suppliedvalidateRequestStructure
         if (grant_type == null)
             throw new AuthenticationException(NO_GRANT_TYPE_ERROR_MESSAGE, AuthenticationFailureType.INVALID_REQUEST);
 

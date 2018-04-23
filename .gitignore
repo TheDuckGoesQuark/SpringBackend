@@ -3,7 +3,7 @@
 *.iws
 workspace.xml
 tasks.xml
-
+target/
 *.class
 
 # Log metaFile

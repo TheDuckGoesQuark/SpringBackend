@@ -129,19 +129,18 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileModel getMetaFileWithChildren(String projectName, String filePath) {
-        MetaFile root = fileRepository.findByFileId(projectService.getProjectRootDirId(projectName));
-        return getFileModelWithChildren(root);
+        return getFileModelWithChildren(getMetaFileFromPath(projectName, filePath));
     }
 
     @Override
     public FileModel getMetaFileWithChildren(int file_id) {
-        MetaFile root = fileRepository.findByFileId(file_id);
-        return getFileModelWithChildren(root);
+        MetaFile dir = fileRepository.findByFileId(file_id);
+        return getFileModelWithChildren(dir);
     }
 
     @Override
     public InputStream getRawFile(String projectName, String filePath) {
-        int id = getMetaFile(projectName, filePath).getFile_id();
+        int id = getMetaFile(projectName, filePath).getId();
         return storageService.getFileStream(id);
     }
 
@@ -170,10 +169,11 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public SupportsViewModel supportsView(String project_name, String filePath, String view) {
-        return new SupportsViewModel(getMetaFileFromPath(project_name, filePath)
+        boolean supportsView = getMetaFileFromPath(project_name, filePath)
                 .getSupported_views()
                 .stream()
-                .anyMatch(supportedView -> supportedView.getView().equals(view)));
+                .anyMatch(supportedView -> supportedView.getView().equals(view));
+        return new SupportsViewModel(supportsView);
     }
 
     private MetaFile addTabularInformation(MetaFile metaFile) {
