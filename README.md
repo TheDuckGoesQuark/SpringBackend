@@ -58,28 +58,179 @@ To see examples of how to use the API.
 
 ### src/
 BE package includes all source files for back end.
+
 #### advices/
 Classes for intercepting method calls to other classes. Used to wrap error and success responses 
-according to protocol
+according to protocol.
+###### ErrorResponseWrapper/
+A response wrapper for errors and exceptions with http requests.
+###### JSONAdvisor/
+Serialises the response to JSON, structures the response in expected format.
+###### JSONErrorAdvisor/
+Final call before serialising response to JSON.
+###### ResponseWrapper/
+The response wrapper itself.
+
 #### aspects/
 Classes for monitoring method calls. Used for performance monitoring by timing method execution.
+###### TimerAspect/
+This contains performance tracking for controllers (logging).
+
+#### config/
+Configuration classes for starting up the application itself.
+###### ApplicationStartup/
+This adds userModels to the database for startup functionality.
+###### ContentNegotiationConfig/
+This ensures that the right file paths are taken in accordance with file extensions.
+
+
 #### controllers/
 REST Controller classes, which maps URLS to the corresponding service call, and extracts any data
 from the request body.
+###### AccessRight/
+A class for storing the REGULAR and ADMIN strings in regards to access level
+###### Action/
+A class for initialising strings in regards to actions with requests.
+###### MediaType/
+A class for setting up the mediaType structures expected.
+###### ProjectController/
+This is the where all project and file http requests are handled.
+###### SystemController
+This is where logging for http requests are handled.
+###### UserController/
+This is where all user http requests are handled.
+
 #### entities/
 Hibernate entities for ORM from database. Different to 'models' which are used for transforming 
 these entities into the requested structure for the controllers.
+##### project/
+Containing the classes to do with the project structure.
+###### tabular/
+A folder containing two classes for the header and row count.
+###### FileStatus/
+A class for initialising strings for the file status
+###### FileTypes/
+A class for initialising strings for the file types
+###### MetaFile/
+Initialising a MetaFile object which is able to create files and directories.
+###### Project/
+A class for initialising a Project object.
+###### Role/
+Initialising the Role object.
+###### SupportedView/
+A class for initialising the SupportedView object.
+##### security/
+The security token for bearer authentication.
+###### Token/
+The class for the token itself used to authenticate the user.
+##### user/
+A folder containing classes for the the user properties.
+###### MetaData/
+The user's metadata.
+###### UserProject/
+Projects the user is involved in.
+###### UserProjectPK/
+The IDClass for UserProject class
+
 #### exceptions/
 All exceptions extend base exception class, and contain the fields required by the Error response wrapper. 
+
+#### models/
+Classes for mapping entities to expected response models and the reverse.
+##### files/
+###### supportedviewinfoobjects/
+A number of classes that contain objects relevant for SupportedView
+###### FileModel/
+The FileModel object class.
+###### FileRequestOptions/
+A class for uploading and downloading files.
+###### MoveFileRequestModel/
+A class for the implementation of moving files.
+###### SupportsViewModel/
+The SupportsViewModel object class.
+##### project/
+A folder containing classes on the ProjectModel, the ProjectRoleModel, and the UserListModel.
+##### security/
+A folder containing classes on the TokenHeaderModel, the TokenModel, and the TokenRequest.
+##### system/
+A folder containing classes on the LoggingModel, the PropertyModel, and the SupportedProtocolListModel.
+##### user/
+A folder containing classes on the AvailabilityModel, the PrivilegeModel, the ProjectListModel and the UserModel.
+###### JsonViews/
+A class for the interface in regards to User/Admin/CurrentUser views.
+###### MetaDataModel/
+A class for the MetaDataModel object.
+
 #### repositories/
 Repositories provide an interface into the DB, and simplify requests.
-#### responsemodels/
-Classes for mapping entities to expected response models and the reverse.
+###### ColumnHeaderRepository/
+The interface for the column header.
+###### FileRepository/
+The interface for handling files.
+###### PrivilegeRepository/
+The interface for changing a users privilege.
+###### ProjectRepository/
+The interface projects.
+###### RoleRepository/
+The interface for roles.
+###### SupportedViewRepository/
+The interface for upportedView.
+###### TokenRepository/
+The interface for handling tokens.
+###### UserProjectRepository/
+The interface for handling user projects.
+###### UserRepository/
+The interface for handling users.
+
 #### security/
 Package contains custom implemenation of Spring Security interfaces, implementing a simple JWT system.
+##### enums/
+A folder containing the enums of AutheticanFailureType(s), GrantTypes, as well as initialising privilege strings.
+##### handlers/
+A folder containing handlers for 'AccessDenied', 'LoginFailure' as well as 'LoginSuccessful'.
+##### passwordAuth/
+A folder containing classes to handle authentication of the username and password.
+##### passwordHash/
+This is for hashing the password of the user.
+##### tokenAuth/
+A folder containing classes to handle tokens for authentication.
+###### AuthenticationEntryPoint/
+A class to commence the authetication request.
+###### CORSFilter/
+This is for internal filtering of the authentication request.
+###### SecurityConfig/
+This is the set up of the security authentication handling.
+###### SecurityUtils/
+A class with extra utility strings and functions for use with security.
+###### UserAdapter/
+A class for handling the user's details in conjunction with security.
+
 #### services/
 Services remove business logic from controllers, and provide the actual implementation and
-an interface for the controllers.     
+an interface for the controllers.
+###### FileService/
+An interface for providing methods for retrieving project files.
+###### FileServiceImpl/
+The implementation of FileService.
+###### ProjectService/
+An interface for handling and retrieving Projects.
+###### ProjectServiceImpl/
+The implementation of ProjectService.
+###### StorageService/
+An interface for the storage and distribution of files.
+###### StorageServiceImpl/
+The implementation of StorageService.
+###### TokenService/
+An interface for handling tokens and retrieving user's by token Id.
+###### TokenServiceImpl/
+The implementation of TokenService.
+###### UserService/
+An interface for handling users.
+###### UserServiceImpl/
+The implementation of UserService.
+
+#### util/
+Utility classes for Tabular parser, as well as metafiles.
 #### resources/
 Contains properties and other static files such as database connection details.
 #### test/
