@@ -71,10 +71,14 @@ Final call before serialising response to JSON.
 ###### ResponseWrapper
 The response wrapper itself.
 
+
+
 #### aspects/
 Classes for monitoring method calls. Used for performance monitoring by timing method execution.
 ###### TimerAspect
 This contains performance tracking for controllers (logging).
+
+
 
 #### config/
 Configuration classes for starting up the application itself.
@@ -82,6 +86,8 @@ Configuration classes for starting up the application itself.
 This adds userModels to the database for startup functionality.
 ###### ContentNegotiationConfig
 This ensures that the right file paths are taken in accordance with file extensions.
+
+
 
 
 #### controllers/
@@ -99,6 +105,8 @@ This is the where all project and file http requests are handled.
 This is where logging for http requests are handled.
 ###### UserController
 This is where all user http requests are handled.
+
+
 
 #### entities/
 Hibernate entities for ORM from database. Different to 'models' which are used for transforming 
@@ -132,8 +140,12 @@ Projects the user is involved in.
 ###### UserProjectPK
 The IDClass for UserProject class
 
+
+
 #### exceptions/
 All exceptions extend base exception class, and contain the fields required by the Error response wrapper. 
+
+
 
 #### models/
 Classes for mapping entities to expected response models and the reverse.
@@ -161,6 +173,8 @@ A class for the interface in regards to User/Admin/CurrentUser views.
 ###### MetaDataModel
 A class for the MetaDataModel object.
 
+
+
 #### repositories/
 Repositories provide an interface into the DB, and simplify requests.
 ###### ColumnHeaderRepository
@@ -181,6 +195,8 @@ The interface for handling tokens.
 The interface for handling user projects.
 ###### UserRepository
 The interface for handling users.
+
+
 
 #### security/
 Package contains custom implemenation of Spring Security interfaces, implementing a simple JWT system.
@@ -204,6 +220,8 @@ This is the set up of the security authentication handling.
 A class with extra utility strings and functions for use with security.
 ###### UserAdapter
 A class for handling the user's details in conjunction with security.
+
+
 
 #### services/
 Services remove business logic from controllers, and provide the actual implementation and
@@ -229,12 +247,20 @@ An interface for handling users.
 ###### UserServiceImpl
 The implementation of UserService.
 
+
+
 #### util/
 Utility classes for Tabular parser, as well as metafiles.
+
+
 #### resources/
 Contains properties and other static files such as database connection details.
+
+
 #### test/
 Contains tests for various parts of the server.
+
+
 
 ## Running the tests
 
