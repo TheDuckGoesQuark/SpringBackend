@@ -62,42 +62,42 @@ BE package includes all source files for back end.
 #### advices/
 Classes for intercepting method calls to other classes. Used to wrap error and success responses 
 according to protocol.
-###### ErrorResponseWrapper/
+###### ErrorResponseWrapper
 A response wrapper for errors and exceptions with http requests.
-###### JSONAdvisor/
+###### JSONAdvisor
 Serialises the response to JSON, structures the response in expected format.
-###### JSONErrorAdvisor/
+###### JSONErrorAdvisor
 Final call before serialising response to JSON.
-###### ResponseWrapper/
+###### ResponseWrapper
 The response wrapper itself.
 
 #### aspects/
 Classes for monitoring method calls. Used for performance monitoring by timing method execution.
-###### TimerAspect/
+###### TimerAspect
 This contains performance tracking for controllers (logging).
 
 #### config/
 Configuration classes for starting up the application itself.
-###### ApplicationStartup/
+###### ApplicationStartup
 This adds userModels to the database for startup functionality.
-###### ContentNegotiationConfig/
+###### ContentNegotiationConfig
 This ensures that the right file paths are taken in accordance with file extensions.
 
 
 #### controllers/
 REST Controller classes, which maps URLS to the corresponding service call, and extracts any data
 from the request body.
-###### AccessRight/
+###### AccessRight
 A class for storing the REGULAR and ADMIN strings in regards to access level
-###### Action/
+###### Action
 A class for initialising strings in regards to actions with requests.
-###### MediaType/
+###### MediaType
 A class for setting up the mediaType structures expected.
-###### ProjectController/
+###### ProjectController
 This is the where all project and file http requests are handled.
 ###### SystemController
 This is where logging for http requests are handled.
-###### UserController/
+###### UserController
 This is where all user http requests are handled.
 
 #### entities/
@@ -107,29 +107,29 @@ these entities into the requested structure for the controllers.
 Containing the classes to do with the project structure.
 ###### tabular/
 A folder containing two classes for the header and row count.
-###### FileStatus/
+###### FileStatus
 A class for initialising strings for the file status
-###### FileTypes/
+###### FileTypes
 A class for initialising strings for the file types
-###### MetaFile/
+###### MetaFile
 Initialising a MetaFile object which is able to create files and directories.
-###### Project/
+###### Project
 A class for initialising a Project object.
-###### Role/
+###### Role
 Initialising the Role object.
-###### SupportedView/
+###### SupportedView
 A class for initialising the SupportedView object.
-##### security/
+##### Security
 The security token for bearer authentication.
-###### Token/
+###### Token
 The class for the token itself used to authenticate the user.
 ##### user/
 A folder containing classes for the the user properties.
-###### MetaData/
+###### MetaData
 The user's metadata.
-###### UserProject/
+###### UserProject
 Projects the user is involved in.
-###### UserProjectPK/
+###### UserProjectPK
 The IDClass for UserProject class
 
 #### exceptions/
@@ -140,13 +140,13 @@ Classes for mapping entities to expected response models and the reverse.
 ##### files/
 ###### supportedviewinfoobjects/
 A number of classes that contain objects relevant for SupportedView
-###### FileModel/
+###### FileModel
 The FileModel object class.
-###### FileRequestOptions/
+###### FileRequestOptions
 A class for uploading and downloading files.
-###### MoveFileRequestModel/
+###### MoveFileRequestModel
 A class for the implementation of moving files.
-###### SupportsViewModel/
+###### SupportsViewModel
 The SupportsViewModel object class.
 ##### project/
 A folder containing classes on the ProjectModel, the ProjectRoleModel, and the UserListModel.
@@ -156,30 +156,30 @@ A folder containing classes on the TokenHeaderModel, the TokenModel, and the Tok
 A folder containing classes on the LoggingModel, the PropertyModel, and the SupportedProtocolListModel.
 ##### user/
 A folder containing classes on the AvailabilityModel, the PrivilegeModel, the ProjectListModel and the UserModel.
-###### JsonViews/
+###### JsonViews
 A class for the interface in regards to User/Admin/CurrentUser views.
-###### MetaDataModel/
+###### MetaDataModel
 A class for the MetaDataModel object.
 
 #### repositories/
 Repositories provide an interface into the DB, and simplify requests.
-###### ColumnHeaderRepository/
+###### ColumnHeaderRepository
 The interface for the column header.
-###### FileRepository/
+###### FileRepository
 The interface for handling files.
-###### PrivilegeRepository/
+###### PrivilegeRepository
 The interface for changing a users privilege.
-###### ProjectRepository/
+###### ProjectRepository
 The interface projects.
-###### RoleRepository/
+###### RoleRepository
 The interface for roles.
-###### SupportedViewRepository/
+###### SupportedViewRepository
 The interface for upportedView.
-###### TokenRepository/
+###### TokenRepository
 The interface for handling tokens.
-###### UserProjectRepository/
+###### UserProjectRepository
 The interface for handling user projects.
-###### UserRepository/
+###### UserRepository
 The interface for handling users.
 
 #### security/
@@ -194,39 +194,39 @@ A folder containing classes to handle authentication of the username and passwor
 This is for hashing the password of the user.
 ##### tokenAuth/
 A folder containing classes to handle tokens for authentication.
-###### AuthenticationEntryPoint/
+###### AuthenticationEntryPoint
 A class to commence the authetication request.
-###### CORSFilter/
+###### CORSFilter
 This is for internal filtering of the authentication request.
-###### SecurityConfig/
+###### SecurityConfig
 This is the set up of the security authentication handling.
-###### SecurityUtils/
+###### SecurityUtils
 A class with extra utility strings and functions for use with security.
-###### UserAdapter/
+###### UserAdapter
 A class for handling the user's details in conjunction with security.
 
 #### services/
 Services remove business logic from controllers, and provide the actual implementation and
 an interface for the controllers.
-###### FileService/
+###### FileService
 An interface for providing methods for retrieving project files.
-###### FileServiceImpl/
+###### FileServiceImpl
 The implementation of FileService.
-###### ProjectService/
+###### ProjectService
 An interface for handling and retrieving Projects.
-###### ProjectServiceImpl/
+###### ProjectServiceImpl
 The implementation of ProjectService.
-###### StorageService/
+###### StorageService
 An interface for the storage and distribution of files.
-###### StorageServiceImpl/
+###### StorageServiceImpl
 The implementation of StorageService.
-###### TokenService/
+###### TokenService
 An interface for handling tokens and retrieving user's by token Id.
-###### TokenServiceImpl/
+###### TokenServiceImpl
 The implementation of TokenService.
-###### UserService/
+###### UserService
 An interface for handling users.
-###### UserServiceImpl/
+###### UserServiceImpl
 The implementation of UserService.
 
 #### util/
