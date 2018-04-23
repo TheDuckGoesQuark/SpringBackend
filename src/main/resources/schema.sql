@@ -7,12 +7,20 @@ CREATE TABLE IF NOT EXISTS `metadata` (
 );
 
 CREATE TABLE IF NOT EXISTS `logging` (
-  `component` VARCHAR(15),
-  `level` VARCHAR(15),
-  `value` VARCHAR(15),
-  `username`    VARCHAR(15),
-  `timestamp`  VARCHAR(25),
+  `component` VARCHAR(15) NOT NULL,
+  `level` VARCHAR(15) NOT NULL,
+  `value` VARCHAR(15) NOT NULL,
+  `username`    VARCHAR(15) NOT NULL,
+  `timestamp`  VARCHAR(25) NOT NULL,
   PRIMARY KEY (`value`)
+);
+
+CREATE TABLE IF NOT EXISTS `property` (
+  `id` VARCHAR(15) NOT NULL,
+  `readonly` BOOL NOT NULL,
+  `type` VARCHAR(15),
+  `value`    VARCHAR(15),
+  PRIMARY KEY (`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `user` (

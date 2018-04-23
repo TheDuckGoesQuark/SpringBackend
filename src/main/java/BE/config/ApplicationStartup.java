@@ -2,9 +2,11 @@ package BE.config;
 
 import BE.entities.project.SupportedView;
 import BE.models.MetaDataModel;
+import BE.models.system.PropertyModel;
 import BE.models.user.UserModel;
 import BE.repositories.SupportedViewRepository;
 import BE.security.enums.Privileges;
+import BE.services.SystemService;
 import BE.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -17,12 +19,16 @@ import java.util.Arrays;
 public class ApplicationStartup
         implements ApplicationListener<ApplicationReadyEvent> {
 
-    final
+    private final
     UserService userService;
 
+    private final
+    SystemService systemService;
+
     @Autowired
-    public ApplicationStartup(UserService userService) {
+    public ApplicationStartup(UserService userService, SystemService systemService) {
         this.userService = userService;
+        this.systemService = systemService;
     }
 
     /**
@@ -41,6 +47,14 @@ public class ApplicationStartup
         if (!userService.usernameExists("admin1")) {
             UserModel adminModel = new UserModel("admin1", "password1", "email", null, Arrays.asList(adminPrivileges));
             userService.createUser(adminModel);
+        }
+        if (!systemService.propertyExists("0001")) {
+            PropertyModel propertyModel1 = new PropertyModel("0001", true, "string", "readonly ex");
+            systemService.createProperty(propertyModel1);
+        }
+        if (!systemService.propertyExists("0002")) {
+            PropertyModel propertyModel2 = new PropertyModel("0002", false, "string", "editable ex");
+            systemService.createProperty(propertyModel2);
         }
     }
 }

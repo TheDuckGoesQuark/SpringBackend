@@ -70,7 +70,7 @@ public class SystemController {
      */
     @RequestMapping(value = "/properties", method = RequestMethod.GET)
     public List<PropertyModel> getProperties() {
-        throw new NotImplementedException();
+        return systemService.getProperties();
     }
 
     /**
@@ -80,7 +80,7 @@ public class SystemController {
      */
     @RequestMapping(value = "/properties", params = {"action="+Action.UPDATE}, method = RequestMethod.POST)
     public PropertyModel updateProperties(@RequestBody PropertyModel propertyModel) {
-        throw new NotImplementedException();
+        return systemService.updateProperties(propertyModel);
     }
 
 }
