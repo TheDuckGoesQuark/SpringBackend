@@ -32,7 +32,6 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    // Produces swagger documentation at http://localhost:8080/swagger-ui.html
     @Bean
     public Docket newsApi() {
         return new Docket(DocumentationType.SWAGGER_2)

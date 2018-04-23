@@ -1,9 +1,9 @@
 # Junior Honours Project
 
-A back end for the JH project_name, providing metaFile storage, image processing, and username permissions and groups.
+A back end for the JH project, providing metaFile storage, image processing, and username permissions and groups.
 ## Getting Started
 
-These instructions will get you a copy of the project_name up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project_name on a live system.
+These instructions will get you a copy of the Started up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project_name on a live system.
 
 ### Prerequisites
 
