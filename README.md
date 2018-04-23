@@ -269,18 +269,21 @@ To run all tests, run the following command from the root directory of the proje
 mvn test
 ```
 
-### Break down into end to end tests
+### Postman tests
 
-Explain what these tests test and why
+Import the below to Postman (in Chrome App, Authorization header will need to be configured for every test)
 
-```
-Give an example
-```
+Test uses https://jm354.host.cs.st-andrews.ac.uk/BE5/ as the back end base URL.
+
+[Postman Collection](https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.getpostman.com%2Fcollections%2Ff77ddedf7ecc1b6cedf9&h=ATMy3Bax_7CQgKTrEoUFFg9BN3X1STa2drDVLg6q_3y7_2qWMT9i_XyI9H1X0aOiBMj2zpMtnJ3jIDeLx20m5mkuHIsKdvhHJ-DTPRz1tk8)
+
 
 ## Deployment
 
 For deployment, the database connection details will have to be confirmed. These can be found
 in resource/application.properties.
+
+The nginx configuration is also included with the source (see nginx_conf), which redirects requests to port 8080.
 
 
 ## Built With
@@ -308,3 +311,4 @@ We used [Gitlab](https://gitlab.cs.st-andrews.ac.uk/) for VC. For the versions a
 * Susmit Sarkar for supervising and helping us with the project.
 * The many contributors to the huge [Baeldung](http://www.baeldung.com/) collection of Spring tutorials.
 * Anil KC for a [thorough guide on custom spring security for rest services.](http://anilkc.me/securing-spring-based-rest-services-spring-security/)
+* rtw43 (Ryan) for authoring a very clear protocol, and helping the group with so many nginx configuration issues.
